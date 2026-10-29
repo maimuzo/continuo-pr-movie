@@ -301,6 +301,27 @@ export const script = {
 
 **X が受け付ける上限（長さ・容量・解像度）は、Phase 0 で X のヘルプを見て確かめる。**15秒・1080p なら上限に届かない見込みだが、まだ確かめていない。
 
+### 公開の置き場所
+
+**言いたいこと。**できあがった10本の mp4 は、GitHub の release に置く。README.md で再生させる動画は、別に issue のコメント欄から上げ、できた `https://github.com/user-attachments/assets/…` の URL を README.md に1行で書く（2026-10-29 に人間が決めた）。
+
+| 置き場所 | 何のためか | 誰がいつ、どう置くか |
+| --- | --- | --- |
+| release（タグ `videos-v1`） | 10本の元の mp4 をまとめて配る | 人間が10本を確定したあと、AI が `gh release create videos-v1 out/*.mp4 --title "機能紹介動画 10本"` で作る |
+| issue のコメント欄 | README.md の中で再生させる URL を作る | 同じときに、AI が Claude in Chrome で mp4 をコメント欄へ上げ、できた URL を README.md に書く |
+
+README.md に書く形は次のとおり。URL を1行だけ置くと、GitHub が再生ボタン付きの動画にする。
+
+```markdown
+### 置くだけで、始まる
+
+https://github.com/user-attachments/assets/<上げたときにできる id>
+```
+
+**release の URL を README.md で再生させる案は採らない。**GitHub の描画 API（`gh api -X POST markdown -f mode=gfm`）に通すと、release を指す `<video>` は中身の無い `<p dir="auto"></p>` になり、URL を1行で書くとただのリンクになった。release のファイルは `content-disposition: attachment` で返るので、押すとダウンロードになる。github.com の CSP の media-src にも、release の転送先 `release-assets.githubusercontent.com` が入っていない（いずれも 2026-10-29 に測った）。
+
+**mp4 をリポジトリに commit する案も採らない。**README.md から相対パスで指しても再生されず、git の履歴に10本ぶんの動画が残り続ける。
+
 **投稿は人間が行う。**AI は投稿しない。投稿文の下書き（題・1〜2行の説明・ハッシュタグ）は `out/<id>/post.txt` に書いて渡す。
 
 ---

@@ -1,81 +1,90 @@
 import React from "react";
-import { interpolate, spring, useCurrentFrame, useVideoConfig } from "remotion";
+import { spring, useCurrentFrame, useVideoConfig } from "remotion";
 import { theme } from "../../theme";
 
-const clamp = { extrapolateLeft: "clamp", extrapolateRight: "clamp" } as const;
 const INK = theme.color.ink;
 
-// 指示の紙に描く記号。文字を使わず、矢印・チェック・足す・行の4つで「次はこれ」を表す
-export type SlipKind = "arrow" | "check" | "plus" | "lines";
-
-const SlipIcon: React.FC<{ kind: SlipKind }> = ({ kind }) => {
-  switch (kind) {
-    case "arrow":
-      return <path d="M22 40 H62 M50 26 L64 40 L50 54" fill="none" stroke={theme.color.cardTag} strokeWidth={9} strokeLinecap="round" strokeLinejoin="round" />;
-    case "check":
-      return <path d="M24 40 L38 54 L62 26" fill="none" stroke="#3E9B4F" strokeWidth={10} strokeLinecap="round" strokeLinejoin="round" />;
-    case "plus":
-      return <path d="M43 20 V60 M23 40 H63" fill="none" stroke="#E0554A" strokeWidth={10} strokeLinecap="round" />;
-    default:
-      return (
-        <g stroke="#8A8278" strokeWidth={8} strokeLinecap="round">
-          <line x1={22} y1={28} x2={64} y2={28} />
-          <line x1={22} y1={42} x2={56} y2={42} />
-          <line x1={22} y1={56} x2={46} y2={56} />
-        </g>
-      );
-  }
-};
-
-// コンティがメガホンで飛ばす指示の紙。(x, y) は真ん中
-export const InstructionSlip: React.FC<{ x: number; y: number; kind: SlipKind; scale?: number; rotate?: number; opacity?: number }> = ({
+// issue のコメント1つ。頭に書いた人の丸（色で誰かを示す）と名前の線、本文の2行。文字は書かない。
+// (x, y) は真ん中。color は書いた人の色（開発者は紺、Claude Code はテラコッタ）
+export const COMMENT_SIZE = { w: 150, h: 96 };
+export const CommentCard: React.FC<{ x: number; y: number; color: string; scale?: number; rotate?: number; opacity?: number }> = ({
   x,
   y,
-  kind,
+  color,
   scale = 1,
   rotate = 0,
   opacity = 1,
 }) => (
   <svg
-    width={86}
-    height={80}
-    viewBox="0 0 86 80"
-    style={{ position: "absolute", left: x - 43, top: y - 40, transform: `scale(${scale}) rotate(${rotate}deg)`, opacity }}
+    width={COMMENT_SIZE.w}
+    height={COMMENT_SIZE.h}
+    viewBox="0 0 150 96"
+    style={{ position: "absolute", left: x - 75, top: y - 48, transform: `scale(${scale}) rotate(${rotate}deg)`, opacity, overflow: "visible" }}
   >
-    <rect x={4} y={4} width={78} height={72} rx={12} fill="#FFFFFF" stroke={INK} strokeWidth={5} />
-    <SlipIcon kind={kind} />
+    <rect x={3} y={3} width={144} height={90} rx={12} fill="#FFFFFF" stroke={INK} strokeWidth={5} />
+    <path d="M3 34 H147" stroke={INK} strokeWidth={3} />
+    <path d="M15 3 H135 A12 12 0 0 1 147 15 V34 H3 V15 A12 12 0 0 1 15 3 Z" fill="#F1EBE0" stroke={INK} strokeWidth={5} strokeLinejoin="round" />
+    <circle cx={22} cy={19} r={9} fill={color} stroke={INK} strokeWidth={3} />
+    <rect x={38} y={14} width={52} height={10} rx={5} fill="#8A8278" />
+    <rect x={16} y={48} width={112} height={10} rx={5} fill="#B8B0A4" />
+    <rect x={16} y={68} width={74} height={10} rx={5} fill="#B8B0A4" />
   </svg>
 );
 
-// メガホンの口から出る音の弧。出た瞬間に広がって消える
-export const SoundArcs: React.FC<{ x: number; y: number }> = ({ x, y }) => {
+// 絡まったコメントの山。tangle が 1 のとき、コメントが傾いて重なり、上に黒い糸がぐしゃぐしゃに絡む。
+// tangle が 0 に近づくと糸が消え、コメントが縦にきれいに並ぶ。shown は見えているコメントの数（降ってくる途中を描くため）。
+// (x, y) は山の真ん中
+const PILE = [
+  { dx: -46, dy: 30, r: -18, who: 0 },
+  { dx: 40, dy: 22, r: 14, who: 1 },
+  { dx: -10, dy: -10, r: 8, who: 0 },
+  { dx: 54, dy: -30, r: -22, who: 1 },
+  { dx: -58, dy: -40, r: 26, who: 0 },
+  { dx: 6, dy: -62, r: -10, who: 1 },
+];
+export const PILE_COLORS = ["#2D3E66", "#D97757"];
+export const CommentPile: React.FC<{ x: number; y: number; tangle: number; shown?: number; scale?: number }> = ({
+  x,
+  y,
+  tangle,
+  shown = PILE.length,
+  scale = 1,
+}) => {
   const f = useCurrentFrame();
-  const grow = interpolate(f, [0, 8], [0.7, 1.15], clamp);
-  const o = interpolate(f, [0, 2, 10], [0, 1, 0], clamp);
+  const wobble = Math.sin(f / 3) * 3 * tangle;
   return (
-    <svg width={140} height={180} style={{ position: "absolute", left: x, top: y - 90, opacity: o, transform: `scale(${grow})`, transformOrigin: "0 50%" }}>
-      {[0, 1, 2].map((i) => (
-        <path key={i} d={`M${20 + i * 34} ${50 - i * 18} Q ${50 + i * 40} 90 ${20 + i * 34} ${130 + i * 18}`} fill="none" stroke={INK} strokeWidth={7} strokeLinecap="round" />
-      ))}
-    </svg>
-  );
-};
-
-// チャックを閉めた印。ジグザグの線が左から右へ走る
-export const ZipMark: React.FC<{ x: number; y: number }> = ({ x, y }) => {
-  const f = useCurrentFrame();
-  const w = interpolate(f, [0, 8], [0, 1], clamp);
-  const o = interpolate(f, [8, 16], [1, 0], clamp);
-  const pts = Array.from({ length: 9 }, (_, i) => `${i * 15},${i % 2 === 0 ? 0 : 14}`).join(" ");
-  return (
-    <svg width={140} height={30} style={{ position: "absolute", left: x, top: y, opacity: o }}>
-      <defs>
-        <clipPath id="zipclip">
-          <rect x={0} y={-5} width={140 * w} height={40} />
-        </clipPath>
-      </defs>
-      <polyline points={pts} transform="translate(6 8)" fill="none" stroke={theme.color.highlight} strokeWidth={6} strokeLinejoin="round" clipPath="url(#zipclip)" />
-    </svg>
+    <div style={{ position: "absolute", left: x, top: y, transform: `scale(${scale})`, transformOrigin: "0 0" }}>
+      {PILE.slice(0, Math.ceil(shown)).map((c, i) => {
+        // ほどけると、左右2列に3つずつきれいに並ぶ
+        const neat = { dx: (i % 2 === 0 ? -1 : 1) * 82, dy: -70 + Math.floor(i / 2) * 70, r: 0 };
+        const k = tangle;
+        const drop = Math.min(1, shown - i);
+        return (
+          <CommentCard
+            key={i}
+            x={neat.dx + (c.dx - neat.dx) * k + wobble * (i % 2 ? 1 : -1)}
+            y={neat.dy + (c.dy - neat.dy) * k - (1 - drop) * 160}
+            rotate={c.r * k}
+            color={PILE_COLORS[c.who]}
+            scale={0.9}
+            opacity={drop}
+          />
+        );
+      })}
+      {tangle > 0.02 ? (
+        <svg width={360} height={300} viewBox="-180 -150 360 300" style={{ position: "absolute", left: -180, top: -150, opacity: Math.min(1, tangle * 1.4), overflow: "visible" }}>
+          <path
+            d="M-130 -20 C -60 -120, 40 60, 110 -40 S 20 110, -70 40 S -40 -110, 60 -90 S 140 60, 30 70 S -150 60, -110 -60 S 80 -20, 130 30"
+            fill="none"
+            stroke={INK}
+            strokeWidth={6}
+            strokeLinecap="round"
+            strokeDasharray={1400}
+            strokeDashoffset={1400 * (1 - Math.min(1, tangle))}
+          />
+        </svg>
+      ) : null}
+    </div>
   );
 };
 

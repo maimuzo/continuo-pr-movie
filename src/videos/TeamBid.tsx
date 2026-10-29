@@ -1,5 +1,5 @@
 import React from "react";
-import { AbsoluteFill, Audio, Easing, Img, interpolate, Sequence, staticFile, useCurrentFrame } from "remotion";
+import { AbsoluteFill, Audio, Easing, interpolate, Sequence, staticFile, useCurrentFrame } from "remotion";
 import { Caption } from "../components/Caption";
 import { Exclamation, Sparkle, SpeedLines, Sweat } from "../components/Effects";
 import { IssueCard } from "../components/IssueCard";
@@ -8,13 +8,14 @@ import { NameTag } from "../components/NameTag";
 import { Sprite } from "../components/Sprite";
 import { TitleCard } from "../components/TitleCard";
 import { sec, theme } from "../theme";
-import { Battery } from "./team_bid/Battery";
+import { BAT_TOP, BatteryRow, Desk, deskXs, DESK, HEAD_TOP, KB, Room, ROBOT_BASE, ROBOT_H, robotCxOf } from "./team_bid/TeamRoom";
 import { EndCardLines } from "./team_bid/EndCardLines";
 import { script } from "./team_bid.script";
 
 // チームで入札の回。1つの部屋のカットだけで通す（カメラは動かさない）。
 // 上に共有のカンバン、下にメンバーの机3つと Claude Code 3体、コンティは1頭。
-// 残りの枠を持つのは Claude Code なので、％は各 Claude Code の頭の上の燃料計に出す。
+// レートリミットの余裕を持つのは Claude Code なので、余裕値の％は各 Claude Code の頭の上の電池に出す。
+// 部屋・机・電池の構図は ./team_bid/TeamRoom.tsx にあり、寝て待つ回でも使い回す。
 // 時刻はすべて動画の頭からの秒で書く。座標は 1080×1080 の画面の座標
 
 const clamp = { extrapolateLeft: "clamp", extrapolateRight: "clamp" } as const;
@@ -27,22 +28,16 @@ const ramp = (t: number, a: number, b: number) => interpolate(t, [a, b], [0, 1],
 const bumpAt = (t: number, a: number, len = 0.3) => interpolate(t, [a, a + 0.06, a + len], [0, 1, 0], clamp);
 
 // ---- 配置 ----
-const KB = { x: 202, y: 36 }; // カンバン（等倍、676×300）
 const slotOf = (col: number, i: number) => ({ x: KB.x + cardSlot(col).x, y: KB.y + cardSlot(col).y + i * 34 });
-const DESK = { w: 330, top: 735 };
-const DESK_X = [20, 375, 730];
-const ROBOT_H = 300;
-const ROBOT_BASE = 862; // 足もとは机の板の後ろに隠れる
-const robotCx = (i: number) => DESK_X[i] + DESK.w / 2 + 30; // 机の左のモニターを避けて、少し右に座る
-const HEAD_TOP = ROBOT_BASE - ROBOT_H + 8;
-const BAT_TOP = 472; // 燃料計の上辺。数字はその上に出る
+const DESK_X = deskXs(3); // 20・375・730
+const robotCx = (i: number) => robotCxOf(DESK_X[i]);
 const stackSpot = (i: number, k: number) => ({ x: DESK_X[i] + DESK.w - 62, y: 792 - k * 12 }); // 机の右に積む、受け取ったカード
 const WHALE_H = 150;
 const IDLE = { x: 205, y: 330 }; // コンティが待つ位置（カンバンの左）。カードを持つヒレの先の位置で表す
 
-// ---- 入札の回ごとの時刻と、燃料の動き ----
-// 新しいカードが Ready に出る（t0）→ 3体の燃料計に％が浮かぶ（bid）→ いちばん大きい机が光る（win）
-// → コンティがカードを取り（grab）、運び（lift→drop）、受け取った机の燃料が減る（drop→drainEnd）
+// ---- 入札の回ごとの時刻と、レートリミットの余裕値の動き ----
+// 新しいカードが Ready に出る（t0）→ 3体の電池に余裕値の％が浮かぶ（bid）→ いちばん大きい机が光る（win）
+// → コンティがカードを取り（grab）、運び（lift→drop）、受け取った机の余裕値が減る（drop→drainEnd）
 type Round = { t0: number; bid: number; win: number; grab: number; lift: number; drop: number; drainEnd: number; to: number; after: number; stagger: number };
 const ff = (t0: number, to: number, after: number): Round => ({
   t0,
@@ -75,7 +70,7 @@ const fuel = (i: number, t: number) => {
 };
 const deposits = (i: number) => ROUNDS.filter((r) => r.to === i).map((r) => r.drop);
 
-// 10〜13秒：机に積んだカードが、手分けして In Review へ飛ぶ
+// 10〜13秒：机に積んだカードが、作業分担して In Review へ飛ぶ
 const FLIGHTS = (() => {
   const order: { desk: number; k: number }[] = [
     { desk: 0, k: 1 },
@@ -155,12 +150,6 @@ const POSE_SRC: Record<string, string> = {
   cheer: "characters/claude_code/peace_jump.png",
 };
 
-const Room: React.FC = () => <Img src={staticFile("ep/team_bid/room.png")} style={{ position: "absolute", width: 1080, height: 1080 }} />;
-
-const Desk: React.FC<{ i: number }> = ({ i }) => (
-  <Img src={staticFile("ep/team_bid/desk.png")} style={{ position: "absolute", left: DESK_X[i], top: DESK.top, width: DESK.w }} />
-);
-
 // 共有のカンバン。Ready の積み残し3枚・その回の新しいカード・In Review に届いたカードを描く
 const BoardWithCards: React.FC<{ t: number }> = ({ t }) => {
   const backlog = [0.35, 0.85, 1.35];
@@ -227,7 +216,7 @@ const Main: React.FC = () => {
         );
       })}
       {[0, 1, 2].map((i) => (
-        <Desk key={i} i={i} />
+        <Desk key={i} x={DESK_X[i]} />
       ))}
 
       {/* 机に積んだカード。In Review へ飛ぶまで置いておく */}
@@ -240,7 +229,7 @@ const Main: React.FC = () => {
         }),
       )}
 
-      {/* 燃料切れの机：座ったまま待つ汗 */}
+      {/* 余裕の無い机：座ったまま待つ汗 */}
       {[0, 1, 2].map((i) => (robotPose(i, t) === "wait" && t >= 2.3 ? <Sweat key={i} x={robotCx(i) + 85} y={HEAD_TOP + 50} scale={0.7} /> : null))}
 
       {/* 働く机のスピード線 */}
@@ -253,17 +242,17 @@ const Main: React.FC = () => {
       {holding ? <IssueCard x={w.x - 65} y={w.y - 39} scale={lerp(ramp(t, holding.lift, holding.drop), 0.8, 0.5)} /> : null}
       {holding && t >= holding.lift ? <SpeedLines x={whaleCx + (right ? -230 : 110)} y={whaleBase - 120} width={120} height={90} direction={right ? 1 : -1} /> : null}
 
-      {/* 燃料計と、入札の％。コンティが前を通っても数字が読めるように、コンティより手前に描く */}
-      {[0, 1, 2].map((i) => {
-        if (t < TAG_FROM + TAG_LEN - 0.05) return null;
-        const appear = interpolate(t, [3.3, 3.5], [0, 1], { ...clamp, easing: Easing.out(Easing.back(2)) });
-        const firstBid = ROUNDS[0].bid + i * ROUNDS[0].stagger;
-        const bump = Math.max(0, ...ROUNDS.map((r) => bumpAt(t, r.bid + i * r.stagger, 0.3)));
-        const win = Math.max(0, ...ROUNDS.filter((r) => r.to === i).map((r) => interpolate(t, [r.win, r.win + 0.08, r.drop - 0.05, r.drop + 0.1], [0, 1, 1, 0], clamp)));
-        return (
-          <Battery key={i} cx={robotCx(i)} top={BAT_TOP} level={fuel(i, t)} number={t >= firstBid ? fuel(i, t) : null} bump={bump} win={win} scale={appear} />
-        );
-      })}
+      {/* 電池と、入札の％。コンティが前を通っても数字が読めるように、コンティより手前に描く */}
+      {t >= TAG_FROM + TAG_LEN - 0.05 ? (
+        <BatteryRow
+          cxs={[0, 1, 2].map(robotCx)}
+          levels={[0, 1, 2].map((i) => fuel(i, t))}
+          numbers={[0, 1, 2].map((i) => (t >= ROUNDS[0].bid + i * ROUNDS[0].stagger ? fuel(i, t) : null))}
+          bumps={[0, 1, 2].map((i) => Math.max(0, ...ROUNDS.map((r) => bumpAt(t, r.bid + i * r.stagger, 0.3))))}
+          wins={[0, 1, 2].map((i) => Math.max(0, ...ROUNDS.filter((r) => r.to === i).map((r) => interpolate(t, [r.win, r.win + 0.08, r.drop - 0.05, r.drop + 0.1], [0, 1, 1, 0], clamp))))}
+          scale={interpolate(t, [3.3, 3.5], [0, 1], { ...clamp, easing: Easing.out(Easing.back(2)) })}
+        />
+      ) : null}
       {ROUNDS.map((r, n) => (
         <Sequence key={n} from={sec(r.win)} durationInFrames={sec(0.5)}>
           <Sparkle x={robotCx(r.to) + 70} y={BAT_TOP - 120} />

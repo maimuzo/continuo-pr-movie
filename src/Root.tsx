@@ -11,8 +11,10 @@ import { StrangerComment } from "./videos/StrangerComment";
 import { FlatRate } from "./videos/FlatRate";
 import { Resume } from "./videos/Resume";
 import { DirectChat } from "./videos/DirectChat";
+import { WhatIsContinuo } from "./videos/WhatIsContinuo";
+import { Setup } from "./videos/Setup";
 
-// 10本の動画を Composition として並べる。各回の中身は src/videos/ の同じ名前のファイル
+// 12本の動画を Composition として並べる。各回の中身は src/videos/ の同じ名前のファイル
 export const Root: React.FC = () => (
   <>
     <Composition
@@ -26,11 +28,13 @@ export const Root: React.FC = () => (
     <Composition id="visible-workshop" component={VisibleWorkshop} durationInFrames={theme.fps * theme.durationInSeconds} fps={theme.fps} width={theme.size} height={theme.size} />
     <Composition id="one-kanban" component={OneKanban} durationInFrames={theme.fps * theme.durationInSeconds} fps={theme.fps} width={theme.size} height={theme.size} />
     <Composition id="blocked" component={Blocked} durationInFrames={theme.fps * theme.durationInSeconds} fps={theme.fps} width={theme.size} height={theme.size} />
-    <Composition id="wait-quota" component={WaitQuota} durationInFrames={theme.fps * theme.durationInSeconds} fps={theme.fps} width={theme.size} height={theme.size} />
     <Composition id="team-bid" component={TeamBid} durationInFrames={theme.fps * theme.durationInSeconds} fps={theme.fps} width={theme.size} height={theme.size} />
+    <Composition id="wait-quota" component={WaitQuota} durationInFrames={theme.fps * theme.durationInSeconds} fps={theme.fps} width={theme.size} height={theme.size} />
     <Composition id="stranger-comment" component={StrangerComment} durationInFrames={theme.fps * theme.durationInSeconds} fps={theme.fps} width={theme.size} height={theme.size} />
     <Composition id="flat-rate" component={FlatRate} durationInFrames={theme.fps * theme.durationInSeconds} fps={theme.fps} width={theme.size} height={theme.size} />
     <Composition id="resume" component={Resume} durationInFrames={theme.fps * theme.durationInSeconds} fps={theme.fps} width={theme.size} height={theme.size} />
     <Composition id="direct-chat" component={DirectChat} durationInFrames={theme.fps * theme.durationInSeconds} fps={theme.fps} width={theme.size} height={theme.size} />
+    <Composition id="what-is-continuo" component={WhatIsContinuo} durationInFrames={theme.fps * 30} fps={theme.fps} width={theme.size} height={theme.size} />
+    <Composition id="setup" component={Setup} durationInFrames={theme.fps * 30} fps={theme.fps} width={theme.size} height={theme.size} />
   </>
 );

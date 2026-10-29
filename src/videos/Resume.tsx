@@ -12,7 +12,7 @@ import { script } from "./resume.script";
 
 // 止めても続きからの回。2〜13秒は「開発者の PC の画面に窓が2つ並ぶ」1つのカットで通す。
 // コンティは左の窓（continuo）、Claude Code は右の窓（pane）の中だけで動き、窓の外は切り取る。
-// 止めて暗くなるのは左の窓だけで、モニターの電源の灯りと右の窓は最後まで点いたまま。
+// 止めて暗くなるのは左の窓だけで、右の窓は明るいまま。夜はディスプレイの電源だけを消し、PC 本体のランプは最後まで点いたまま。
 // 時刻はすべて動画の頭からの秒で書く。座標は 1080×1080 の画面の座標（窓の中身は窓の中身の左上からの座標）
 
 const clamp = { extrapolateLeft: "clamp", extrapolateRight: "clamp" } as const;
@@ -24,28 +24,33 @@ const ink = theme.color.ink;
 
 // ---- 時刻（秒）----
 const T = {
-  keyIn: 3.0, // Ctrl+C のキーが出る
-  press: 3.2, // 押す
-  dark: 3.6, // 左の窓が暗くなりきる
-  sign: 3.5, // 「休業」の札が落ちる
-  sip: 3.7, // 開発者はコーヒー
-  keyOut: 4.1,
-  done: 4.6, // Claude Code が手元の作業を仕上げる
-  sit: 5.0, // 座って待つ
-  nightFrom: 4.8,
-  nightTo: 5.6,
-  morning: 6.0, // 翌朝
-  type: 6.4, // continuo と打つ
-  enter: 7.2,
-  light: 7.3, // 左の窓が明るくなる
-  leap: 7.5, // 潮を吹いて跳ねる
-  toEdge: 8.1, // 窓の右の端へ寄る
-  stand: 8.4, // Claude Code が立って手を出す
-  pass: 8.5, // 紙が境目を越える
-  got: 9.2,
-  fist: 10.0, // 続きを始める気合
-  work2: 10.4,
-  letdown: 10.3, // 開発者が拍子抜け
+  keyIn: 2.5, // Ctrl+C のキーが出る
+  press: 2.7, // 押す
+  dark: 3.1, // 左の窓が暗くなりきる
+  sip: 3.0, // 開発者はコーヒー
+  keyOut: 3.4,
+  done: 3.7, // Claude Code が手元の作業を仕上げる
+  sit: 4.1, // 座って待つ
+  nightFrom: 4.9, // 夜になる
+  nightTo: 5.3,
+  displayOff: 5.4, // ディスプレイの電源が消える
+  standUp: 5.7, // 開発者がかばんを持って立つ
+  leave: 5.9, // 歩いて帰る
+  gone: 6.7,
+  morning: 7.0, // 翌朝。開発者が出社して歩いてくる
+  seat: 7.6, // 席に着く
+  displayOn: 7.8, // ディスプレイを点ける
+  type: 8.15, // continuo と打つ
+  enter: 8.85,
+  light: 8.95, // 左の窓が明るくなる
+  leap: 9.1, // 潮を吹いて跳ねる
+  toEdge: 9.45, // 窓の右の端へ寄る
+  stand: 9.65, // Claude Code が立って手を出す
+  pass: 9.7, // 紙が境目を越える
+  got: 10.25,
+  fist: 10.35, // 続きを始める気合
+  work2: 10.75,
+  cheer: 10.5, // 開発者が笑顔で喜ぶ
 };
 
 // ---- 配置 ----
@@ -57,10 +62,12 @@ const CONTENT_H = WIN_L.h - BAR;
 const DESK_Y = 700;
 const DEV = { cx: 180, baseY: 1085 };
 const KEY = { x: 360, y: 770, w: 250, h: 120 };
+const TOWER = { x: 850, y: 770, w: 150, h: 270 }; // PC 本体。机の前の床に置く
+const LED = { x: MON.x + MON.w - 46, y: MON.y + MON.h - 23 }; // ディスプレイの電源の灯り
 // 左の窓の中のコンティ（中身の座標）
 const WHALE = { cx: 229, baseY: 335, h: 200 };
 const WAVE_W = (WHALE.h * 729) / 556;
-// 右の窓の中の作業台と Claude Code（中身の座標）
+// 右の窓の中の机と Claude Code（中身の座標）
 const BENCH = { x: 10, y: 290, w: 440 };
 const CC = { cx: 250, baseBehind: 395, h: 320 };
 
@@ -124,18 +131,47 @@ function mix(a: string, b: string, t: number) {
   return `rgb(${x.map((v, i) => Math.round(lerp(t, v, y[i]))).join(",")})`;
 }
 
-// 「休業」の札。上から紐で下がる木の板
-const ClosedSign: React.FC<{ cx: number; y: number }> = ({ cx, y }) => (
-  <svg style={{ position: "absolute", left: cx - 120, top: y - 120 }} width={240} height={240}>
-    <path d="M60 120 L120 20 L180 120" fill="none" stroke={ink} strokeWidth={5} />
-    <circle cx={120} cy={20} r={8} fill="#B0B0B0" stroke={ink} strokeWidth={4} />
-    <rect x={14} y={112} width={212} height={110} rx={14} fill="#C9935A" stroke={ink} strokeWidth={6} />
-    <rect x={26} y={124} width={188} height={86} rx={8} fill="#DDB07A" />
-    <text x={120} y={188} textAnchor="middle" fontFamily={theme.fontFamily} fontWeight={800} fontSize={60} fill={ink}>
-      休業
-    </text>
+// PC 本体。ランプは最後まで緑に点いたまま。glow（0〜1）で暗い部屋の中の光を強める
+const Tower: React.FC<{ glow: number }> = ({ glow }) => (
+  <div style={{ position: "absolute", left: TOWER.x, top: TOWER.y, width: TOWER.w, height: TOWER.h }}>
+    <div style={{ position: "absolute", inset: 0, borderRadius: 16, background: "#3A3C44", border: `6px solid ${ink}`, boxSizing: "border-box" }} />
+    {[0, 1, 2].map((i) => (
+      <div key={i} style={{ position: "absolute", left: 28, top: 120 + i * 30, width: TOWER.w - 56, height: 10, borderRadius: 5, background: "#24262C" }} />
+    ))}
+    <div style={{ position: "absolute", left: TOWER.w / 2 - 50, top: 26, width: 100, height: 100, borderRadius: 50, background: "#6BE07A", opacity: 0.15 + glow * 0.45, filter: "blur(14px)" }} />
+    <div style={{ position: "absolute", left: TOWER.w / 2 - 22, top: 54, width: 44, height: 44, borderRadius: 22, background: "#6BE07A", border: `5px solid ${ink}`, boxSizing: "border-box" }} />
+  </div>
+);
+
+// 誰も座っていない椅子。開発者が立っている間に出す
+const EmptyChair: React.FC = () => (
+  <svg style={{ position: "absolute", left: 20, top: 760 }} width={260} height={330}>
+    <rect x={30} y={10} width={110} height={170} rx={26} fill="#2A2B30" stroke={ink} strokeWidth={6} />
+    <rect x={20} y={175} width={200} height={42} rx={16} fill="#2A2B30" stroke={ink} strokeWidth={6} />
+    <rect x={108} y={215} width={22} height={60} fill="#55565E" stroke={ink} strokeWidth={5} />
+    <path d="M40 300 L120 272 L200 300" fill="none" stroke={ink} strokeWidth={12} strokeLinecap="round" />
+    <path d="M40 300 L120 272 L200 300" fill="none" stroke="#2A2B30" strokeWidth={5} strokeLinecap="round" />
+    <circle cx={40} cy={308} r={11} fill="#2A2B30" stroke={ink} strokeWidth={4} />
+    <circle cx={200} cy={308} r={11} fill="#2A2B30" stroke={ink} strokeWidth={4} />
   </svg>
 );
+
+// 「夜」の札と月
+const NightTag: React.FC = () => {
+  const f = useCurrentFrame();
+  const pop = interpolate(f, [0, 5, 9], [0, 1.15, 1], clamp);
+  const out = interpolate(f, [sec(1.1), sec(1.3)], [1, 0], clamp);
+  return (
+    <div style={{ position: "absolute", left: 540, top: 330, transform: `translate(-50%, -50%) scale(${pop})`, opacity: out }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 16, padding: "14px 40px 14px 26px", background: "#2B3360", border: `7px solid ${ink}`, borderRadius: 999, fontFamily: theme.fontFamily, fontWeight: 800, fontSize: 84, color: "#FFF4D6" }}>
+        <svg width={96} height={96} viewBox="-48 -48 96 96">
+          <path d="M10 -36 A36 36 0 1 0 34 14 A28 28 0 1 1 10 -36 Z" fill="#F2C14E" stroke={ink} strokeWidth={6} strokeLinejoin="round" />
+        </svg>
+        夜
+      </div>
+    </div>
+  );
+};
 
 // 大きなキー。press（0〜1）で沈む
 const BigKey: React.FC<{ label: string; x: number; y: number; w: number; h: number; press: number; fontSize?: number }> = ({ label, x, y, w, h, press, fontSize = 62 }) => (
@@ -230,8 +266,11 @@ const DoneBadge: React.FC<{ x: number; y: number }> = ({ x, y }) => {
 const Room: React.FC<{ t: number }> = ({ t }) => {
   const f = sec(t);
   const morning = t >= T.morning;
-  // 夜：部屋（モニターの外）だけを青く暗くする。翌朝で明るく戻す
+  // 夜：部屋を青く暗くする。翌朝で明るく戻す
   const night = morning ? 0 : interpolate(t, [T.nightFrom, T.nightTo], [0, 1], clamp);
+  // ディスプレイの電源。夜に消え、翌朝に開発者が点ける。PC 本体は消えない
+  const screenOff = t < T.morning ? interpolate(t, [T.displayOff, T.displayOff + 0.15], [0, 1], clamp) : interpolate(t, [T.displayOn, T.displayOn + 0.25], [1, 0], clamp);
+  const ledOn = t < T.displayOff || t >= T.displayOn;
   const sun = morning ? interpolate(t, [T.morning, T.morning + 0.4], [0, 1], clamp) : 0;
   // 左の窓の暗さ：押すと暗くなり、翌朝 continuo を起動すると明るくなる
   const dim = t < T.light ? interpolate(t, [T.press, T.dark], [0, 1], clamp) : interpolate(t, [T.light, T.light + 0.3], [1, 0], clamp);
@@ -255,8 +294,8 @@ const Room: React.FC<{ t: number }> = ({ t }) => {
       <div style={{ position: "absolute", left: 410, top: DESK_Y - 4, width: 260, height: 26, borderRadius: 10, background: "#2E3038", border: `6px solid ${ink}`, boxSizing: "border-box" }} />
       <div style={{ position: "absolute", left: MON.x, top: MON.y, width: MON.w, height: MON.h, borderRadius: 26, background: "#2E3038", border: `7px solid ${ink}`, boxSizing: "border-box" }} />
       <div style={{ position: "absolute", left: MON.x + 22, top: MON.y + 22, width: MON.w - 44, height: MON.h - 50, borderRadius: 10, background: "#8FB7D9", border: `5px solid ${ink}`, boxSizing: "border-box" }} />
-      {/* 電源の灯り。PC は最後まで点いたまま */}
-      <div style={{ position: "absolute", left: MON.x + MON.w - 46, top: MON.y + MON.h - 23, width: 16, height: 16, borderRadius: 8, background: "#6BE07A", border: `3px solid ${ink}` }} />
+      {/* ディスプレイの電源の灯り。ディスプレイが消えている間だけ消える */}
+      <div style={{ position: "absolute", left: LED.x, top: LED.y, width: 16, height: 16, borderRadius: 8, background: ledOn ? "#6BE07A" : "#4A4B52", border: `3px solid ${ink}` }} />
 
       {/* 左の窓：continuo */}
       <Window box={WIN_L} title="continuo" dim={dim} over={<LeftOver t={t} stopped={stopped} />}>
@@ -267,8 +306,17 @@ const Room: React.FC<{ t: number }> = ({ t }) => {
         <RightContent t={t} />
       </Window>
 
+      {/* ディスプレイの電源が消えて画面が黒くなる */}
+      <div style={{ position: "absolute", left: MON.x + 22, top: MON.y + 22, width: MON.w - 44, height: MON.h - 50, borderRadius: 10, background: "#0B0D14", opacity: screenOff }} />
+      <Sequence from={sec(T.displayOn)} durationInFrames={sec(0.5)} layout="none">
+        <PressMarks x={LED.x - 120} y={LED.y - 70} />
+      </Sequence>
+
       {/* 窓の境目を越えて渡す紙 */}
       <PassedCard t={t} />
+
+      {/* PC 本体 */}
+      <Tower glow={night} />
 
       {/* 机の上のキーボード */}
       <div style={{ position: "absolute", left: 290, top: 728, width: 400, height: 40, borderRadius: 10, background: "#3A3C44", border: `5px solid ${ink}`, boxSizing: "border-box", filter: `brightness(${1 - night * 0.4})` }} />
@@ -315,6 +363,9 @@ const Room: React.FC<{ t: number }> = ({ t }) => {
       <Sequence from={sec(2.1)} durationInFrames={sec(1.5)} layout="none">
         <NameTag cx={WIN_R.x + 6 + CC.cx} tipY={WIN_R.y + BAR + CC.baseBehind - CC.h - 2} name="Claude Code" color={TERRACOTTA} durationInFrames={sec(1.5)} fontSize={36} />
       </Sequence>
+      <Sequence from={sec(T.nightFrom + 0.2)} durationInFrames={sec(1.4)} layout="none">
+        <NightTag />
+      </Sequence>
       <Sequence from={sec(T.morning)} durationInFrames={sec(1.1)} layout="none">
         <MorningTag />
       </Sequence>
@@ -344,35 +395,24 @@ const LeftContent: React.FC<{ t: number; stopped: boolean }> = ({ t, stopped }) 
   );
 };
 
-// 左の窓の幕の上に出すもの：「休業」の札と、翌朝に打つ `$ continuo`
+// 左の窓の幕の上に出すもの：翌朝に打つ `$ continuo`
 const LeftOver: React.FC<{ t: number; stopped: boolean }> = ({ t }) => {
-  const drop = interpolate(t, [T.sign, T.sign + 0.2], [-260, 0], { ...clamp, easing: Easing.out(Easing.back(1.6)) });
-  const fall = interpolate(t, [T.light, T.light + 0.35], [0, 500], { ...clamp, easing: Easing.in(Easing.quad) });
   const typed = "continuo".slice(0, Math.floor(interpolate(t, [T.type, T.enter - 0.1], [0, 8], clamp)));
   const cursor = Math.floor(sec(t) / 8) % 2 === 0;
-  return (
-    <>
-      {t >= T.sign && t < T.light + 0.4 ? (
-        <div style={{ filter: "brightness(0.82)", transform: `translateY(${drop + fall}px) rotate(${fall / 30}deg)` }}>
-          <ClosedSign cx={WHALE.cx} y={245} />
-        </div>
-      ) : null}
-      {t >= T.morning && t < T.light ? (
-        <div style={{ position: "absolute", left: 24, top: 410, fontFamily: "Menlo, monospace", fontWeight: 700, fontSize: 40, color: "#8CF29A" }}>
-          $ {typed}
-          {cursor ? "▌" : ""}
-        </div>
-      ) : null}
-    </>
-  );
+  return t >= T.displayOn && t < T.light ? (
+    <div style={{ position: "absolute", left: 24, top: 410, fontFamily: "Menlo, monospace", fontWeight: 700, fontSize: 40, color: "#8CF29A" }}>
+      $ {typed}
+      {cursor ? "▌" : ""}
+    </div>
+  ) : null;
 };
 
-// 右の窓の中身：作業台と Claude Code
+// 右の窓の中身：机と Claude Code
 const RightContent: React.FC<{ t: number }> = ({ t }) => {
   const f = sec(t);
   const working = (t < T.done) || t >= T.work2;
   const shake = working ? Math.sin(f * 1.7) * 4 : 0;
-  // 作業台の奥にいる絵と、作業台の前にいる絵を分ける
+  // 机の奥にいる絵と、机の前にいる絵を分ける
   const behind = t < T.sit || t >= T.work2;
   const behindSrc = t < T.done ? "work" : t < T.sit ? "fist" : "work";
   const frontSrc = t < T.stand ? "ep/resume/cc_sit_wait.png" : t < T.fist ? "characters/claude_code/receive.png" : "characters/claude_code/fist.png";
@@ -429,12 +469,44 @@ const PassedCard: React.FC<{ t: number }> = ({ t }) => {
 };
 
 const Developer: React.FC<{ t: number }> = ({ t }) => {
-  const typing = (t < T.sip) || (t >= T.type - 0.1 && t < T.enter + 0.25);
-  if (t >= T.letdown) {
+  const f = sec(t);
+  // 帰る：かばんを持って立ち、左へ歩いて部屋を出る（左向きにする）
+  if (t >= T.standUp && t < T.morning) {
+    const x = interpolate(t, [T.leave, T.gone], [DEV.cx + 40, -260], clamp);
+    const step = t >= T.leave ? Math.abs(Math.sin(f / 3)) * -10 : 0;
     return (
-      <Sprite src="ep/resume/dev_anticlimax.png" cx={DEV.cx + 10} baseY={DEV.baseY + 5} height={500} flip squash={false} />
+      <>
+        <EmptyChair />
+        {t < T.gone ? <Sprite src="ep/resume/dev_walk_bag.png" cx={x} baseY={DEV.baseY - 30 + step} height={440} flip squash={false} /> : null}
+      </>
     );
   }
+  // 出社：左から歩いてきて席に着く
+  if (t >= T.morning && t < T.seat) {
+    const x = interpolate(t, [T.morning, T.seat - 0.05], [-260, DEV.cx + 40], { ...clamp, easing: Easing.out(Easing.quad) });
+    const step = Math.abs(Math.sin(f / 3)) * -10;
+    return (
+      <>
+        <EmptyChair />
+        <Sprite src="ep/resume/dev_walk_bag.png" cx={x} baseY={DEV.baseY - 30 + step} height={440} squash={false} />
+      </>
+    );
+  }
+  // 喜ぶ：椅子の横に立ち、笑顔でガッツポーズ
+  if (t >= T.cheer) {
+    const hop = Math.abs(Math.sin((f - sec(T.cheer)) / 5)) * -18;
+    return (
+      <>
+        <EmptyChair />
+        <Sprite src="ep/resume/dev_cheer.png" cx={DEV.cx + 60} baseY={DEV.baseY - 20 + hop} height={420} squash={false} />
+        <Sequence from={sec(T.cheer)} durationInFrames={sec(2.5)} layout="none">
+          <Sparkle x={DEV.cx - 120} y={640} />
+          <Sparkle x={DEV.cx + 200} y={620} />
+        </Sequence>
+      </>
+    );
+  }
+  const typing = t < T.sip || t >= T.seat; // 出社して席に着いた後は、喜ぶまでキーボードに手を置いたまま
   if (typing) return <Sprite src="characters/developer/typing.png" cx={DEV.cx} baseY={DEV.baseY} height={460} flip squash={false} />;
   return (
     <>
@@ -453,14 +525,17 @@ const Scene: React.FC = () => {
 const SFX: { name: string; at: number; volume: number }[] = [
   { name: "enter", at: T.press, volume: 0.7 }, // Ctrl+C を押す
   { name: "resume_off", at: T.press + 0.05, volume: 0.55 }, // 左の窓が暗くなる
-  { name: "pop", at: T.sign, volume: 0.4 }, // 休業の札が下がる
   { name: "sparkle", at: T.done, volume: 0.5 }, // 手元の作業を仕上げる
+  { name: "resume_click", at: T.displayOff, volume: 0.6 }, // ディスプレイの電源が消える
+  { name: "resume_steps", at: T.leave, volume: 0.45 }, // 歩いて帰る
+  { name: "resume_steps", at: T.morning, volume: 0.45 }, // 歩いて出社する
+  { name: "resume_click", at: T.displayOn, volume: 0.6 }, // ディスプレイを点ける
   { name: "typing", at: T.type, volume: 0.35 }, // continuo と打つ
   { name: "enter", at: T.enter, volume: 0.7 }, // Enter
   { name: "resume_on", at: T.light, volume: 0.55 }, // 左の窓が明るくなる
   { name: "spout", at: T.leap, volume: 0.6 }, // 潮を吹く
   { name: "whoosh", at: T.pass, volume: 0.5 }, // 紙が境目を越える
-  { name: "sparkle", at: T.fist, volume: 0.4 }, // 続きを始める
+  { name: "sparkle", at: T.cheer, volume: 0.5 }, // 開発者が喜ぶ
   { name: "pop", at: S("end").from, volume: 0.6 }, // 締めの字
 ];
 
@@ -468,7 +543,7 @@ export const Resume: React.FC = () => (
   <AbsoluteFill style={{ background: "#F3E3C8", overflow: "hidden" }}>
     <Sequence durationInFrames={sec(2)}>
       <AbsoluteFill style={{ filter: "blur(10px)" }}>
-        <Room t={2.6} />
+        <Room t={2.2} />
       </AbsoluteFill>
     </Sequence>
     <Sequence from={sec(S("stop").from)} durationInFrames={sec(S("go").to - S("stop").from)}>

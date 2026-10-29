@@ -48,25 +48,29 @@ const tagSpot = (i: number) => ({ x: signLeft(i) + 84 * SIGN_SCALE, y: SIGN_Y + 
 const WorkshopsBackground: React.FC = () => (
   <>
     <Img src={staticFile("ep/one_kanban/workshops.png")} style={{ position: "absolute", left: 0, top: 0, width: 1080, height: 1080 }} />
-    {/* 入口の看板にリポジトリの名前。絵には字を描かせず、ここで書く（字が崩れないように） */}
+    {/* 入口の看板にリポジトリの名前。絵には字を描かせず、ここで書く（字が崩れないように）。
+        板の幅は約250pxで、maimuzo/project-a を1行では収まらないので、owner と名前の2行にする */}
     {REPOS.map((r, i) => (
       <div
         key={r.name}
         style={{
           position: "absolute",
           left: BOOTH_X[i] - 125,
-          top: SIGNBOARD_Y - 26,
+          top: SIGNBOARD_Y - 32,
           width: 250,
-          textAlign: "center",
+          height: 64,
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          alignItems: "center",
           fontFamily: theme.fontFamily,
           fontWeight: 800,
-          fontSize: 31,
-          lineHeight: "52px",
           color: theme.color.ink,
           whiteSpace: "nowrap",
         }}
       >
-        {r.name}
+        <div style={{ fontSize: 22, lineHeight: "26px" }}>{r.owner}/</div>
+        <div style={{ fontSize: 32, lineHeight: "36px" }}>{r.short}</div>
       </div>
     ))}
   </>
@@ -423,7 +427,7 @@ export const OneKanban: React.FC = () => (
       <TitleCard text={script.title} outFrom={sec(1.7)} />
     </Sequence>
     <Sequence from={sec(S("end").from)}>
-      <EndCard text={script.end} sprite="characters/continuo/wave.png" spriteWidth={300} spriteTop={680} />
+      <EndCard lines={[script.end.slice(0, 8), script.end.slice(8)]} sprite="characters/continuo/wave.png" spriteWidth={300} spriteTop={680} />
     </Sequence>
 
     {SFX.map((e, i) => (

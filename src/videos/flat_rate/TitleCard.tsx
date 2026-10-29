@@ -2,7 +2,7 @@ import React from "react";
 import { interpolate, spring, useCurrentFrame, useVideoConfig } from "remotion";
 import { theme } from "../../theme";
 
-// 冒頭のタイトル（定額のままの回の写し。11字が1行に収まるよう字を 92 にし、折り返さない）。弾んで出て、outFrom から縮んで消える
+// 冒頭のタイトル（共通の部品の写し。6字のタイトルを大きく見せるため字を 140 にし、折り返さない）。弾んで出て、outFrom から縮んで消える
 export const TitleCard: React.FC<{ text: string; outFrom: number }> = ({ text, outFrom }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
@@ -14,7 +14,7 @@ export const TitleCard: React.FC<{ text: string; outFrom: number }> = ({ text, o
         style={{
           fontFamily: theme.fontFamily,
           fontWeight: 800,
-          fontSize: 92,
+          fontSize: 140,
           whiteSpace: "nowrap",
           color: theme.color.caption,
           WebkitTextStroke: `20px ${theme.color.captionStroke}`,

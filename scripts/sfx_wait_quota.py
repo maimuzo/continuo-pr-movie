@@ -1,8 +1,9 @@
 """寝て待つ回だけで使う効果音を合成し、public/sfx/wait_quota_*.wav に書き出す。
 
 `uv run --with numpy python -I scripts/sfx_wait_quota.py` で作る。make_sfx.py の関数を借り、make_sfx.py は書き換えない。
-empty は燃料計が空になって座り込むときの下がる音、tick は時計の早回しのチクタク、
-bell は目覚まし時計のベル、charge は燃料計が満タンへ戻るときの上がる音。
+empty は電池が空になって座り込むときの下がる音、tick は時計の早回しのチクタク、
+bell は壁の時計のベル、charge は電池が満タンへ戻るときの上がる音、
+flip は日めくりがパラパラめくれる音、fall は担当者の顔のアイコンが外れて落ちる音。
 """
 import os
 import sys
@@ -61,8 +62,38 @@ def charge():
     return out
 
 
+def flip(sec=1.2, n=7):
+    """パラパラ。紙をめくるかすれた音を n 回、少しずつ間を詰めて鳴らす"""
+    out = np.zeros(int(RATE * sec))
+    pos, gap = 0.0, 0.2
+    rng = np.random.default_rng(3)
+    for _ in range(n):
+        x = t(0.07)
+        noise = rng.standard_normal(len(x))
+        hi = np.diff(noise, prepend=0.0)
+        s = hi * np.sin(np.pi * np.linspace(0, 1, len(x))) ** 2 * 0.5
+        i = int(pos * RATE)
+        out[i:i + len(s)] += s[: len(out) - i]
+        pos += gap
+        gap = max(0.12, gap * 0.92)
+    return out
+
+
+def fall():
+    """ヒューッ、ポトッ。下がる笛の音のあとに、軽く落ちる音"""
+    s = sweep(1500, 420, 0.38) * 0.45 * np.linspace(1, 0.6, int(RATE * 0.38))
+    x = t(0.18)
+    thud = (np.sin(2 * np.pi * 160 * x) + 0.5 * np.sin(2 * np.pi * 330 * x)) * env(len(x), 0.002, 0.05)
+    out = np.zeros(len(s) + len(thud))
+    out[: len(s)] += s
+    out[len(s):] += thud
+    return out
+
+
 if __name__ == "__main__":
     save("wait_quota_empty", empty())
     save("wait_quota_tick", tick())
     save("wait_quota_bell", bell())
     save("wait_quota_charge", charge())
+    save("wait_quota_flip", flip())
+    save("wait_quota_fall", fall())

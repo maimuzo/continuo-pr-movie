@@ -12,17 +12,15 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from make_sfx import env, lowpass, save, t  # noqa: E402
 
 
-def shrug():
-    """肩をすくめる「やれやれ」。下がっていく柔らかい2音"""
-    parts = []
-    for f0, f1, sec in ((520, 470, 0.16), (420, 330, 0.3)):
-        x = t(sec)
-        freq = np.linspace(f0, f1, len(x))
-        phase = 2 * np.pi * np.cumsum(freq) / 44100
-        tone = (np.sin(phase) + 0.3 * np.sin(2 * phase)) * env(len(x), 0.01, sec * 0.6)
-        parts.append(tone)
-        parts.append(np.zeros(int(44100 * 0.03)))
-    return lowpass(np.concatenate(parts), 0.35) * 0.6
+def relief():
+    """ほっと息をつく「ふう」。柔らかい息の音と、下がっていく温かい1音"""
+    x = t(0.6)
+    n = len(x)
+    breath = lowpass(np.random.default_rng(7).normal(0, 1, n), 0.08) * env(n, 0.08, 0.35) * 1.6
+    freq = np.linspace(560, 400, n)
+    phase = 2 * np.pi * np.cumsum(freq) / 44100
+    tone = (np.sin(phase) + 0.25 * np.sin(2 * phase)) * env(n, 0.03, 0.4) * 0.45
+    return lowpass(breath + tone, 0.3) * 0.7
 
 
 def drop():
@@ -34,5 +32,5 @@ def drop():
 
 
 if __name__ == "__main__":
-    save("stranger_comment_shrug", shrug())
+    save("stranger_comment_relief", relief())
     save("stranger_comment_drop", drop())

@@ -2,7 +2,7 @@
 export const script = {
   id: "one-kanban",
   title: "カンバンは1枚でいい",
-  end: "1枚で全部回す",
+  end: "1つのカンバンで全プロジェクトを管理",
   scenes: [
     { id: "title", from: 0, to: 2, caption: null },
     { id: "line_up", from: 2, to: 5, caption: "リポジトリが違っても" },

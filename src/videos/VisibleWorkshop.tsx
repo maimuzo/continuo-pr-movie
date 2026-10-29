@@ -2,7 +2,6 @@ import React from "react";
 import { AbsoluteFill, Audio, Easing, Img, interpolate, Sequence, staticFile, useCurrentFrame } from "remotion";
 import { Caption } from "../components/Caption";
 import { Exclamation, Sparkle, SpeedLines, Sweat } from "../components/Effects";
-import { Inset } from "../components/Inset";
 import { NameTag } from "../components/NameTag";
 import { Sprite } from "../components/Sprite";
 import { TitleCard } from "../components/TitleCard";
@@ -10,7 +9,7 @@ import { sec, theme } from "../theme";
 import { EndCard } from "./visible_workshop/EndCard";
 import { script } from "./visible_workshop.script";
 
-// 見える工房の回。場面ごとにカットを割る（黒い箱の部屋・ガラスの工房・居間）。
+// 見える工房の回。場面ごとにカットを割る（黒い箱の部屋・左右に割った黒い箱と工房・工房の中）。
 // 座標はすべて 1080×1080 の画面の座標。各場面の中の時刻は、その場面の頭からの秒で書く。
 // Codex に頼むのは Claude Code で、コンティは工房の外にいる（storyboard.md の注記）
 
@@ -134,7 +133,7 @@ const SpeechBubble: React.FC<{ x: number; y: number; text: string; fontSize?: nu
 };
 
 // 考え事の吹き出し。lines を1文字ずつ出す。(x, y) は雲の左上、尾の小さな丸は右下へ伸ばす
-const ThoughtBubble: React.FC<{ x: number; y: number; w: number; h: number; lines: string[]; tail: { x: number; y: number } }> = ({ x, y, w, h, lines, tail }) => {
+const ThoughtBubble: React.FC<{ x: number; y: number; w: number; h: number; lines: string[]; tail: { x: number; y: number }; fontSize?: number }> = ({ x, y, w, h, lines, tail, fontSize = 40 }) => {
   const f = useCurrentFrame();
   const s = interpolate(f, [0, 5, 9], [0, 1.1, 1], clamp);
   const shown = Math.max(0, f - 6); // 1フレームに1文字
@@ -177,7 +176,7 @@ const ThoughtBubble: React.FC<{ x: number; y: number; w: number; h: number; line
           alignItems: "center",
           fontFamily: theme.fontFamily,
           fontWeight: 800,
-          fontSize: 40,
+          fontSize,
           lineHeight: 1.3,
           color: theme.color.ink,
         }}
@@ -223,24 +222,102 @@ const ClapBurst: React.FC<{ x: number; y: number }> = ({ x, y }) => {
   );
 };
 
-// ---- 場面2（2〜5秒）：黒い箱の部屋 ----
-const BOX = { x: 560, y: 560, w: 290, h: 230 };
-const DEV_BOX = { cx: 330, baseY: 900, height: 560 };
+// 看板。(cx, bottomY) は板の下の辺の中央。下へ2本の脚を伸ばして、箱や工房の上に立てる。
+// 字は字幕と同じくらいはっきり読める大きさにする。pop なら出た瞬間に下から起き上がる
+const SIGN_FONT = 52;
+const SIGN_LEG = 40;
+const Signboard: React.FC<{ cx: number; bottomY: number; text: string; board: string; textColor: string; textStroke?: string; pop?: boolean }> = ({
+  cx,
+  bottomY,
+  text,
+  board,
+  textColor,
+  textStroke,
+  pop = true,
+}) => {
+  const f = useCurrentFrame();
+  const up = pop ? interpolate(f, [0, 5, 9], [0, 1.12, 1], clamp) : 1;
+  return (
+    <div style={{ position: "absolute", left: cx, top: bottomY, transform: `translate(-50%, -100%) scaleY(${up})`, transformOrigin: "50% 100%" }}>
+      {/* 脚。板の下から、立てる先の上の面まで */}
+      {[0.22, 0.78].map((p) => (
+        <div
+          key={p}
+          style={{ position: "absolute", left: `${p * 100}%`, top: "100%", width: 14, height: SIGN_LEG, marginLeft: -7, background: "#8A5A30", border: `4px solid ${theme.color.ink}`, borderTop: "none" }}
+        />
+      ))}
+      <div
+        style={{
+          padding: "6px 18px 10px",
+          background: board,
+          border: `6px solid ${theme.color.ink}`,
+          borderRadius: 14,
+          fontFamily: theme.fontFamily,
+          fontWeight: 800,
+          fontSize: SIGN_FONT,
+          lineHeight: 1.2,
+          color: textColor,
+          whiteSpace: "nowrap",
+          WebkitTextStroke: textStroke ? `10px ${textStroke}` : undefined,
+          paintOrder: "stroke fill",
+          boxShadow: `0 6px 0 rgba(0,0,0,0.18)`,
+        }}
+      >
+        {text}
+      </div>
+    </div>
+  );
+};
+
+// ---- 黒い箱と工房の大きさ ----
+// 黒い箱の正面と、右の continuo の工房（ガラスの枠の外側）を同じ大きさにする（人間の指摘）
+const FLOOR = 780;
+const BOX_W = 380;
+const BOX_H = 540;
+const BOX_TOP = FLOOR - BOX_H; // 240
+const SIGN_BOTTOM = BOX_TOP - SIGN_LEG; // 看板の脚の先が箱の上の面に乗る
+
+// ---- 場面2（2〜5.5秒）：黒い箱の部屋。5.5秒からは左半分へ寄り、9秒まで映し続ける ----
+const BOX = { x: 560, y: BOX_TOP, w: BOX_W, h: BOX_H };
+const DEV_BOX = { cx: 260, baseY: 920, height: 560 };
+const BOX_SCENE_LEN = 3.5; // 場面2だけの長さ。この後は左半分に寄る
+const PAN_X = 80 - BOX.x; // 左半分に寄ったときの、箱の正面の左端が 80 になる
 
 const BlackBox: React.FC = () => {
   const f = useCurrentFrame();
   const shaking = f >= at(0.1);
-  const jx = shaking ? Math.sin(f * 2.3) * 7 : 0;
-  const jy = shaking ? -Math.abs(Math.sin(f * 1.9)) * 9 : 0;
-  const rot = shaking ? Math.sin(f * 1.6) * 2.5 : 0;
+  const jx = shaking ? Math.sin(f * 2.3) * 6 : 0;
+  const jy = shaking ? -Math.abs(Math.sin(f * 1.9)) * 8 : 0;
+  const rot = shaking ? Math.sin(f * 1.6) * 1.6 : 0;
   const { x, y, w, h } = BOX;
-  const d = 55; // 奥行き
+  const d = 40; // 奥行き
   return (
     <>
       {/* 床の影 */}
       <svg style={{ position: "absolute", left: x - 30, top: y + h - 20 }} width={w + d + 60} height={60}>
         <ellipse cx={(w + d + 60) / 2} cy={30} rx={(w + d) / 2 + 10} ry={18} fill="#000000" opacity={0.18} />
       </svg>
+      {/* 煙。0.5秒ごとに1つ、箱の上の左右の端から吹き、上りながら膨らんで薄れる。看板の後ろを通る */}
+      {Array.from({ length: 13 }, (_, i) => {
+        const born = at(0.25 + i * 0.5);
+        const t = (f - born) / at(1.4);
+        if (t < 0 || t > 1) return null;
+        const side = i % 2 === 0 ? -1 : 1;
+        const px = x + w / 2 + side * (w / 2 - 20 + t * 60) + Math.sin(t * 5 + i) * 14;
+        const py = y - d - 10 - t * 230;
+        const r = 30 + t * 40;
+        return (
+          <svg key={i} style={{ position: "absolute", left: px - r * 1.6, top: py - r * 1.4, opacity: 1 - t }} width={r * 3.2} height={r * 2.8}>
+            {[
+              [0.35, 0.55, 0.42],
+              [0.62, 0.45, 0.5],
+              [0.5, 0.7, 0.38],
+            ].map(([cx, cy, rr], k) => (
+              <circle key={k} cx={r * 3.2 * cx} cy={r * 2.8 * cy} r={r * rr * 1.6} fill="#A9A9AE" stroke="#6E6E74" strokeWidth={5} />
+            ))}
+          </svg>
+        );
+      })}
       <svg
         style={{ position: "absolute", left: x, top: y - d, transform: `translate(${jx}px, ${jy}px) rotate(${rot}deg)`, transformOrigin: "50% 100%" }}
         width={w + d + 10}
@@ -255,7 +332,7 @@ const BlackBox: React.FC = () => {
         ? [-1, 1].map((side) => (
             <svg
               key={side}
-              style={{ position: "absolute", left: side < 0 ? x - 75 : x + w + d + 10, top: y + 20, opacity: Math.sin(f * 0.9 + side) > -0.3 ? 1 : 0 }}
+              style={{ position: "absolute", left: side < 0 ? x - 75 : x + w + d + 10, top: y + 160, opacity: Math.sin(f * 0.9 + side) > -0.3 ? 1 : 0 }}
               width={70}
               height={140}
             >
@@ -272,110 +349,86 @@ const BlackBox: React.FC = () => {
             </svg>
           ))
         : null}
-      {/* 煙。0.55秒ごとに1つ吹き、上りながら膨らんで薄れる */}
-      {Array.from({ length: 6 }, (_, i) => {
-        const born = at(0.25 + i * 0.5);
-        const t = (f - born) / at(1.4);
-        if (t < 0 || t > 1) return null;
-        const px = x + 60 + (i % 3) * 90 + Math.sin(t * 5 + i) * 18;
-        const py = y - d - 40 - t * 260;
-        const r = 30 + t * 40;
-        return (
-          <svg key={i} style={{ position: "absolute", left: px - r * 1.6, top: py - r * 1.4, opacity: 1 - t }} width={r * 3.2} height={r * 2.8}>
-            {[
-              [0.35, 0.55, 0.42],
-              [0.62, 0.45, 0.5],
-              [0.5, 0.7, 0.38],
-            ].map(([cx, cy, rr], k) => (
-              <circle key={k} cx={r * 3.2 * cx} cy={r * 2.8 * cy} r={r * rr * 1.6} fill="#A9A9AE" stroke="#6E6E74" strokeWidth={5} />
-            ))}
-          </svg>
-        );
-      })}
+      {/* 箱の上の看板。箱が何を指すかが最初のコマから分かるよう、場面の頭から立てておく */}
+      <Signboard cx={x + w / 2} bottomY={SIGN_BOTTOM + jy * 0.5} text="他のフレームワーク" board="#D9D5CC" textColor={theme.color.ink} pop={false} />
     </>
   );
 };
 
+// 場面2から場面3の終わり（2〜9秒）まで続けて映す。5.5秒で左へ寄って、箱が左半分に収まる
 const BoxScene: React.FC = () => {
   const f = useCurrentFrame();
   const tilt = Math.sin(f / 14) * 3.5; // 首をかしげて、ゆっくり左右に傾く
+  const pan = interpolate(f, [at(BOX_SCENE_LEN), at(BOX_SCENE_LEN + SPLIT_T)], [0, 1], { ...clamp, easing: ease });
   return (
     <AbsoluteFill>
-      <Room />
-      <BlackBox />
-      <Sprite src={EP("dev_puzzled")} cx={DEV_BOX.cx} baseY={DEV_BOX.baseY} height={DEV_BOX.height} rotate={tilt} squash={false} />
-      <Sequence from={at(0.6)} durationInFrames={at(0.9)}>
-        <Question x={DEV_BOX.cx + 110} y={250} />
-      </Sequence>
-      <Sequence from={at(1.8)}>
-        <Question x={DEV_BOX.cx + 140} y={230} />
-      </Sequence>
+      <div style={{ position: "absolute", inset: 0, transform: `translateX(${PAN_X * pan}px)` }}>
+        <Room floorY={FLOOR} />
+        <Sprite src={EP("dev_puzzled")} cx={DEV_BOX.cx} baseY={DEV_BOX.baseY} height={DEV_BOX.height} rotate={tilt} squash={false} />
+        <BlackBox />
+        <Sequence from={at(0.6)} durationInFrames={at(1.1)}>
+          <Question x={DEV_BOX.cx + 100} y={250} />
+        </Sequence>
+        <Sequence from={at(2.0)} durationInFrames={at(BOX_SCENE_LEN - 2.0)}>
+          <Question x={DEV_BOX.cx + 130} y={230} />
+        </Sequence>
+      </div>
+      <div style={{ position: "absolute", inset: 0, background: `rgba(40, 36, 40, ${0.22 * pan})` }} />
     </AbsoluteFill>
   );
 };
 
-// ---- 場面3（5〜8秒）：左に黒い箱、右にガラスの工房 ----
-const SPLIT = 340; // 左の幅
+// ---- 場面3（5.5〜9秒）：右半分に continuo の工房が滑り込む ----
+const SPLIT = 540; // 左右の半分
 const SPLIT_T = 0.4; // 割り終わる
-const GLASS3 = { x: 560, y: 110, w: 500, h: 710 };
-const CC3 = { cx: 250, baseY: 600, height: 300 }; // 工房の中の座標
-const WHALE3 = { cx: 450, baseY: 650 };
+const GLASS3 = { x: 660 - SPLIT, y: BOX_TOP, w: BOX_W, h: BOX_H }; // 右半分の中の座標。画面では x=660〜1040
+const CC3 = { cx: 190, baseY: 430, height: 270 }; // 工房の中の座標
+const WHALE3 = { cx: 618 - SPLIT, baseY: 770, height: 120 };
 
 const GlassScene: React.FC = () => {
   const f = useCurrentFrame();
   const split = interpolate(f, [0, at(SPLIT_T)], [0, 1], { ...clamp, easing: ease });
-  // 左：場面2を縮めて、黒い箱と開発者だけが左の幅に入るようにする
-  const s = lerp(split, 1, 0.54);
-  const tx = lerp(split, 0, -230 * 0.54);
-  const ty = lerp(split, 0, 540 - 600 * 0.54);
   const rightX = lerp(split, 1080, SPLIT);
   const shake = Math.sin(f * 1.7) * 4;
-  const offer = interpolate(f, [at(1.3), at(1.5)], [0, 1], { ...clamp, easing: Easing.out(Easing.back(2)) });
+  const offer = interpolate(f, [at(1.4), at(1.6)], [0, 1], { ...clamp, easing: Easing.out(Easing.back(2)) });
   const ccTop = GLASS3.y + CC3.baseY - CC3.height;
 
   return (
     <AbsoluteFill>
-      {/* 左 */}
-      <div style={{ position: "absolute", left: 0, top: 0, width: Math.max(SPLIT, rightX), height: 1080, overflow: "hidden" }}>
-        <div style={{ position: "absolute", left: 0, top: 0, width: 1080, height: 1080, transform: `translate(${tx}px, ${ty}px) scale(${s})`, transformOrigin: "0 0" }}>
-          <BoxScene />
-        </div>
-        <div style={{ position: "absolute", inset: 0, background: `rgba(40, 36, 40, ${0.3 * split})` }} />
-      </div>
-
-      {/* 右：ガラスの工房 */}
       <div style={{ position: "absolute", left: rightX, top: 0, width: 1080 - SPLIT, height: 1080, overflow: "hidden" }}>
-        <div style={{ position: "absolute", left: -SPLIT, top: 0, width: 1080, height: 1080 }}>
-          <Room />
-          <GlassWorkshop x={GLASS3.x} y={GLASS3.y} w={GLASS3.w} h={GLASS3.h} bgLeft={-200} bgTop={-120} bgWidth={900}>
-            <Sprite src="characters/claude_code/work.png" cx={CC3.cx + shake} baseY={CC3.baseY + Math.abs(Math.sin(f * 0.9)) * -5} height={CC3.height} rotate={shake / 3} squash={false} />
-            <Img src={staticFile("props/bench.png")} style={{ position: "absolute", left: 30, top: 515, width: 440 }} />
-            <Sweat x={CC3.cx + 95} y={CC3.baseY - CC3.height + 40} scale={0.7} />
-          </GlassWorkshop>
-          {/* コンティは工房の外。右向きに浮かび、ヒレを前へ出して「どうぞ」 */}
-          <Sprite
-            src="characters/continuo/wave.png"
-            cx={WHALE3.cx + offer * 12}
-            baseY={WHALE3.baseY + Math.sin(f / 7) * 6}
-            height={WHALE_H}
-            flip
-            rotate={-offer * 10}
-            squash={false}
-          />
-          <Sequence from={at(1.3)}>
-            <SpeechBubble x={WHALE3.cx - 70} y={WHALE3.baseY - WHALE_H - 110} text="どうぞ" />
-          </Sequence>
-          <Sequence from={at(1.35)} durationInFrames={at(0.6)}>
-            <Sparkle x={WHALE3.cx + 70} y={WHALE3.baseY - 120} />
-          </Sequence>
-          {/* 考え事の吹き出し（工房の中） */}
-          <Sequence from={at(1.0)}>
-            <ThoughtBubble x={GLASS3.x + 50} y={GLASS3.y + 45} w={400} h={130} lines={["テストを書いて…", "ここを直そう"]} tail={{ x: GLASS3.x + CC3.cx + 60, y: ccTop - 10 }} />
-          </Sequence>
-          <Sequence from={at(0.5)} durationInFrames={at(1.5)}>
-            <NameTag cx={GLASS3.x + CC3.cx} tipY={ccTop - 8} name="Claude Code" color={TERRACOTTA} durationInFrames={at(1.5)} fontSize={38} />
-          </Sequence>
-        </div>
+        <Room floorY={FLOOR} />
+        <GlassWorkshop x={GLASS3.x} y={GLASS3.y} w={GLASS3.w} h={GLASS3.h} bgLeft={-170} bgTop={-90} bgWidth={720}>
+          <Sprite src="characters/claude_code/work.png" cx={CC3.cx + shake} baseY={CC3.baseY + Math.abs(Math.sin(f * 0.9)) * -5} height={CC3.height} rotate={shake / 3} squash={false} />
+          <Img src={staticFile("props/bench.png")} style={{ position: "absolute", left: 20, top: 365, width: 340 }} />
+          <Sweat x={CC3.cx + 85} y={CC3.baseY - CC3.height + 35} scale={0.6} />
+        </GlassWorkshop>
+        {/* 工房の上の看板 */}
+        <Sequence from={at(0.45)}>
+          <Signboard cx={GLASS3.x + GLASS3.w / 2} bottomY={SIGN_BOTTOM} text="continuo" board={theme.color.accent} textColor="#FFFFFF" textStroke={theme.color.ink} />
+        </Sequence>
+        {/* コンティは工房の外。右向きに浮かび、ヒレを前へ出して「どうぞ」 */}
+        <Sprite
+          src="characters/continuo/wave.png"
+          cx={WHALE3.cx + offer * 10}
+          baseY={WHALE3.baseY + Math.sin(f / 7) * 6}
+          height={WHALE3.height}
+          flip
+          rotate={-offer * 10}
+          squash={false}
+        />
+        <Sequence from={at(1.4)}>
+          <SpeechBubble x={WHALE3.cx - 70} y={WHALE3.baseY - WHALE3.height - 100} text="どうぞ" fontSize={40} />
+        </Sequence>
+        <Sequence from={at(1.45)} durationInFrames={at(0.6)}>
+          <Sparkle x={WHALE3.cx + 60} y={WHALE3.baseY - 110} />
+        </Sequence>
+        {/* 考え事の吹き出し（工房の中） */}
+        <Sequence from={at(1.95)}>
+          <ThoughtBubble x={GLASS3.x + 30} y={GLASS3.y + 25} w={320} h={100} fontSize={34} lines={["テストを書いて…", "ここを直そう"]} tail={{ x: GLASS3.x + CC3.cx + 72, y: ccTop + 10 }} />
+        </Sequence>
+        <Sequence from={at(0.45)} durationInFrames={at(1.5)}>
+          <NameTag cx={GLASS3.x + CC3.cx} tipY={ccTop - 8} name="Claude Code" color={TERRACOTTA} durationInFrames={at(1.5)} fontSize={38} />
+        </Sequence>
       </div>
 
       {/* 仕切り */}
@@ -384,7 +437,7 @@ const GlassScene: React.FC = () => {
   );
 };
 
-// ---- 場面4（8〜11秒）：工房の中で Claude Code が Codex に頼む ----
+// ---- 場面4（9〜13秒）：工房の中で Claude Code が Codex に頼む ----
 const GLASS4 = { x: 360, y: 90, w: 700, h: 770 };
 const CC4 = { cx: 535, baseY: 690, height: 380 };
 const CX4 = { cx: 885, baseY: 690, height: 380 };
@@ -392,14 +445,14 @@ const HF = { height: 400, baseY: 690, handX: 0.9, handY: 0.4, aspect: 1002 / 127
 const HF_W = HF.height * HF.aspect;
 const CLAP = { x: 710, y: HF.baseY - HF.height + HF.height * HF.handY };
 const DEV4 = { cx: 175, baseY: 905, height: 520 };
-const T_PASS = 0.3;
-const T_GOT = 0.9;
-const T_WORK = 1.0;
-const T_DONE = 1.8;
-const T_BACK = 1.9;
-const T_BACK_END = 2.3;
-const T_HF = 2.35;
-const T_CLAP = 2.5;
+const T_PASS = 0.4;
+const T_GOT = 1.0;
+const T_WORK = 1.1;
+const T_DONE = 2.1;
+const T_BACK = 2.25;
+const T_BACK_END = 2.7;
+const T_HF = 2.8;
+const T_CLAP = 3.0;
 const TAG_TIP = 262;
 
 const ReceiveHand = (cx: number, baseY: number, height: number, toRight: boolean) => {
@@ -481,70 +534,11 @@ const HandoffScene: React.FC = () => {
 
       {/* 2体が並ぶ間は、2体とも名前の札を出す（人間の指示） */}
       <Sequence from={at(0.1)}>
-        <NameTag cx={ccCx} tipY={TAG_TIP} name="Claude Code" color={TERRACOTTA} durationInFrames={at(3)} fontSize={38} />
+        <NameTag cx={ccCx} tipY={TAG_TIP} name="Claude Code" color={TERRACOTTA} durationInFrames={at(3.9)} fontSize={38} />
       </Sequence>
       <Sequence from={at(0.1)}>
-        <NameTag cx={cxCx - shake} tipY={TAG_TIP} name="Codex" color={PERIWINKLE} durationInFrames={at(3)} fontSize={38} />
+        <NameTag cx={cxCx - shake} tipY={TAG_TIP} name="Codex" color={PERIWINKLE} durationInFrames={at(3.9)} fontSize={38} />
       </Sequence>
-    </AbsoluteFill>
-  );
-};
-
-// ---- 場面5（11〜13秒）：居間のソファから、タブレットで同じ工房を見る ----
-// 工房の中を小さく映す。PC の小窓とタブレットの画面で同じものを同じ動きで映す
-const MiniWorkshop: React.FC<{ w: number }> = ({ w }) => {
-  const f = useCurrentFrame();
-  const k = w / 400;
-  const shake = Math.sin(f * 1.7) * 4 * k;
-  return (
-    <div style={{ position: "absolute", left: 0, top: 0, width: 400, height: 290, transform: `scale(${k})`, transformOrigin: "0 0" }}>
-      <GlassWorkshop x={-14} y={-24} w={428} h={338} bgLeft={-180} bgTop={-230} bgWidth={760}>
-        <Sprite src="characters/claude_code/work.png" cx={214 + shake / k} baseY={300} height={205} rotate={shake / 3} squash={false} />
-        <Img src={staticFile("props/bench.png")} style={{ position: "absolute", left: 64, top: 210, width: 300 }} />
-        <Sweat x={285} y={115} scale={0.6} />
-      </GlassWorkshop>
-    </div>
-  );
-};
-
-const TABLET = { cx: 665, baseY: 1050, height: 950, img: { w: 1074, h: 1202 }, screen: { x0: 726, x1: 979, y0: 325, y1: 495 } };
-const T_TABLET_ON = 0.35;
-
-const RemoteScene: React.FC = () => {
-  const f = useCurrentFrame();
-  const k = TABLET.height / TABLET.img.h;
-  const left = TABLET.cx - (TABLET.img.w * k) / 2;
-  const top = TABLET.baseY - TABLET.height;
-  const scr = { x: left + TABLET.screen.x0 * k, y: top + TABLET.screen.y0 * k, w: (TABLET.screen.x1 - TABLET.screen.x0) * k, h: (TABLET.screen.y1 - TABLET.screen.y0) * k };
-  const on = interpolate(f, [at(T_TABLET_ON), at(T_TABLET_ON + 0.12)], [0, 1], clamp);
-  return (
-    <AbsoluteFill>
-      <Img src={staticFile("backgrounds/room.png")} style={{ position: "absolute", left: -560, top: 0, height: 1080 }} />
-      <Sprite src={EP("dev_tablet")} cx={TABLET.cx} baseY={TABLET.baseY} height={TABLET.height} squash={false} />
-      {/* タブレットの画面：点くと、同じ工房が映る */}
-      <div style={{ position: "absolute", left: scr.x - 2, top: scr.y - 2, width: scr.w + 4, height: scr.h + 4, overflow: "hidden", background: "#2E3138", borderRadius: 4 }}>
-        <div style={{ position: "absolute", inset: 0, opacity: on }}>
-          <MiniWorkshop w={scr.w + 4} />
-        </div>
-        <div style={{ position: "absolute", inset: 0, background: "#FFFFFF", opacity: interpolate(f, [at(T_TABLET_ON), at(T_TABLET_ON + 0.05), at(T_TABLET_ON + 0.3)], [0, 0.9, 0], clamp) }} />
-      </div>
-      <Sequence from={at(T_TABLET_ON)} durationInFrames={at(0.6)}>
-        <Sparkle x={scr.x + scr.w - 30} y={scr.y - 70} />
-        <Sparkle x={scr.x - 60} y={scr.y + scr.h - 30} />
-      </Sequence>
-      {/* もとからある PC の画面の小窓。場面の1コマ目から出しておき、タブレットの画面が後から点く */}
-      <div style={{ position: "absolute", left: 0, top: 0 }}>
-        <Inset x={24} y={24} width={420} height={330} background="#2E3138">
-          <div style={{ position: "absolute", left: 0, top: 0, width: 404, height: 34, background: "#3A3F4A", display: "flex", alignItems: "center", gap: 10, paddingLeft: 14 }}>
-            {["#E5534B", "#F2C14E", "#8FB3FF"].map((c) => (
-              <div key={c} style={{ width: 14, height: 14, borderRadius: 7, background: c }} />
-            ))}
-          </div>
-          <div style={{ position: "absolute", left: 0, top: 34, width: 404, height: 280, overflow: "hidden" }}>
-            <MiniWorkshop w={404} />
-          </div>
-        </Inset>
-      </div>
     </AbsoluteFill>
   );
 };
@@ -565,41 +559,42 @@ const SFX: { name: string; at: number; volume: number }[] = [
   { name: "visible_workshop_rattle", at: S("box").from + 0.1, volume: 0.6 }, // 黒い箱がガタガタ
   { name: "pop", at: S("box").from + 0.6, volume: 0.35 }, // 「？」
   { name: "visible_workshop_rattle", at: S("box").from + 1.3, volume: 0.5 },
-  { name: "pop", at: S("box").from + 1.8, volume: 0.35 }, // 2つ目の「？」
+  { name: "pop", at: S("box").from + 2.0, volume: 0.35 }, // 2つ目の「？」
+  { name: "visible_workshop_rattle", at: S("box").from + 2.5, volume: 0.45 },
   { name: "whoosh", at: S("glass").from, volume: 0.5 }, // 画面が左右に割れる
-  { name: "typing", at: S("glass").from + 1.2, volume: 0.35 }, // 吹き出しに考えが出る
-  { name: "sparkle", at: S("glass").from + 1.35, volume: 0.45 }, // コンティの「どうぞ」
+  { name: "pop", at: S("glass").from + 0.45, volume: 0.45 }, // 「continuo」の看板が立つ
+  { name: "sparkle", at: S("glass").from + 1.45, volume: 0.45 }, // コンティの「どうぞ」
+  { name: "typing", at: S("glass").from + 2.0, volume: 0.35 }, // 吹き出しに考えが出る
   { name: "swish", at: S("handoff").from + T_PASS, volume: 0.6 }, // 紙を Codex へ
   { name: "typing", at: S("handoff").from + T_WORK, volume: 0.35 }, // Codex が仕上げる
   { name: "sparkle", at: S("handoff").from + T_DONE, volume: 0.45 }, // 仕上がり
   { name: "swish", at: S("handoff").from + T_BACK, volume: 0.6 }, // 紙を返す
   { name: "visible_workshop_clap", at: S("handoff").from + T_CLAP, volume: 0.8 }, // ハイタッチ
-  { name: "pop", at: S("remote").from + T_TABLET_ON, volume: 0.5 }, // タブレットが点く
   { name: "pop", at: S("end").from, volume: 0.6 }, // 締めの字
 ];
+
+const len = (id: (typeof script.scenes)[number]["id"]) => sec(S(id).to - S(id).from);
 
 export const VisibleWorkshop: React.FC = () => (
   <AbsoluteFill style={{ background: "#F3E3C8", overflow: "hidden" }}>
     <Sequence durationInFrames={sec(2)}>
       <TitleBackdrop />
     </Sequence>
-    <Sequence from={sec(S("box").from)} durationInFrames={sec(3)}>
+    {/* 黒い箱は、場面3の間も左半分に映し続ける */}
+    <Sequence from={sec(S("box").from)} durationInFrames={len("box") + len("glass")}>
       <BoxScene />
     </Sequence>
-    <Sequence from={sec(S("glass").from)} durationInFrames={sec(3)}>
+    <Sequence from={sec(S("glass").from)} durationInFrames={len("glass")}>
       <GlassScene />
     </Sequence>
-    <Sequence from={sec(S("handoff").from)} durationInFrames={sec(3)}>
+    <Sequence from={sec(S("handoff").from)} durationInFrames={len("handoff")}>
       <HandoffScene />
-    </Sequence>
-    <Sequence from={sec(S("remote").from)} durationInFrames={sec(2)}>
-      <RemoteScene />
     </Sequence>
 
     {script.scenes.map((s) =>
       s.caption ? (
         <Sequence key={s.id} from={sec(s.from) + 4} durationInFrames={sec(s.to - s.from) - 4}>
-          <Caption text={s.caption} size={s.caption.length > 18 ? 42 : 64} />
+          <Caption text={s.caption} size={s.captionSize} />
         </Sequence>
       ) : null,
     )}

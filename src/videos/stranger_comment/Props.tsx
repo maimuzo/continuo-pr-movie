@@ -30,7 +30,7 @@ export const BoxFront: React.FC<{ x: number; y: number; mark: "check" | "eye"; l
       )}
       {glow > 0 ? <rect x={3} y={3} width={BOX.w - 6} height={BOX.h - BOX.lip - 6} rx={10} fill="none" stroke={theme.color.highlight} strokeWidth={10 * glow} opacity={glow} /> : null}
     </svg>
-    {/* 字は箱の下に札で下げる。箱の面に詰めると小さくて読めない */}
+    {/* 字は箱の下に名前の板で下げる。箱の面に詰めると小さくて読めない */}
     <div
       style={{
         position: "absolute",
@@ -58,12 +58,12 @@ const Pill: React.FC<{ role: "OWNER" | "MEMBER" }> = ({ role }) => (
   <span
     style={{
       display: "inline-block",
-      padding: "0 12px",
-      margin: "0 4px",
+      padding: "0 10px",
+      margin: "0 2px",
       borderRadius: 999,
       border: `4px solid ${theme.color.ink}`,
       background: ROLE_COLOR[role],
-      fontSize: 28,
+      fontSize: 25,
       lineHeight: 1.25,
       verticalAlign: "middle",
     }}
@@ -75,7 +75,7 @@ const Pill: React.FC<{ role: "OWNER" | "MEMBER" }> = ({ role }) => (
 // 指示書。コンティが Claude Code に渡す紙。tail は吹き出しのしっぽを出す向き（左下の点の x）
 export const RuleSheet: React.FC<{ x: number; y: number; scale?: number; tailTo?: { x: number; y: number } }> = ({ x, y, scale = 1, tailTo }) => {
   const W = 450;
-  const H = 250;
+  const H = 290;
   return (
     <>
       {tailTo ? (
@@ -103,10 +103,12 @@ export const RuleSheet: React.FC<{ x: number; y: number; scale?: number; tailTo?
         }}
       >
         <div style={{ fontSize: 46, marginTop: 14, borderBottom: `5px solid ${theme.color.ink}`, marginLeft: 120, marginRight: 120, paddingBottom: 4 }}>指示書</div>
-        <div style={{ fontSize: 34, marginTop: 20, lineHeight: 1.5 }}>
-          札が<Pill role="OWNER" />・<Pill role="MEMBER" />
+        <div style={{ fontSize: 32, marginTop: 18, lineHeight: 1.5, whiteSpace: "nowrap" }}>
+          Role が<Pill role="OWNER" />・<Pill role="MEMBER" />
           <br />
-          のものだけ聞く
+          のものだけ
+          <br />
+          指示として扱うこと
         </div>
       </div>
     </>

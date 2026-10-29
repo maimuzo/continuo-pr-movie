@@ -2,13 +2,14 @@
 export const script = {
   id: "wait-quota",
   title: "尽きても、勝手に再開",
-  end: "尽きたら寝て待つ",
+  // 締めは「尽きても、止まらない」。10字を1行にすると締めの字の大きさで画面に収まらないので2行に分ける
+  end: ["尽きても、", "止まらない"],
   scenes: [
     { id: "title", from: 0, to: 2, caption: null },
-    { id: "work", from: 2, to: 5, caption: "作業の途中で" },
-    { id: "empty", from: 5, to: 8, caption: "枠を使い切っても" },
-    { id: "wait", from: 8, to: 11, caption: "枠が戻るのを待って" },
-    { id: "resume", from: 11, to: 13, caption: "勝手に続きから" },
+    { id: "five", from: 2, to: 4, caption: "5時間のレートリミットが尽きても" },
+    { id: "resume", from: 4, to: 7, caption: "放っておけば、勝手に再開" },
+    { id: "week", from: 7, to: 10, caption: "1週間のレートリミットが尽きたら" },
+    { id: "handover", from: 10, to: 13, caption: "担当を外して、別の人が引き継ぐ" },
     { id: "end", from: 13, to: 15, caption: null },
   ],
 } as const;

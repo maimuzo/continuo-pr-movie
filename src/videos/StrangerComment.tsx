@@ -1,7 +1,7 @@
 import React from "react";
 import { AbsoluteFill, Audio, Easing, Img, interpolate, Sequence, spring, staticFile, useCurrentFrame, useVideoConfig } from "remotion";
 import { Caption } from "../components/Caption";
-import { Sparkle, SpeedLines, Sweat } from "../components/Effects";
+import { Sparkle, SpeedLines } from "../components/Effects";
 import { NameTag } from "../components/NameTag";
 import { Sprite } from "../components/Sprite";
 import { sec, theme } from "../theme";
@@ -10,9 +10,9 @@ import { BOX, BoxBack, BoxFront, RuleSheet, SmallSheet } from "./stranger_commen
 import { EndCard2, TitleCard2 } from "./stranger_comment/Titles";
 import { script } from "./stranger_comment.script";
 
-// 他人のコメントの回。issue のコメント欄に3つのコメントが並び、Claude Code が立場の札を見て
-// チームの2つを「指示」の箱へ、知らない人の1つを「報告として読む」の箱へしまう。
-// コメントの文言と札は絵に描かせず、すべて Remotion の字で描く。
+// 他人のコメントの回。issue のコメント欄に3つのコメントが並び、Claude Code が書き手の Role を見て
+// OWNER・MEMBER の2つを「指示」の箱へ、知らない人の1つを「報告として読む」の箱へしまい、ほっと安心する。
+// コメントの文言と Role は絵に描かせず、すべて Remotion の字で描く。
 // 座標はすべて 1080×1080 の画面の座標。各場面の中の時刻は、その場面の頭からの秒で書く
 
 const clamp = { extrapolateLeft: "clamp", extrapolateRight: "clamp" } as const;
@@ -32,7 +32,7 @@ const rowCenter = (p: { x: number; y: number; scale: number }, i: number) => ({
 });
 
 // ---- 場面1・2：コメント欄（0〜6秒）----
-// 3つのコメントが上から続けて落ちてきて、コメント欄の行に収まる。札は最初から付いている
+// 3つのコメントが上から続けて落ちてきて、コメント欄の行に収まる。Role は最初から付いている
 const DROP_AT = [0.3, 1.2, 2.1];
 
 const DeskBackground: React.FC = () => (
@@ -95,7 +95,7 @@ const T_PANEL = 0.45; // コメント欄が右上に縮み終わる
 const T_CC = 0.15; // Claude Code が下から出る
 const T_PASS = 0.7; // 指示書を渡し始める
 const T_GOT = 1.0; // 受け取る
-const T_READ = [2.0, 2.35, 2.7]; // 1つずつコメントを読み、札を見る
+const T_READ = [2.0, 2.35, 2.7]; // 1つずつコメントを読み、Role を見る
 const T_SORT = [2.95, 3.4]; // チームの2つを「指示」の箱へ
 const SORT_DUR = 0.5;
 // 場面4の中の秒（場面3から続けて数える。場面3は4秒）
@@ -104,7 +104,7 @@ const T_GRAB = R0 + 0.15; // 知らない人のコメントを手に取る
 const T_HELD = R0 + 0.6; // 箱の上で止まる
 const T_DROP = R0 + 0.9; // 「報告として読む」箱へ
 const T_IN = R0 + 1.4;
-const T_SHRUG = R0 + 1.5;
+const T_RELIEF = R0 + 1.5; // ほっと胸をなで下ろす
 
 // コメントを写した紙。from から to へ、arc だけ上に膨らむ弧を描いて飛び、大きさを s0 から s1 へ変える
 const Slip: React.FC<{ i: number; from: { x: number; y: number }; to: { x: number; y: number }; t: number; s0: number; s1: number; arc?: number }> = ({ i, from, to, t, s0, s1, arc = 40 }) => {
@@ -136,15 +136,16 @@ const RoomScene: React.FC = () => {
   // Claude Code：下から跳ねて出る。受け取ってから指示書を持って読む
   const rise = interpolate(f, [at(T_CC), at(T_CC + 0.3)], [0, 1], { ...clamp, easing: Easing.out(Easing.back(1.8)) });
   const ccBase = lerp(rise, CC.baseY + CC.height, CC.baseY);
-  const ccSrc = f < at(T_GOT) ? "characters/claude_code/receive.png" : f < at(R0) ? "ep/stranger_comment/hold_sheet.png" : f < at(T_SHRUG) ? "characters/claude_code/receive.png" : "ep/stranger_comment/shrug.png";
-  const ccFlip = f >= at(R0) && f < at(T_SHRUG);
-  const shrugBob = f >= at(T_SHRUG) ? interpolate(f, [at(T_SHRUG), at(T_SHRUG + 0.15), at(T_SHRUG + 0.35)], [0, -18, 0], clamp) : 0;
+  const ccSrc = f < at(T_GOT) ? "characters/claude_code/receive.png" : f < at(R0) ? "ep/stranger_comment/hold_sheet.png" : f < at(T_RELIEF) ? "characters/claude_code/receive.png" : "ep/stranger_comment/relief.png";
+  const ccFlip = f >= at(R0) && f < at(T_RELIEF);
+  // ほっとして肩の力が抜ける：いったん少し沈んでから戻る
+  const reliefBob = f >= at(T_RELIEF) ? interpolate(f, [at(T_RELIEF), at(T_RELIEF + 0.25), at(T_RELIEF + 0.6)], [0, 14, 0], { ...clamp, easing: ease }) : 0;
 
   // 箱は、コメント欄が縮み終わってから床に置く（縮む途中の大きな欄と重ねない）
   const boxPop = spring({ frame: f - at(T_PANEL - 0.05), fps, config: { damping: 24, stiffness: 240 } }); // 弾みすぎると字が画面の端から出る
   const sheetPop = spring({ frame: f - at(T_GOT), fps, config: { damping: 11, stiffness: 200 } });
 
-  // 読む：見ている行が光る。札の付いた行は札も膨らむ
+  // 読む：見ている行が光る。Role の付いた行は Role の印も膨らむ
   const readGlow = (i: number) => interpolate(f, [at(T_READ[i]), at(T_READ[i] + 0.1), at(T_READ[i] + 0.45)], [0, 1, 0], clamp);
   const sortT = (k: number) => interpolate(f, [at(T_SORT[k]), at(T_SORT[k] + SORT_DUR)], [0, 1], { ...clamp, easing: ease });
   const ruleGlow = Math.max(...T_SORT.map((t) => interpolate(f, [at(t + SORT_DUR), at(t + SORT_DUR + 0.1), at(t + SORT_DUR + 0.45)], [0, 1, 0], clamp)));
@@ -170,7 +171,7 @@ const RoomScene: React.FC = () => {
         <BoxBack x={BOX_REPORT.x} y={BOX_REPORT.y} />
       </div>
 
-      {f >= at(T_CC) ? <Sprite src={ccSrc} cx={CC.cx} baseY={ccBase + shrugBob} height={CC.height} flip={ccFlip} squash={f >= at(T_GOT)} /> : null}
+      {f >= at(T_CC) ? <Sprite src={ccSrc} cx={CC.cx} baseY={ccBase + reliefBob} height={CC.height} flip={ccFlip} squash={f >= at(T_GOT)} /> : null}
       <Sprite src="characters/continuo/wave.png" cx={whale.cx} baseY={whale.baseY} height={WHALE.h} flip squash={false} />
       <Sequence durationInFrames={at(0.5)}>
         <SpeedLines x={0} y={WHALE.baseY - 140} width={150} height={120} direction={1} />
@@ -214,10 +215,7 @@ const RoomScene: React.FC = () => {
         </Sequence>
       ))}
 
-      {/* 肩をすくめる */}
-      <Sequence from={at(T_SHRUG + 0.1)}>
-        <Sweat x={CC.cx + 130} y={CC.baseY - CC.height + 40} scale={0.8} />
-      </Sequence>
+      {/* ほっと吐く息は絵に描いてある。光を足すと顔や耳に重なるので足さない */}
 
       {/* 名前の札は最前面に。Claude Code が初めて出たときから 1.5秒。左のコンティが指示書を渡す手もとを隠さないよう、頭の右寄りに立てる */}
       <Sequence from={at(T_CC + 0.15)} durationInFrames={at(1.5)}>
@@ -240,7 +238,7 @@ const SFX: { name: string; at: number; volume: number }[] = [
   { name: "stranger_comment_drop", at: R + T_SORT[1] + SORT_DUR, volume: 0.6 },
   { name: "swish", at: R + T_GRAB, volume: 0.45 }, // 知らない人のコメントを手に取る
   { name: "stranger_comment_drop", at: R + T_IN, volume: 0.6 }, // 「報告として読む」箱へ
-  { name: "stranger_comment_shrug", at: R + T_SHRUG, volume: 0.6 }, // 肩をすくめる
+  { name: "stranger_comment_relief", at: R + T_RELIEF, volume: 0.6 }, // ほっと息をつく
   { name: "pop", at: S("end").from, volume: 0.6 }, // 締めの字
 ];
 
@@ -270,7 +268,7 @@ export const StrangerComment: React.FC = () => (
       <TitleCard2 text={script.title} outFrom={sec(1.7)} />
     </Sequence>
     <Sequence from={sec(S("end").from)}>
-      <EndCard2 text={script.end} sprite="characters/continuo/wave.png" spriteWidth={300} spriteTop={700} />
+      <EndCard2 text={script.end} sprite="characters/continuo/wave.png" spriteWidth={300} spriteTop={700} fontSize={104} />
     </Sequence>
 
     {SFX.map((e, i) => (

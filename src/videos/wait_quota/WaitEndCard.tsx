@@ -2,11 +2,16 @@ import React from "react";
 import { Img, interpolate, spring, staticFile, useCurrentFrame, useVideoConfig } from "remotion";
 import { theme } from "../../theme";
 
-// 締め。共通の EndCard の写しで、締めの字が8文字と長く 150px では画面からはみ出すので、字を 112px にし、出だしの拡大を 1.15倍までにした。
-// 締め。中央に決めの字幕、下に continuo の名前と URL、跳ねるキャラクター。
-// 字幕は最初のフレームから見えるように、透明から出さず、大きい字から縮めて「ドン」と置く
-// spriteWidth はキャラクターの幅。横に長いクジラと縦に長いロボットで変えられるようにする
-export const WaitEndCard: React.FC<{ text: string; sprite: string; spriteWidth?: number; spriteTop?: number }> = ({ text, sprite, spriteWidth = 200, spriteTop = 700 }) => {
+// 締め。チームで入札の回の EndCardLines を写したもの。決めの字幕を2行に分けて出す。
+// 「尽きても、止まらない」は10字あり、共通の EndCard の 150px では画面の幅に収まらないため。
+// 出だしの拡大も 1.15 倍までにし、13.0 秒の1コマ目で字が画面の左右から切れないようにする
+export const WaitEndCard: React.FC<{ lines: readonly string[]; sprite: string; spriteWidth?: number; spriteTop?: number; fontSize?: number }> = ({
+  lines,
+  sprite,
+  spriteWidth = 200,
+  spriteTop = 700,
+  fontSize = 110,
+}) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const slam = spring({ frame, fps, config: { damping: 8, stiffness: 260 } });
@@ -16,19 +21,22 @@ export const WaitEndCard: React.FC<{ text: string; sprite: string; spriteWidth?:
       <div
         style={{
           position: "absolute",
-          top: 230,
+          top: 140,
           width: "100%",
           textAlign: "center",
           fontFamily: theme.fontFamily,
           fontWeight: 800,
-          fontSize: 112,
+          fontSize,
+          lineHeight: 1.15,
           color: theme.color.ink,
           transform: `scale(${interpolate(slam, [0, 1], [1.15, 1])})`,
         }}
       >
-        {text}
+        {lines.map((l) => (
+          <div key={l}>{l}</div>
+        ))}
       </div>
-      <div style={{ position: "absolute", top: 440, width: "100%", textAlign: "center", fontFamily: theme.fontFamily, fontWeight: 800, color: theme.color.ink }}>
+      <div style={{ position: "absolute", top: 460, width: "100%", textAlign: "center", fontFamily: theme.fontFamily, fontWeight: 800, color: theme.color.ink }}>
         <div style={{ fontSize: 76, color: theme.color.accent }}>continuo</div>
         <div style={{ fontSize: 34, marginTop: 4 }}>github.com/maimuzo/continuo</div>
       </div>

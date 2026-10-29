@@ -9,8 +9,8 @@ import { TitleCard } from "./flat_rate/TitleCard";
 import { sec, theme } from "../theme";
 import { script } from "./flat_rate.script";
 
-// 定額のままの回。2〜10秒は画面を左右に割り、左（ほかのやり方＝従量課金）と右（continuo＝定額のまま）を同じ作りで並べる。
-// 左右の違いは「レジの表示が回るか止まるか」と開発者の顔だけにする（右の意味が読み取れないという人間の指摘への答え）。
+// 定額のままの回。2〜10秒は画面を左右に割り、左（従量課金）と右（continuo＝定額のまま）を同じ作りで並べる。
+// 左右の違いは「レジの表示が回るか止まるか」と開発者の顔だけにし、どちらが何かは上の大きな看板の帯で見せる。
 // 座標は、割った場面では幅540の半分の中の座標、引っ越しの場面では 1080×1080 の画面の座標
 
 const clamp = { extrapolateLeft: "clamp", extrapolateRight: "clamp" } as const;
@@ -118,7 +118,8 @@ const Drum: React.FC<{ value: number; color: string }> = ({ value, color }) => {
 };
 
 // レジ。幅 260 の箱で、(x, y) が左上。
-// yen を渡すと桁ごとに回る表示、fixed を渡すと止まった表示。off で表示が消える。
+// yen を渡すと桁ごとに回る表示、fixed を渡すと止まった表示。
+// off（0〜1）で、ブラウン管が消えるときのように表示が真ん中の横線に縮み、点になって消える。
 const REG_W = 260;
 const REG_H = 300;
 const DISPLAY_COLOR = "#FFD86B";
@@ -171,8 +172,22 @@ const Register: React.FC<{ x: number; y: number; scale?: number; yen?: number; f
           <rect x={100} y={246} width={60} height={14} rx={7} fill="#3B3F4C" stroke={ink} strokeWidth={3.5} />
         )}
       </svg>
-      {/* 金額の表示 */}
-      <div style={{ position: "absolute", left: 42, top: 20, width: 176, height: 60, display: "flex", alignItems: "center", justifyContent: "center", opacity: 1 - off }}>
+      {/* 金額の表示。off の前半で縦に潰れて白く光り、後半で横線が真ん中へ縮む */}
+      <div
+        style={{
+          position: "absolute",
+          left: 42,
+          top: 20,
+          width: 176,
+          height: 60,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          transform: `scaleY(${interpolate(off, [0, 0.35], [1, 0.03], clamp)})`,
+          filter: `brightness(${interpolate(off, [0, 0.35], [1, 3], clamp)})`,
+          opacity: off < 0.35 ? 1 : 0,
+        }}
+      >
         {fixed !== undefined ? (
           <div style={{ display: "flex", alignItems: "baseline", gap: 6, whiteSpace: "nowrap", fontFamily: theme.fontFamily, fontWeight: 800, color: DISPLAY_COLOR }}>
             <span style={{ fontSize: 40 }}>{FLAT_PRICE}</span>
@@ -189,6 +204,7 @@ const Register: React.FC<{ x: number; y: number; scale?: number; yen?: number; f
           </div>
         )}
       </div>
+      {off > 0 && off < 1 ? <CrtLine off={off} /> : null}
       {/* 錠 */}
       {locked >= 0 ? (
         <svg style={{ position: "absolute", left: REG_W / 2 - 42, top: 196 + lockDrop }} width={84} height={110} viewBox="0 0 84 110">
@@ -200,6 +216,28 @@ const Register: React.FC<{ x: number; y: number; scale?: number; yen?: number; f
         </svg>
       ) : null}
     </div>
+  );
+};
+
+// 表示が消えるときの白い横線。真ん中に縮んで、最後は点になって消える
+const CrtLine: React.FC<{ off: number }> = ({ off }) => {
+  if (off < 0.3) return null;
+  const w = interpolate(off, [0.35, 0.85], [176, 6], { ...clamp, easing: Easing.in(Easing.quad) });
+  const a = interpolate(off, [0.85, 1], [1, 0], clamp);
+  return (
+    <div
+      style={{
+        position: "absolute",
+        left: 42 + (176 - w) / 2,
+        top: 20 + 30 - 3,
+        width: w,
+        height: 6,
+        borderRadius: 3,
+        background: "#FFFFFF",
+        boxShadow: "0 0 12px 4px rgba(200,230,255,0.9)",
+        opacity: a,
+      }}
+    />
   );
 };
 
@@ -227,19 +265,36 @@ const HalfBackground: React.FC<{ gloomy?: boolean }> = ({ gloomy }) => (
   />
 );
 
-const Label: React.FC<{ text: string; color: string; x?: number; width?: number }> = ({ text, color, x = 0, width = 540 }) => (
-  <div style={{ position: "absolute", left: x, top: 26, width, display: "flex", justifyContent: "center" }}>
+// 看板の帯。半分の幅いっぱいに目立つ色の帯を渡し、太い字を大きく出す（字幕より目立たせる）
+const BANNER_TOP = 18;
+const BANNER_H = 150;
+const Label: React.FC<{ text: string; color: string; x?: number; width?: number; fontSize?: number }> = ({ text, color, x = 0, width = 540, fontSize = 104 }) => (
+  <div
+    style={{
+      position: "absolute",
+      left: x + 14,
+      top: BANNER_TOP,
+      width: width - 28,
+      height: BANNER_H,
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      background: color,
+      border: `8px solid ${ink}`,
+      borderRadius: 22,
+      boxShadow: `0 8px 0 ${ink}`,
+      boxSizing: "border-box",
+    }}
+  >
     <div
       style={{
-        padding: "4px 26px",
-        background: color,
-        border: `6px solid ${ink}`,
-        borderRadius: 999,
         fontFamily: theme.fontFamily,
         fontWeight: 800,
-        fontSize: 46,
+        fontSize,
+        lineHeight: 1,
+        whiteSpace: "nowrap",
         color: "#FFFFFF",
-        WebkitTextStroke: `8px ${ink}`,
+        WebkitTextStroke: `14px ${ink}`,
         paintOrder: "stroke fill",
       }}
     >
@@ -247,10 +302,11 @@ const Label: React.FC<{ text: string; color: string; x?: number; width?: number 
     </div>
   </div>
 );
+const METERED_RED = "#D8402F";
 
 // ---- 半分の中の配置（幅540）----
 // 右上にレジ、左に品を積む台、その手前に Claude Code、右手前に開発者
-const H_REG = { x: 258, y: 120 };
+const H_REG = { x: 258, y: 200 };
 const H_TABLE = { x: 6, y: 600, w: 268 };
 const H_PILE = { x: 12, groundY: H_TABLE.y + 4, w: 52 };
 const H_CC = { cx: 165, baseY: 910, height: 255 };
@@ -290,7 +346,7 @@ const MeteredHalf: React.FC<{ t: number }> = ({ t }) => {
   return (
     <AbsoluteFill style={{ width: 540, overflow: "hidden" }}>
       <HalfBackground gloomy />
-      <Label text="ほかのやり方" color="#8A8F9C" />
+      <Label text="従量課金" color={METERED_RED} />
       <Register x={H_REG.x} y={H_REG.y} yen={meteredYen(t)} drawerOpen={count > 0} shake={shake} />
       <PileTable x={H_TABLE.x} y={H_TABLE.y} w={H_TABLE.w} />
       <Pile count={count} x={H_PILE.x} groundY={H_PILE.groundY} w={H_PILE.w} dropT={sinceBox / STACK_EVERY} />
@@ -333,7 +389,7 @@ const FlatHalf: React.FC<{ t: number; lockT: number }> = ({ t, lockT }) => {
       <Pile count={count} x={H_PILE.x} groundY={H_PILE.groundY} w={H_PILE.w} dropT={sinceBox / STACK_EVERY} />
       <StackingRobot t={t} cx={H_CC.cx} baseY={H_CC.baseY} height={H_CC.height} />
       {/* コンティは Claude Code の頭の上で、ヒレを振って見守る */}
-      <Sprite src="characters/continuo/wave.png" cx={350} baseY={500 + Math.sin(f / 7) * 6} height={100} flip squash={false} rotate={Math.sin(f / 4) * 6} />
+      <Sprite src="characters/continuo/wave.png" cx={315} baseY={600 + Math.sin(f / 7) * 6} height={95} flip squash={false} rotate={Math.sin(f / 4) * 6} />
       <Sprite src="characters/developer/sip_coffee.png" cx={H_DEV.cx + 5} baseY={H_DEV.baseY + 10} height={330} squash={false} />
       <Steam x={H_DEV.cx - 135} y={H_DEV.baseY - 390} />
     </AbsoluteFill>
@@ -407,7 +463,8 @@ const MoveScene: React.FC = () => {
   const f = useCurrentFrame();
   const local = f / theme.fps;
   const t = S("move").from + local;
-  const off = interpolate(local, [T_UNPLUG, T_UNPLUG + 0.15], [0, 1], clamp);
+  // 抜いた瞬間から 0.55秒で、ブラウン管が消えるように表示が横線に縮んで消える（音の「ブォン」と同じ長さ）
+  const off = interpolate(local, [T_UNPLUG, T_UNPLUG + 0.55], [0, 1], clamp);
   // 抜いた瞬間に金額が止まり、表示が消える
   const yen = meteredYen(Math.min(t, S("move").from + T_UNPLUG));
   const walk = interpolate(local, [T_WALK, T_ARRIVE], [0, 1], { ...clamp, easing: ease });
@@ -424,10 +481,10 @@ const MoveScene: React.FC = () => {
   return (
     <AbsoluteFill>
       <Img src={staticFile("backgrounds/workshop.png")} style={{ position: "absolute", left: 0, top: 0, width: 1080, height: 1080 }} />
-      {/* 左の隅は彩度を落とし、ほかのやり方の場所だと分かるようにする */}
+      {/* 左の隅は彩度を落とし、従量課金の場所だと分かるようにする */}
       <div style={{ position: "absolute", left: 0, top: 0, width: 400, height: 1080, background: "rgba(60,64,80,0.28)" }} />
-      <Label text="ほかのやり方" color="#8A8F9C" x={0} width={400} />
-      <Label text="continuo" color={theme.color.accent} x={600} width={480} />
+      <Label text="従量課金" color={METERED_RED} x={0} width={420} fontSize={88} />
+      <Label text="continuo" color={theme.color.accent} x={600} width={480} fontSize={96} />
 
       {/* 左：従量課金のレジと台、壁のコンセント */}
       <svg style={{ position: "absolute", left: 0, top: 0 }} width={1080} height={1080}>
@@ -477,11 +534,17 @@ const SFX: { name: string; at: number; volume: number }[] = [
   ...coinTimes.map((s, i) => ({ name: "flat_rate_coin", at: s, volume: s < T_REVEAL ? 0.45 : 0.22 + (i % 2) * 0.03 })),
   { name: "whoosh", at: T_REVEAL, volume: 0.45 }, // シャッターが上がる
   { name: "flat_rate_lock", at: T_LOCK + 0.25, volume: 0.8 }, // 錠が掛かる
-  { name: "flat_rate_unplug", at: S("move").from + T_UNPLUG, volume: 0.85 }, // 電源を抜く
+  { name: "flat_rate_crt_off", at: S("move").from + T_UNPLUG, volume: 0.9 }, // 電源を抜く。ブラウン管が消える「ブォン」
   { name: "swish", at: S("move").from + T_WALK, volume: 0.5 }, // 箱を抱えて歩き出す
   { name: "sparkle", at: S("move").from + T_ARRIVE, volume: 0.45 }, // 右の工房に着く
   { name: "pop", at: S("end").from, volume: 0.6 }, // 締めの字
 ];
+
+// 字幕の字の大きさ。英字は和字の 0.55 字ぶんと数え、1行が 960px に収まる大きさにする（最大 64）
+const captionSize = (text: string) => {
+  const units = Array.from(text).reduce((n, c) => n + (c.charCodeAt(0) < 128 ? 0.55 : 1), 0);
+  return Math.min(64, Math.floor(960 / units));
+};
 
 const TitleBackdrop: React.FC = () => (
   <AbsoluteFill style={{ filter: "blur(10px)" }}>
@@ -510,7 +573,7 @@ export const FlatRate: React.FC = () => (
     {script.scenes.map((s) =>
       s.caption ? (
         <Sequence key={s.id} from={sec(s.from) + 4} durationInFrames={sec(s.to - s.from) - 4}>
-          <Caption text={s.caption} size={s.caption.length > 14 ? 56 : 64} />
+          <Caption text={s.caption} size={captionSize(s.caption)} />
         </Sequence>
       ) : null,
     )}

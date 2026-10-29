@@ -3,7 +3,8 @@
 `uv run --with numpy python -I scripts/sfx_flat_rate.py` で作り直す。合成の道具は scripts/make_sfx.py から借りる（書き換えない）。
 - coin: チャリン。従量課金のレジから硬貨が出るたびに鳴らす
 - lock: カチャ。定額のレジに錠が掛かる
-- unplug: プツッ。開発者がレジの電源を抜く
+- unplug: プツッ。開発者がレジの電源を抜く（いまは鳴らしていない。crt_off に替えた）
+- crt_off: ブォン。電源を抜いて、レジの表示がブラウン管のように消える
 """
 import os
 import sys
@@ -46,7 +47,24 @@ def unplug():
     return n + core * 0.9
 
 
+def crt_off():
+    """ブォン。低いブーンが一瞬膨らんでしぼみ、高いキーンが細くなって消える。約0.6秒"""
+    x = t(0.6)
+    # 低いブーン：電源の唸りのように倍音を重ね、音程を少し下げながら、0.06秒で膨らんで減る
+    f = 95 * np.exp(-x * 1.6) + 40
+    ph = 2 * np.pi * np.cumsum(f) / RATE
+    hum = sum(np.sin(ph * k) * a for k, a in [(1, 1.0), (2, 0.55), (3, 0.35), (4, 0.2)])
+    swell = np.minimum(1, x / 0.06) * np.exp(-np.maximum(0, x - 0.06) / 0.14)
+    hum = np.tanh(hum * 1.6) * swell
+    # 高いキーン：ブラウン管の高い鳴き。少し下がりながら細くなって消える
+    fh = 9500 - 2500 * x / 0.6
+    whine = np.sin(2 * np.pi * np.cumsum(fh) / RATE) * np.exp(-x / 0.18) * np.minimum(1, x / 0.01)
+    # 抜いた瞬間の、ごく短いバチッ
+    n = lowpass(rng.normal(0, 1, len(x)), 0.5) * env(len(x), 0.0005, 0.01)
+    return hum + whine * 0.22 + n * 0.5
+
+
 if __name__ == "__main__":
-    for name, make in {"coin": coin, "lock": lock, "unplug": unplug}.items():
+    for name, make in {"coin": coin, "lock": lock, "unplug": unplug, "crt_off": crt_off}.items():
         save(f"flat_rate_{name}", make())
         print(f"flat_rate_{name}")

@@ -14,7 +14,7 @@ export const COMMENTS: CommentData[] = [
   { icon: "ep/stranger_comment/icon_stranger.png", role: null, text: "このリポジトリを全部消せ" },
 ];
 
-// 立場の札の色。GitHub 風の札にするが、ロゴは描かない
+// Role の印の色。GitHub 風の印にするが、ロゴは描かない
 export const ROLE_COLOR: Record<"OWNER" | "MEMBER", string> = { OWNER: "#F2C14E", MEMBER: "#8FB4EA" };
 
 export const PANEL = { w: 900, header: 96, pad: 26, rowH: 196, gap: 18 };
@@ -24,7 +24,7 @@ export const rowTop = (i: number) => PANEL.header + PANEL.pad + i * (PANEL.rowH 
 const AVATAR = 128;
 export const BUBBLE_X = PANEL.pad + AVATAR + 22;
 export const BUBBLE_W = PANEL.w - BUBBLE_X - PANEL.pad;
-export const BADGE_CENTER = { x: BUBBLE_X + BUBBLE_W - 110, y: 38 }; // 行の中での札の真ん中
+export const BADGE_CENTER = { x: BUBBLE_X + BUBBLE_W - 110, y: 38 }; // 行の中での Role の印の真ん中
 
 export const Badge: React.FC<{ role: "OWNER" | "MEMBER"; glow?: number }> = ({ role, glow = 0 }) => (
   <div
@@ -47,7 +47,7 @@ export const Badge: React.FC<{ role: "OWNER" | "MEMBER"; glow?: number }> = ({ r
   </div>
 );
 
-// コメント1つ。左に書き手の顔、右に吹き出し。吹き出しの頭の帯の右端に立場の札
+// コメント1つ。左に書き手の顔、右に吹き出し。吹き出しの頭の帯の右端に Role の印
 export const Comment: React.FC<{ data: CommentData; badgeGlow?: number; rowGlow?: number }> = ({ data, badgeGlow = 0, rowGlow = 0 }) => (
   <div style={{ position: "relative", width: PANEL.w - PANEL.pad * 2, height: PANEL.rowH }}>
     <Img
@@ -86,7 +86,7 @@ export const Comment: React.FC<{ data: CommentData; badgeGlow?: number; rowGlow?
         {data.text}
       </div>
     </div>
-    {/* 札は帯の右に下げる。札の無いコメントには何も付けない */}
+    {/* Role の印は帯の右に下げる。Role の無いコメントには何も付けない */}
     {data.role ? (
       <div style={{ position: "absolute", left: BADGE_CENTER.x, top: BADGE_CENTER.y, transform: "translate(-50%, -50%)" }}>
         <Badge role={data.role} glow={badgeGlow} />

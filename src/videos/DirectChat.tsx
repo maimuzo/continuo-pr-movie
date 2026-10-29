@@ -1,7 +1,7 @@
 import React from "react";
 import { AbsoluteFill, Audio, Easing, Img, interpolate, Sequence, staticFile, useCurrentFrame } from "remotion";
 import { Caption } from "../components/Caption";
-import { Exclamation, Sparkle, SpeedLines, Sweat } from "../components/Effects";
+import { Sparkle, SpeedLines, Sweat } from "../components/Effects";
 import { CARD_SIZE, IssueCard } from "../components/IssueCard";
 import { NameTag } from "../components/NameTag";
 import { Sprite } from "../components/Sprite";
@@ -9,14 +9,16 @@ import { sec } from "../theme";
 import { script } from "./direct_chat.script";
 import { EndCardDC, TitleCardDC } from "./direct_chat/Cards";
 import { cardSlot, DIRECT_CHAT, IN_PROGRESS, Kanban6 } from "./direct_chat/Kanban6";
-import { BubbleKind, InstructionSlip, PaneScreen, SlipKind, SoundArcs, SpeechBubble, ZipMark } from "./direct_chat/Props";
+import { BubbleKind, CommentCard, CommentPile, PaneScreen, PILE_COLORS, SpeechBubble } from "./direct_chat/Props";
 
-// Direct Chat の回。作業台・カンバンの壁・作業台（話す）・カンバンの壁（戻す）の順にカットを割る。
-// 座標はすべて 1080×1080 の画面の座標。各場面の中の時刻は、その場面の頭からの秒で書く。中身は docs/spec/detailed_storyboards/direct_chat.md
+// Direct Chat の回。ふだんは issue のコメントで会話し、込み入ったらカードを Direct Chat へ動かして Claude Code と直接話す。
+// continuo は指示を出さない（Claude Code を起動して見届けるだけ）ので、コンティは横で見守る役にする。
+// 座標はすべて 1080×1080 の画面の座標。各カットの中の時刻は、そのカットの頭からの秒で書く。中身は docs/spec/detailed_storyboards/direct_chat.md
 
 const clamp = { extrapolateLeft: "clamp", extrapolateRight: "clamp" } as const;
 const ease = Easing.inOut(Easing.cubic);
 const TERRACOTTA = "#D97757";
+const DEV_COLOR = PILE_COLORS[0];
 const S = (id: (typeof script.scenes)[number]["id"]) => script.scenes.find((s) => s.id === id)!;
 const at = (s: number) => sec(s);
 const lerp = (t: number, a: number, b: number) => a + (b - a) * t;
@@ -25,85 +27,114 @@ const EP = (name: string) => `ep/direct_chat/${name}.png`;
 const Workshop: React.FC = () => <Img src={staticFile("backgrounds/workshop.png")} style={{ position: "absolute", width: 1080, height: 1080 }} />;
 const Corner: React.FC = () => <Img src={staticFile("backgrounds/corner.png")} style={{ position: "absolute", width: 1080, height: 1080 }} />;
 
-// ---- 作業台のカット（タイトルの後ろ・2〜5秒）----
-const BENCH = { x: 400, y: 640, width: 640 };
-const CC = { cx: 720, baseY: 860, height: 470 };
-const SHOUT = { cx: 260, baseY: 520, height: 230 };
-const BELL = { x: 467, y: 400 }; // メガホンの口（konti_megaphone.png の右端）
-const CC_HEAD = { x: 700, y: 500 };
+// ---- 作業台のカット（コメントで会話する）----
+// 左に作業台と、その奥で作る Claude Code。右に、膝のノートパソコンでコメントを書く開発者。上の真ん中でコンティが見守る
+const BENCH = { x: 20, y: 640, width: 600 };
+const CC = { cx: 320, baseY: 850, height: 440 };
+const DEV = { cx: 850, baseY: 905, height: 500 };
+const LAPTOP = { x: 700, y: 640 }; // 開発者のノートパソコンの画面のあたり
+const CC_HEAD = { x: 330, y: 470 };
+const KONTI_WATCH = { cx: 560, baseY: 300, height: 150 };
+const PILE_AT = { x: 600, y: 450, scale: 1.1 };
+const FLY = 0.45; // コメントが届くまでの秒
 
-const TitleBackdrop: React.FC = () => (
-  <AbsoluteFill style={{ filter: "blur(10px)" }}>
-    <Workshop />
-    <Img src={staticFile("props/bench.png")} style={{ position: "absolute", left: BENCH.x, top: BENCH.y, width: BENCH.width }} />
-  </AbsoluteFill>
-);
+type Flight = { t: number; from: "dev" | "cc" };
+const flightPath = (from: "dev" | "cc") => (from === "dev" ? [LAPTOP, CC_HEAD] : [CC_HEAD, LAPTOP]);
 
-// 場面2：コンティがメガホンで次々に指示を飛ばし、Claude Code がせっせと作る
-const SHOUTS: { t: number; kind: SlipKind }[] = [
-  { t: 0.3, kind: "arrow" },
-  { t: 0.9, kind: "plus" },
-  { t: 1.5, kind: "lines" },
-  { t: 2.1, kind: "check" },
-];
-const FLY = 0.5; // 紙が Claude Code に届くまでの秒
-
-const OrderScene: React.FC = () => {
+// 飛んでいくコメント。送った人の手もとから相手へ弧を描いて飛び、届くと小さくなって消える
+const FlyingComment: React.FC<{ fl: Flight }> = ({ fl }) => {
   const f = useCurrentFrame();
-  const shake = Math.sin(f * 1.7) * 5;
-  // 叫ぶたびに少し前へ乗り出す
-  const lean = SHOUTS.reduce((acc, s) => acc + interpolate(f, [at(s.t), at(s.t + 0.06), at(s.t + 0.3)], [0, 1, 0], clamp), 0);
+  if (f < at(fl.t) || f > at(fl.t + FLY + 0.15)) return null;
+  const [a, b] = flightPath(fl.from);
+  const t = interpolate(f, [at(fl.t), at(fl.t + FLY)], [0, 1], { ...clamp, easing: Easing.inOut(Easing.quad) });
+  const gone = interpolate(f, [at(fl.t + FLY), at(fl.t + FLY + 0.15)], [1, 0], clamp);
+  return (
+    <CommentCard
+      x={lerp(t, a.x, b.x)}
+      y={lerp(t, a.y, b.y) - Math.sin(t * Math.PI) * 150}
+      color={fl.from === "dev" ? DEV_COLOR : TERRACOTTA}
+      scale={lerp(Math.sin(t * Math.PI), 0.9, 1.45) * gone}
+      rotate={(fl.from === "dev" ? -1 : 1) * lerp(t, 12, -6)}
+    />
+  );
+};
+
+const DeskCut: React.FC<{ flights: Flight[]; dev: "laptop" | "tangle"; devHop?: number; pile?: { tangle: number; shown: number }; nameTag?: boolean }> = ({
+  flights,
+  dev,
+  devHop = 0,
+  pile,
+  nameTag,
+}) => {
+  const f = useCurrentFrame();
+  const shake = Math.sin(f * 1.7) * 4;
   return (
     <AbsoluteFill>
       <Workshop />
       <Sprite src="characters/claude_code/work.png" cx={CC.cx + shake} baseY={CC.baseY + Math.abs(Math.sin(f * 0.9)) * -6} height={CC.height} rotate={shake / 3} squash={false} />
       <Img src={staticFile("props/bench.png")} style={{ position: "absolute", left: BENCH.x, top: BENCH.y, width: BENCH.width }} />
-      <Sweat x={CC.cx + 150} y={CC.baseY - CC.height + 90} scale={0.8} />
-      <SpeedLines x={CC.cx - 300} y={CC.baseY - 300} width={100} height={100} direction={-1} />
-      <SpeedLines x={CC.cx + 200} y={CC.baseY - 300} width={100} height={100} direction={1} />
+      <SpeedLines x={CC.cx - 280} y={CC.baseY - 300} width={90} height={100} direction={-1} />
 
-      <Sprite src={EP("konti_megaphone")} cx={SHOUT.cx + lean * 20} baseY={SHOUT.baseY + Math.sin(f / 7) * 6} height={SHOUT.height} rotate={-lean * 4} squash={false} />
+      <Sprite src="characters/continuo/wave.png" cx={KONTI_WATCH.cx} baseY={KONTI_WATCH.baseY + Math.sin(f / 8) * 6} height={KONTI_WATCH.height} squash={false} />
 
-      {SHOUTS.map((s, i) => {
-        const t = interpolate(f, [at(s.t), at(s.t + FLY)], [0, 1], { ...clamp, easing: Easing.out(Easing.quad) });
-        const gone = interpolate(f, [at(s.t + FLY), at(s.t + FLY + 0.15)], [1, 0], clamp);
-        if (f < at(s.t) || f > at(s.t + FLY + 0.15)) return null;
-        return (
-          <React.Fragment key={i}>
-            <InstructionSlip
-              x={lerp(t, BELL.x, CC_HEAD.x)}
-              y={lerp(t, BELL.y, CC_HEAD.y) - Math.sin(t * Math.PI) * 110}
-              kind={s.kind}
-              scale={lerp(t, 0.6, 1.1) * gone}
-              rotate={lerp(t, -20, 10)}
-            />
-          </React.Fragment>
-        );
-      })}
-      {SHOUTS.map((s, i) => (
-        <Sequence key={i} from={at(s.t)} durationInFrames={at(0.4)}>
-          <SoundArcs x={BELL.x - 10} y={BELL.y} />
-        </Sequence>
+      <Sprite src={EP(dev === "laptop" ? "dev_laptop" : "dev_tangle")} cx={DEV.cx} baseY={DEV.baseY + devHop} height={DEV.height} />
+      {dev === "tangle" ? <Sweat x={DEV.cx + 110} y={DEV.baseY - DEV.height + 70} scale={0.9} /> : null}
+
+      {pile ? <CommentPile x={PILE_AT.x} y={PILE_AT.y} tangle={pile.tangle} shown={pile.shown} scale={PILE_AT.scale} /> : null}
+      {flights.map((fl, i) => (
+        <FlyingComment key={i} fl={fl} />
       ))}
 
-      {/* 初めて出た Claude Code に名前の札 */}
-      <Sequence from={at(0.15)} durationInFrames={at(1.6)}>
-        <NameTag cx={CC.cx} tipY={CC.baseY - CC.height - 8} name="Claude Code" color={TERRACOTTA} durationInFrames={at(1.6)} fontSize={40} />
-      </Sequence>
+      {nameTag ? (
+        <Sequence from={at(0.15)} durationInFrames={at(1.6)}>
+          <NameTag cx={CC.cx} tipY={CC.baseY - CC.height - 8} name="Claude Code" color={TERRACOTTA} durationInFrames={at(1.6)} fontSize={40} />
+        </Sequence>
+      ) : null}
     </AbsoluteFill>
   );
 };
 
-// ---- カンバンの壁のカット（5〜8秒・12〜13秒）----
-// 6列のカンバンを 0.8倍で右寄りに掛ける。開発者はカードの左の縁に手を当てて、カードと一緒に横へ歩く
+const TitleBackdrop: React.FC = () => (
+  <AbsoluteFill style={{ filter: "blur(10px)" }}>
+    <DeskCut flights={[]} dev="laptop" />
+  </AbsoluteFill>
+);
+
+// 場面2（2〜4.5秒）：コメントが2往復する
+const COMMENTS: Flight[] = [
+  { t: 0.3, from: "dev" },
+  { t: 0.85, from: "cc" },
+  { t: 1.4, from: "dev" },
+  { t: 1.95, from: "cc" },
+];
+const CommentScene: React.FC = () => {
+  const f = useCurrentFrame();
+  // コメントを送るたびに開発者が小さく弾む
+  const hop = COMMENTS.filter((c) => c.from === "dev").reduce((acc, c) => acc + interpolate(f, [at(c.t), at(c.t + 0.07), at(c.t + 0.2)], [0, -12, 0], clamp), 0);
+  return <DeskCut flights={COMMENTS} dev="laptop" devHop={hop} nameTag />;
+};
+
+// 場面3の前半（4.5〜5.6秒）：コメントが次々に降って山になり、糸が絡まる。開発者が頭を抱える
+const T_PILE_STEP = 0.12; // コメントが1つ降る間隔
+const T_TANGLE = 0.45; // 糸が絡み始める
+const T_HEAD = 0.55; // 頭を抱える
+const TangleScene: React.FC = () => {
+  const f = useCurrentFrame();
+  const shown = interpolate(f, [0, at(T_PILE_STEP * 6)], [0, 6], clamp);
+  const tangle = interpolate(f, [at(T_TANGLE), at(T_TANGLE + 0.4)], [0, 1], { ...clamp, easing: Easing.out(Easing.quad) });
+  return <DeskCut flights={[]} dev={f < at(T_HEAD) ? "laptop" : "tangle"} pile={{ tangle, shown }} />;
+};
+
+// ---- カンバンの壁のカット ----
+// 6列のカンバンを 0.8倍で右寄りに掛ける。開発者はカードの左の縁に手を当てて、カードと一緒に横へ歩く。
+// カットの頭から開発者はカードの前に立っている（左から歩いて入ると、体が画面の左の端で切れるため）
 const K = { x: 270, y: 394, scale: 0.8 };
 const slotX = (col: number) => K.x + cardSlot(col).x * K.scale;
 const CARD_Y = K.y + cardSlot(0).y * K.scale;
 const DRAG = { height: 460, handDX: 202, handDY: 271 }; // dev_drag.png の手の先は、足もとの中心から (+202, -271)
 const devAt = (cardX: number) => ({ cx: cardX + 15 - DRAG.handDX, baseY: CARD_Y + (CARD_SIZE.h * K.scale) / 2 + DRAG.handDY });
-const KONTI_TOP = { cx: 250, baseY: 290, height: 200 };
-const KONTI_ASIDE = { cx: 130, baseY: 760, height: 150 };
-const MEGA_FLOOR = { x: 230, y: 840, height: 90 }; // 床に置いたメガホンの真ん中
+const KONTI_TOP = { cx: 230, baseY: 300, height: 170 };
+const KONTI_ASIDE = { cx: 140, baseY: 770, height: 130 };
 
 const Board: React.FC<{ cardX: number; pin: boolean; highlight?: number; glow?: number }> = ({ cardX, pin, highlight, glow }) => (
   <Kanban6 x={K.x} y={K.y} scale={K.scale} highlight={highlight} glow={glow}>
@@ -111,90 +142,62 @@ const Board: React.FC<{ cardX: number; pin: boolean; highlight?: number; glow?: 
   </Kanban6>
 );
 
-const FloorMegaphone: React.FC<{ y?: number; rotate?: number }> = ({ y = MEGA_FLOOR.y, rotate = 0 }) => (
-  <Sprite src={EP("megaphone")} cx={MEGA_FLOOR.x} baseY={y + MEGA_FLOOR.height / 2} height={MEGA_FLOOR.height} rotate={rotate} squash={false} />
-);
+const Konti: React.FC<{ aside: number }> = ({ aside }) => {
+  const f = useCurrentFrame();
+  return (
+    <Sprite
+      src="characters/continuo/wave.png"
+      cx={lerp(aside, KONTI_TOP.cx, KONTI_ASIDE.cx)}
+      baseY={lerp(aside, KONTI_TOP.baseY, KONTI_ASIDE.baseY) + Math.sin(f / 7) * 5}
+      height={lerp(aside, KONTI_TOP.height, KONTI_ASIDE.height)}
+      squash={false}
+    />
+  );
+};
 
-// 場面3：開発者がカードを Direct Chat へ動かす。コンティはメガホンを置き、口にチャックをして脇へ下がる
-const T_IN = 0.4; // 開発者が左から入りきる
-const T_GRAB = 0.5;
-const T_LAND = 1.5; // カードが Direct Chat に着く
-const T_DROP = 1.8; // メガホンを放す
-const T_FLOOR = 2.05; // メガホンが床に着く
-const T_ZIP = 2.2; // 口にチャック
-const T_ASIDE = 2.35;
-
+// 場面3の後半（5.6〜7秒）：開発者がカードを Direct Chat へ動かす。コンティは脇のクッションへ下がる
+const T_GRAB = 0.2;
+const T_LAND = 1.0; // カードが Direct Chat に着く
+const T_ASIDE = 0.7;
 const MoveScene: React.FC = () => {
   const f = useCurrentFrame();
   const drag = interpolate(f, [at(T_GRAB), at(T_LAND)], [0, 1], { ...clamp, easing: ease });
   const cardX = lerp(drag, slotX(IN_PROGRESS), slotX(DIRECT_CHAT));
   const dev = devAt(cardX);
-  const walkIn = interpolate(f, [0, at(T_IN)], [-330, 0], { ...clamp, easing: Easing.out(Easing.cubic) });
-  const walking = f < at(T_LAND);
-  const bob = walking ? -Math.abs(Math.sin(f * 0.6)) * 10 : 0;
-  const glow = interpolate(f, [at(T_LAND), at(T_LAND + 0.12), at(T_LAND + 0.5)], [0, 1, 0], clamp);
-  // メガホン：コンティのヒレから真下へ落ちて、床で小さく跳ねる
-  const fall = interpolate(f, [at(T_DROP), at(T_FLOOR)], [0, 1], { ...clamp, easing: Easing.in(Easing.quad) });
-  const bounce = interpolate(f, [at(T_FLOOR), at(T_FLOOR + 0.08), at(T_FLOOR + 0.16)], [0, -18, 0], clamp);
-  const megaFrom = { x: KONTI_TOP.cx + 150, y: KONTI_TOP.baseY - 90 };
-  // 脇へ下がる：上の宙から、左下のクッションのそばへ
-  const aside = interpolate(f, [at(T_ASIDE), at(T_ASIDE + 0.5)], [0, 1], { ...clamp, easing: ease });
-  const kontiCx = lerp(aside, KONTI_TOP.cx, KONTI_ASIDE.cx);
-  const kontiBase = lerp(aside, KONTI_TOP.baseY, KONTI_ASIDE.baseY) + Math.sin(f / 7) * 5;
-  const kontiH = lerp(aside, KONTI_TOP.height, KONTI_ASIDE.height);
-
+  const bob = f >= at(T_GRAB) && f < at(T_LAND) ? -Math.abs(Math.sin(f * 0.6)) * 10 : 0;
+  const glow = interpolate(f, [at(T_LAND), at(T_LAND + 0.12), at(T_LAND + 0.4)], [0, 1, 0], clamp);
+  const aside = interpolate(f, [at(T_ASIDE), at(T_ASIDE + 0.55)], [0, 1], { ...clamp, easing: ease });
   return (
     <AbsoluteFill>
       <Corner />
       <Board cardX={cardX} pin={f < at(T_GRAB) || f >= at(T_LAND)} highlight={DIRECT_CHAT} glow={glow} />
-
-      <Sprite src={EP("dev_drag")} cx={dev.cx + walkIn} baseY={dev.baseY + bob} height={DRAG.height} squash={false} />
-      <Sequence durationInFrames={at(T_IN)}>
-        <SpeedLines x={0} y={500} width={200} height={160} direction={1} />
-      </Sequence>
+      {/* コンティは開発者の奥を通る */}
+      <Konti aside={aside} />
+      <Sprite src={EP("dev_drag")} cx={dev.cx} baseY={dev.baseY + bob} height={DRAG.height} />
       <Sequence from={at(T_GRAB)} durationInFrames={at(T_LAND - T_GRAB)}>
         <SpeedLines x={dev.cx - 260} y={dev.baseY - 330} width={150} height={150} direction={1} />
       </Sequence>
-      <Sequence from={at(T_LAND)} durationInFrames={at(0.6)}>
+      <Sequence from={at(T_LAND)} durationInFrames={at(0.4)}>
         <Sparkle x={slotX(DIRECT_CHAT) + 60} y={CARD_Y - 100} />
       </Sequence>
-
-      {/* コンティ：メガホンを持つ → 放す → チャック → 脇へ */}
-      {f < at(T_DROP) ? (
-        <Sprite src={EP("konti_megaphone")} cx={KONTI_TOP.cx} baseY={KONTI_TOP.baseY + Math.sin(f / 7) * 5} height={KONTI_TOP.height} squash={false} />
-      ) : f < at(T_ZIP) ? (
-        <Sprite src="characters/continuo/wave.png" cx={KONTI_TOP.cx - 30} baseY={KONTI_TOP.baseY + Math.sin(f / 7) * 5} height={KONTI_TOP.height * 0.95} flip />
-      ) : (
-        <Sprite src={EP("konti_zip")} cx={kontiCx} baseY={kontiBase} height={kontiH} />
-      )}
-      <Sequence from={at(T_LAND + 0.05)} durationInFrames={at(0.5)}>
-        <Exclamation x={KONTI_TOP.cx + 120} y={40} />
-      </Sequence>
-      <Sequence from={at(T_ZIP)} durationInFrames={at(0.6)}>
-        <ZipMark x={KONTI_TOP.cx - 20} y={KONTI_TOP.baseY - 70} />
-      </Sequence>
-
-      {f >= at(T_DROP) && f < at(T_FLOOR) ? (
-        <Sprite src={EP("megaphone")} cx={lerp(fall, megaFrom.x, MEGA_FLOOR.x)} baseY={lerp(fall, megaFrom.y, MEGA_FLOOR.y) + MEGA_FLOOR.height / 2} height={MEGA_FLOOR.height} rotate={fall * -25} squash={false} />
-      ) : null}
-      {f >= at(T_FLOOR) ? <FloorMegaphone y={MEGA_FLOOR.y + bounce} /> : null}
     </AbsoluteFill>
   );
 };
 
-// ---- 作業台のカット・話す（8〜12秒）----
-// 壁の大きな画面（pane）を真ん中の上に。左に Claude Code、右に椅子ごと寄ってきた開発者。2人で画面を指さして話す
-const SCREEN = { x: 360, y: 100, w: 360, h: 270 };
-const CC_TALK = { cx: 340, baseY: 880, height: 500 };
-const DEV_TALK = { cx: 800, baseY: 900, height: 540 };
-const QUIET = { cx: 95, baseY: 760, height: 105 };
+// ---- 作業台のカット・話す（7〜10.5秒）----
+// 壁の大きな画面（pane）を真ん中の上に。左に Claude Code、右に椅子ごと寄ってきた開発者。2人で画面を指さして話す。
+// 画面の下で、絡まっていたコメントの山が、話が進むたびにほどけていく
+const SCREEN = { x: 360, y: 90, w: 360, h: 250 };
+const CC_TALK = { cx: 330, baseY: 890, height: 500 };
+const DEV_TALK = { cx: 810, baseY: 905, height: 540 };
+const CHAT_PILE = { x: 540, y: 445, scale: 0.75 };
 const T_ROLL = 0.5; // 椅子ごと寄ってくる
 const TALK: { t: number; who: "cc" | "dev"; kind: BubbleKind }[] = [
   { t: 0.7, who: "dev", kind: "question" },
   { t: 1.3, who: "cc", kind: "idea" },
   { t: 1.9, who: "dev", kind: "code" },
   { t: 2.5, who: "cc", kind: "check" },
-  { t: 3.1, who: "dev", kind: "star" },
+  { t: 3.0, who: "dev", kind: "star" },
 ];
 
 const ChatScene: React.FC = () => {
@@ -205,7 +208,9 @@ const ChatScene: React.FC = () => {
   const ccSay = last("cc");
   const devSay = last("dev");
   const talked = TALK.filter((s) => f >= at(s.t)).length;
-  const lines = interpolate(f, [at(0.6), at(3.2)], [1, 6], clamp);
+  const lines = interpolate(f, [at(0.6), at(3.0)], [1, 6], clamp);
+  // 話すたびに糸が少しずつほどけ、4つ目の話（チェック）でほどけきる
+  const tangle = TALK.slice(0, 4).reduce((acc, s) => acc - interpolate(f, [at(s.t), at(s.t + 0.3)], [0, 0.25], { ...clamp, easing: ease }), 1);
   const nod = (who: "cc" | "dev") => {
     const s = last(who);
     return s ? interpolate(f, [at(s.t), at(s.t + 0.08), at(s.t + 0.25)], [0, -16, 0], clamp) : 0;
@@ -215,10 +220,13 @@ const ChatScene: React.FC = () => {
     <AbsoluteFill>
       <Workshop />
       <PaneScreen x={SCREEN.x} y={SCREEN.y} w={SCREEN.w} h={SCREEN.h} lines={lines} done={talked >= 4} />
+      <CommentPile x={CHAT_PILE.x} y={CHAT_PILE.y} tangle={Math.max(0, tangle)} scale={CHAT_PILE.scale} />
+      <Sequence from={at(2.8)} durationInFrames={at(0.6)}>
+        <Sparkle x={CHAT_PILE.x + 70} y={CHAT_PILE.y - 90} />
+      </Sequence>
 
-      {/* 口にチャックをしたコンティと、置いたメガホンは左下の隅 */}
-      <Sprite src={EP("megaphone")} cx={90} baseY={870} height={70} squash={false} />
-      <Sprite src={EP("konti_zip")} cx={QUIET.cx} baseY={QUIET.baseY + Math.sin(f / 8) * 4} height={QUIET.height} squash={false} />
+      {/* コンティは左下のクッションのそばで見守る */}
+      <Sprite src="characters/continuo/wave.png" cx={95} baseY={800 + Math.sin(f / 8) * 4} height={90} squash={false} />
 
       <Sprite src={EP("cc_point")} cx={CC_TALK.cx} baseY={CC_TALK.baseY + nod("cc")} height={CC_TALK.height} squash={false} />
       <Sprite src={EP("dev_point")} cx={devCx} baseY={DEV_TALK.baseY + nod("dev")} height={DEV_TALK.height} squash={false} />
@@ -226,8 +234,8 @@ const ChatScene: React.FC = () => {
         <SpeedLines x={880} y={560} width={200} height={200} direction={-1} />
       </Sequence>
 
-      {ccSay ? <SpeechBubble x={40} y={150} w={260} h={170} tail={{ x: 290, y: 390 }} kind={ccSay.kind} stepFrame={at(ccSay.t)} /> : null}
-      {devSay ? <SpeechBubble x={780} y={130} w={260} h={170} tail={{ x: 800, y: 370 }} kind={devSay.kind} stepFrame={at(devSay.t)} /> : null}
+      {ccSay ? <SpeechBubble x={40} y={130} w={260} h={170} tail={{ x: 290, y: 380 }} kind={ccSay.kind} stepFrame={at(ccSay.t)} /> : null}
+      {devSay ? <SpeechBubble x={780} y={120} w={260} h={170} tail={{ x: 800, y: 370 }} kind={devSay.kind} stepFrame={at(devSay.t)} /> : null}
       <Sequence from={at(2.5)} durationInFrames={at(0.6)}>
         <Sparkle x={SCREEN.x + SCREEN.w - 60} y={SCREEN.y - 30} />
       </Sequence>
@@ -235,77 +243,106 @@ const ChatScene: React.FC = () => {
   );
 };
 
-// ---- カンバンの壁・戻す（12〜13秒）----
-// 開発者がカードを Direct Chat から In Progress へ引き戻すと、コンティがチャックを外してメガホンを拾い直す
-const T_BACK = 0.45; // カードが In Progress に着く
-const T_PICK = 0.5; // コンティがメガホンを拾う
-
+// ---- カンバンの壁・戻す（10.5〜11.4秒）----
+// 開発者がカードを Direct Chat から In Progress へ引き戻す。コンティはクッションから上へ戻って見守る
+const T_BACK = 0.5; // カードが In Progress に着く
 const BackScene: React.FC = () => {
   const f = useCurrentFrame();
-  const drag = interpolate(f, [at(0.03), at(T_BACK)], [0, 1], { ...clamp, easing: ease });
+  const drag = interpolate(f, [at(0.05), at(T_BACK)], [0, 1], { ...clamp, easing: ease });
   const cardX = lerp(drag, slotX(DIRECT_CHAT), slotX(IN_PROGRESS));
   const dev = devAt(cardX);
   const bob = f < at(T_BACK) ? -Math.abs(Math.sin(f * 0.6)) * 10 : 0;
-  const glow = interpolate(f, [at(T_BACK), at(T_BACK + 0.1), at(T_BACK + 0.4)], [0, 1, 0], clamp);
-  const rise = interpolate(f, [at(T_PICK), at(T_PICK + 0.2)], [0, 1], { ...clamp, easing: Easing.out(Easing.back(2)) });
+  const glow = interpolate(f, [at(T_BACK), at(T_BACK + 0.1), at(T_BACK + 0.35)], [0, 1, 0], clamp);
+  const aside = interpolate(f, [at(0.35), at(0.85)], [1, 0], { ...clamp, easing: ease });
   return (
     <AbsoluteFill>
       <Corner />
       <Board cardX={cardX} pin={f >= at(T_BACK)} highlight={IN_PROGRESS} glow={glow} />
-      <Sprite src={EP("dev_drag")} cx={dev.cx} baseY={dev.baseY + bob} height={DRAG.height} squash={false} />
+      {/* コンティは開発者の奥を通る */}
+      <Konti aside={aside} />
+      <Sprite src={EP("dev_drag")} cx={dev.cx} baseY={dev.baseY + bob} height={DRAG.height} />
       <Sequence durationInFrames={at(T_BACK)}>
         <SpeedLines x={dev.cx + 210} y={dev.baseY - 330} width={150} height={150} direction={-1} />
       </Sequence>
-      {/* コンティは開発者の足もとの手前にいる */}
-      {f < at(T_PICK) ? (
-        <>
-          <FloorMegaphone />
-          <Sprite src={EP("konti_zip")} cx={KONTI_ASIDE.cx} baseY={KONTI_ASIDE.baseY + Math.sin(f / 7) * 5} height={KONTI_ASIDE.height} squash={false} />
-        </>
-      ) : (
-        <Sprite src={EP("konti_cheer")} cx={175} baseY={lerp(rise, 900, 850)} height={210} />
-      )}
-      <Sequence from={at(T_PICK)} durationInFrames={at(0.5)}>
-        <Sparkle x={290} y={600} />
-        <Sparkle x={20} y={650} />
+      <Sequence from={at(T_BACK)} durationInFrames={at(0.4)}>
+        <Sparkle x={slotX(IN_PROGRESS) + 60} y={CARD_Y - 100} />
       </Sequence>
     </AbsoluteFill>
   );
 };
 
-// 効果音。at は動画の頭からの秒で、各場面の動きの時刻に合わせる
+// ---- 作業台・またコメントで（11.4〜13秒）----
+// 席へ戻った開発者のノートパソコンに Claude Code からコメントが1つ届き、開発者が2回頷く
+const T_REPLY = 0.3;
+const T_NOD = T_REPLY + FLY + 0.1;
+const AgainScene: React.FC = () => {
+  const f = useCurrentFrame();
+  const nod = [0, 0.28].reduce((acc, d) => acc + interpolate(f, [at(T_NOD + d), at(T_NOD + d + 0.1), at(T_NOD + d + 0.24)], [0, 18, 0], clamp), 0);
+  return (
+    <>
+      <DeskCut flights={[{ t: T_REPLY, from: "cc" }]} dev="laptop" devHop={nod} />
+      <Sequence from={at(T_NOD)} durationInFrames={at(0.6)}>
+        <Sparkle x={LAPTOP.x - 30} y={LAPTOP.y - 120} />
+      </Sequence>
+    </>
+  );
+};
+
+// カットの切り替え（動画の頭からの秒）
+const CUT = {
+  comment: S("comment").from,
+  tangle: S("tangle").from,
+  move: S("tangle").from + 1.1,
+  chat: S("chat").from,
+  back: S("back").from,
+  again: S("back").from + 0.9,
+  end: S("end").from,
+};
+
+// 効果音。at は動画の頭からの秒で、各カットの動きの時刻に合わせる
 const SFX: { name: string; at: number; volume: number }[] = [
-  { name: "typing", at: S("order").from + 0.1, volume: 0.3 }, // Claude Code が作る
-  ...SHOUTS.map((s) => ({ name: "direct_chat_blare", at: S("order").from + s.t, volume: 0.35 })), // メガホンで指示
-  { name: "whoosh", at: S("move").from, volume: 0.35 }, // 開発者が入ってくる
-  { name: "swish", at: S("move").from + T_GRAB, volume: 0.6 }, // カードを動かす
-  { name: "splat", at: S("move").from + T_LAND, volume: 0.7 }, // Direct Chat に着く
-  { name: "pop", at: S("move").from + T_FLOOR, volume: 0.5 }, // メガホンを床に置く
-  { name: "direct_chat_zip", at: S("move").from + T_ZIP, volume: 0.6 }, // 口にチャック
-  { name: "swish", at: S("chat").from, volume: 0.5 }, // 椅子ごと寄る
-  ...TALK.map((s) => ({ name: "pop", at: S("chat").from + s.t, volume: 0.35 })), // 吹き出しが進む
-  { name: "swish", at: S("back").from, volume: 0.5 }, // カードを戻す
-  { name: "splat", at: S("back").from + T_BACK, volume: 0.6 }, // In Progress に着く
-  { name: "spout", at: S("back").from + T_PICK, volume: 0.6 }, // コンティがメガホンを拾い直す
-  { name: "pop", at: S("end").from, volume: 0.6 }, // 締めの字
+  { name: "typing", at: CUT.comment + 0.05, volume: 0.35 }, // コメントを書く
+  ...COMMENTS.map((c) => ({ name: "swish", at: CUT.comment + c.t, volume: 0.35 })), // コメントが飛ぶ
+  ...COMMENTS.map((c) => ({ name: "pop", at: CUT.comment + c.t + FLY, volume: 0.4 })), // コメントが届く
+  ...[0, 1, 2, 3, 4, 5].map((i) => ({ name: "pop", at: CUT.tangle + i * T_PILE_STEP, volume: 0.3 })), // コメントが積み上がる
+  { name: "splat", at: CUT.tangle + T_HEAD, volume: 0.5 }, // 頭を抱える
+  { name: "swish", at: CUT.move + T_GRAB, volume: 0.6 }, // カードを動かす
+  { name: "splat", at: CUT.move + T_LAND, volume: 0.7 }, // Direct Chat に着く
+  { name: "swish", at: CUT.chat, volume: 0.5 }, // 椅子ごと寄る
+  ...TALK.map((s) => ({ name: "pop", at: CUT.chat + s.t, volume: 0.35 })), // 吹き出しが進む
+  { name: "sparkle", at: CUT.chat + 2.8, volume: 0.5 }, // 山がほどけきる
+  { name: "swish", at: CUT.back + 0.05, volume: 0.5 }, // カードを戻す
+  { name: "splat", at: CUT.back + T_BACK, volume: 0.6 }, // In Progress に着く
+  { name: "swish", at: CUT.again + T_REPLY, volume: 0.35 }, // コメントが飛ぶ
+  { name: "pop", at: CUT.again + T_REPLY + FLY, volume: 0.45 }, // コメントが届く
+  { name: "sparkle", at: CUT.again + T_NOD, volume: 0.45 }, // 頷く
+  { name: "pop", at: CUT.end, volume: 0.6 }, // 締めの字
 ];
+
+const span = (a: number, b: number) => ({ from: sec(a), durationInFrames: sec(b) - sec(a) });
 
 export const DirectChat: React.FC = () => (
   <AbsoluteFill style={{ background: "#F3E3C8", overflow: "hidden" }}>
-    <Sequence durationInFrames={sec(2)}>
+    <Sequence {...span(0, CUT.comment)}>
       <TitleBackdrop />
     </Sequence>
-    <Sequence from={sec(S("order").from)} durationInFrames={sec(3)}>
-      <OrderScene />
+    <Sequence {...span(CUT.comment, CUT.tangle)}>
+      <CommentScene />
     </Sequence>
-    <Sequence from={sec(S("move").from)} durationInFrames={sec(3)}>
+    <Sequence {...span(CUT.tangle, CUT.move)}>
+      <TangleScene />
+    </Sequence>
+    <Sequence {...span(CUT.move, CUT.chat)}>
       <MoveScene />
     </Sequence>
-    <Sequence from={sec(S("chat").from)} durationInFrames={sec(4)}>
+    <Sequence {...span(CUT.chat, CUT.back)}>
       <ChatScene />
     </Sequence>
-    <Sequence from={sec(S("back").from)} durationInFrames={sec(1)}>
+    <Sequence {...span(CUT.back, CUT.again)}>
       <BackScene />
+    </Sequence>
+    <Sequence {...span(CUT.again, CUT.end)}>
+      <AgainScene />
     </Sequence>
 
     {script.scenes.map((s) =>
@@ -319,7 +356,7 @@ export const DirectChat: React.FC = () => (
     <Sequence durationInFrames={sec(2)}>
       <TitleCardDC text={script.title} outFrom={sec(1.7)} />
     </Sequence>
-    <Sequence from={sec(S("end").from)}>
+    <Sequence from={sec(CUT.end)}>
       <EndCardDC lines={["話したいときは、", "直接"]} sprite="characters/continuo/wave.png" spriteWidth={300} spriteTop={700} />
     </Sequence>
 
@@ -330,4 +367,3 @@ export const DirectChat: React.FC = () => (
     ))}
   </AbsoluteFill>
 );
-

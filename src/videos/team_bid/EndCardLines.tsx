@@ -3,7 +3,7 @@ import { Img, interpolate, spring, staticFile, useCurrentFrame, useVideoConfig }
 import { theme } from "../../theme";
 
 // 締め。src/components/EndCard.tsx を写し、決めの字幕を2行に分けられるようにしたもの。
-// 「空いてる人へ、どんどん」は11字あり、共通の EndCard の 150px では画面の幅に収まらないため。
+// 「チームの余力を戦力へ」は10字あり、共通の EndCard の 150px では画面の幅に収まらないため。
 // 出だしの拡大も 1.15 倍までにする。1.5 倍だと 13.0 秒の1コマ目で字が画面の左右から切れる
 export const EndCardLines: React.FC<{ lines: readonly string[]; sprite: string; spriteWidth?: number; spriteTop?: number; fontSize?: number }> = ({
   lines,

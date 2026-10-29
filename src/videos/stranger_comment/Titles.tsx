@@ -33,7 +33,7 @@ export const TitleCard2: React.FC<{ text: string; outFrom: number }> = ({ text, 
   );
 };
 
-export const EndCard2: React.FC<{ text: string; sprite: string; spriteWidth?: number; spriteTop?: number }> = ({ text, sprite, spriteWidth = 200, spriteTop = 700 }) => {
+export const EndCard2: React.FC<{ text: string; sprite: string; spriteWidth?: number; spriteTop?: number; fontSize?: number }> = ({ text, sprite, spriteWidth = 200, spriteTop = 700, fontSize = 120 }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const slam = spring({ frame, fps, config: { damping: 8, stiffness: 260 } });
@@ -50,7 +50,7 @@ export const EndCard2: React.FC<{ text: string; sprite: string; spriteWidth?: nu
           lineHeight: 1.2,
           fontFamily: theme.fontFamily,
           fontWeight: 800,
-          fontSize: 120,
+          fontSize,
           color: theme.color.ink,
           transform: `scale(${interpolate(slam, [0, 1], [1.1, 1])})`,
         }}

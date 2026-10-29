@@ -1,7 +1,7 @@
 import React from "react";
 import { theme } from "../../theme";
 
-// Claude Code の頭の上に浮かべる、利用枠の燃料計。電池の形にし、中身は黄色で塗る（緑は使わない）。
+// Claude Code の頭の上に浮かべる、レートリミットの余裕値を示す電池。中身は黄色で塗る（緑は使わない）。
 // (cx, top) は電池の上辺の真ん中。level は 0〜100。number が null のあいだは数字を出さない。
 // bump（0〜1）で数字を弾ませ、win（0〜1）で選ばれた机の数字を光らせる
 export const BATTERY = { w: 150, h: 62 };
