@@ -4,3 +4,4 @@ out/
 .env
 assets/inbox/
 .DS_Store
+__pycache__/
