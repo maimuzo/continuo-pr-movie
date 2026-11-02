@@ -64,3 +64,14 @@ npm install
 npx remotion studio src/index.ts                                  # 確かめながら作る
 npx remotion render src/index.ts place-on-ready out/place_on_ready.mp4  # 1本書き出す
 ```
+
+### 別の製品の動画を同じ流れで作る
+
+この動画を作った流れは、Claude Code のプラグイン [short-movie](https://github.com/maimuzo/maimuzo-claude-plugins-public/tree/main/plugins/short-movie) にしてあります。
+スキルを起動して紹介したいものを渡すと、コンテ → キャラクター → 絵コンテ → 動画の順に、人間の確認を挟みながら進みます。
+
+```
+/plugin marketplace add maimuzo/maimuzo-claude-plugins-public
+/plugin install short-movie@maimuzo-public
+/short-movie:start <紹介したいもののリポジトリの URL かパス>
+```
