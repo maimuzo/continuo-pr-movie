@@ -142,7 +142,7 @@ dark charcoal pants (#3A3D42), headphones around the neck, always holding a yell
 | 丸いロボットの元の絵 | `short_movie/materials/ref/robot.png` | 色違いの元。動画には、この色のままでは出さない |
 | 開発者 | `short_movie/materials/ref/developer.png` | 確定（2026-10-28） |
 | アカネ | `short_movie/materials/ref/akane.png` | 確定（2026-10-28） |
-| ゲンさん | `short_movie/materials/ref/gen.png` | 保留。チームで入札の回の机に人を座らせるかが決まってから |
+| ゲンさん | `short_movie/materials/ref/gen.png` | 描いた（2026-11-06。自分の分だけ上書きの回に出るため）。依頼書は [short_movie/materials/prompts/gen_sheet.md](materials/prompts/gen_sheet.md)。顔は `short_movie/materials/ep/wait-quota/icon_gen.png` に合わせた。人間の確認待ち |
 | 知らない人 | `short_movie/materials/ref/stranger.png` | 確定（2026-10-28） |
 | 使わない絵 | `short_movie/materials/ref/foreman.png`・`short_movie/materials/ref/robot_blue.png`・`short_movie/materials/ref/robot_purple.png` | 役がなくなった |
 
@@ -166,3 +166,5 @@ dark charcoal pants (#3A3D42), headphones around the neck, always holding a yell
 | 定額のままの回 | コンティ・Claude Code・開発者 |
 | 止めても続きからの回 | コンティ・Claude Code・開発者 |
 | Direct Chat の回 | コンティ・Claude Code・開発者 |
+| どの日も自分の分が残る回 | コンティ・Claude Code・開発者 |
+| 自分の分だけ上書きの回 | Claude Code（3体）・開発者・アカネ・ゲンさん（3人とも机の前に立つ全身で出る） |
