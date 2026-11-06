@@ -1,14 +1,14 @@
 import React from "react";
 import { AbsoluteFill, Audio, Easing, Img, interpolate, Sequence, spring, staticFile, useCurrentFrame, useVideoConfig } from "remotion";
-import { Caption } from "../components/Caption";
-import { Sparkle, SpeedLines } from "../components/Effects";
-import { NameTag } from "../components/NameTag";
-import { Sprite } from "../components/Sprite";
-import { sec, theme } from "../theme";
-import { Comment, COMMENTS, Panel, PANEL, rowTop } from "./stranger_comment/Comments";
-import { BOX, BoxBack, BoxFront, RuleSheet, SmallSheet } from "./stranger_comment/Props";
-import { EndCard2, TitleCard2 } from "./stranger_comment/Titles";
-import { script } from "./stranger_comment.script";
+import { Caption } from "../../components/Caption";
+import { Sparkle, SpeedLines } from "../../components/Effects";
+import { NameTag } from "../../components/NameTag";
+import { Sprite } from "../../components/Sprite";
+import { sec, theme } from "../_shared/theme";
+import { Comment, COMMENTS, Panel, PANEL, rowTop } from "./Comments";
+import { BOX, BoxBack, BoxFront, RuleSheet, SmallSheet } from "./Props";
+import { EndCard2, TitleCard2 } from "./Titles";
+import { script } from "./script";
 
 // 他人のコメントの回。issue のコメント欄に3つのコメントが並び、Claude Code が書き手の Role を見て
 // OWNER・MEMBER の2つを「指示」の箱へ、知らない人の1つを「報告として読む」の箱へしまい、ほっと安心する。
@@ -136,7 +136,7 @@ const RoomScene: React.FC = () => {
   // Claude Code：下から跳ねて出る。受け取ってから指示書を持って読む
   const rise = interpolate(f, [at(T_CC), at(T_CC + 0.3)], [0, 1], { ...clamp, easing: Easing.out(Easing.back(1.8)) });
   const ccBase = lerp(rise, CC.baseY + CC.height, CC.baseY);
-  const ccSrc = f < at(T_GOT) ? "characters/claude_code/receive.png" : f < at(R0) ? "ep/stranger_comment/hold_sheet.png" : f < at(T_RELIEF) ? "characters/claude_code/receive.png" : "ep/stranger_comment/relief.png";
+  const ccSrc = f < at(T_GOT) ? "characters/claude_code/receive.png" : f < at(R0) ? "ep/stranger-comment/hold_sheet.png" : f < at(T_RELIEF) ? "characters/claude_code/receive.png" : "ep/stranger-comment/relief.png";
   const ccFlip = f >= at(R0) && f < at(T_RELIEF);
   // ほっとして肩の力が抜ける：いったん少し沈んでから戻る
   const reliefBob = f >= at(T_RELIEF) ? interpolate(f, [at(T_RELIEF), at(T_RELIEF + 0.25), at(T_RELIEF + 0.6)], [0, 14, 0], { ...clamp, easing: ease }) : 0;
@@ -233,12 +233,12 @@ const SFX: { name: string; at: number; volume: number }[] = [
   { name: "whoosh", at: R, volume: 0.45 }, // コメント欄が縮み、コンティが来る
   { name: "sparkle", at: R + T_GOT, volume: 0.45 }, // 指示書が開く
   { name: "swish", at: R + T_SORT[0], volume: 0.55 }, // 1つ目を箱へ
-  { name: "stranger_comment_drop", at: R + T_SORT[0] + SORT_DUR, volume: 0.6 },
+  { name: "stranger-comment_drop", at: R + T_SORT[0] + SORT_DUR, volume: 0.6 },
   { name: "swish", at: R + T_SORT[1], volume: 0.55 }, // 2つ目を箱へ
-  { name: "stranger_comment_drop", at: R + T_SORT[1] + SORT_DUR, volume: 0.6 },
+  { name: "stranger-comment_drop", at: R + T_SORT[1] + SORT_DUR, volume: 0.6 },
   { name: "swish", at: R + T_GRAB, volume: 0.45 }, // 知らない人のコメントを手に取る
-  { name: "stranger_comment_drop", at: R + T_IN, volume: 0.6 }, // 「報告として読む」箱へ
-  { name: "stranger_comment_relief", at: R + T_RELIEF, volume: 0.6 }, // ほっと息をつく
+  { name: "stranger-comment_drop", at: R + T_IN, volume: 0.6 }, // 「報告として読む」箱へ
+  { name: "stranger-comment_relief", at: R + T_RELIEF, volume: 0.6 }, // ほっと息をつく
   { name: "pop", at: S("end").from, volume: 0.6 }, // 締めの字
 ];
 
@@ -278,3 +278,7 @@ export const StrangerComment: React.FC = () => (
     ))}
   </AbsoluteFill>
 );
+
+// short-movie の render.sh は default の部品と meta を読む
+export default StrangerComment;
+export { meta } from "./script";

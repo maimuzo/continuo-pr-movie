@@ -1,7 +1,7 @@
 import React from "react";
-import { theme } from "../../theme";
+import { theme } from "../_shared/theme";
 
-// src/components/Kanban.tsx を写し、列に Blocked と Direct Chat を足した6列のカンバン。
+// short_movie/videos/_shared/Kanban.tsx を写し、列に Blocked と Direct Chat を足した6列のカンバン。
 // 列の並びは continuo の README の Status の表（Ready / In Progress / In Review / Blocked / Done / Direct Chat）に合わせる。
 // 共通の Kanban は4列で固定なので、この回だけの部品として写した
 export const COLUMNS = ["Ready", "In Progress", "In Review", "Blocked", "Done", "Direct Chat"] as const;

@@ -1,8 +1,8 @@
 """コンティの設定画（緑の背景に4つの姿）から背景を抜き、姿ごとの透明 PNG に切り分ける。
 
-使い方: uv run --with pillow --with numpy --with scipy python -I scripts/cut_continuo.py <設定画.jpeg> <出力ディレクトリ>
+使い方: uv run --with pillow --with numpy --with scipy python -I short_movie/materials/scripts/cut_continuo.py <設定画.jpeg> <出力ディレクトリ>
 
-背景は scripts/key_green.py と同じ式で抜く。切り分けは四角で切らず、つながった部分（体・潮・泡・星）ごとに
+背景は short_movie/materials/scripts/key_green.py と同じ式で抜く。切り分けは四角で切らず、つながった部分（体・潮・泡・星）ごとに
 重心がどの姿の範囲にあるかで振り分ける。四角で切ると、隣の姿の潮やヒレが入り込むためである。
 """
 import sys

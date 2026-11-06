@@ -1,21 +1,21 @@
 import React from "react";
 import { AbsoluteFill, Audio, Easing, interpolate, Sequence, staticFile, useCurrentFrame } from "remotion";
-import { Caption } from "../components/Caption";
-import { Exclamation, Sparkle, SpeedLines, Sweat } from "../components/Effects";
-import { IssueCard } from "../components/IssueCard";
-import { cardSlot, Kanban } from "../components/Kanban";
-import { NameTag } from "../components/NameTag";
-import { Sprite } from "../components/Sprite";
-import { TitleCard } from "../components/TitleCard";
-import { sec, theme } from "../theme";
-import { BAT_TOP, BatteryRow, Desk, deskXs, DESK, HEAD_TOP, KB, Room, ROBOT_BASE, ROBOT_H, robotCxOf } from "./team_bid/TeamRoom";
-import { EndCardLines } from "./team_bid/EndCardLines";
-import { script } from "./team_bid.script";
+import { Caption } from "../../components/Caption";
+import { Exclamation, Sparkle, SpeedLines, Sweat } from "../../components/Effects";
+import { IssueCard } from "../_shared/IssueCard";
+import { cardSlot, Kanban } from "../_shared/Kanban";
+import { NameTag } from "../../components/NameTag";
+import { Sprite } from "../../components/Sprite";
+import { TitleCard } from "../../components/TitleCard";
+import { sec, theme } from "../_shared/theme";
+import { BAT_TOP, BatteryRow, Desk, deskXs, DESK, HEAD_TOP, KB, Room, ROBOT_BASE, ROBOT_H, robotCxOf } from "../_shared/TeamRoom";
+import { EndCardLines } from "./EndCardLines";
+import { script } from "./script";
 
 // チームで入札の回。1つの部屋のカットだけで通す（カメラは動かさない）。
 // 上に共有のカンバン、下にメンバーの机3つと Claude Code 3体、コンティは1頭。
 // レートリミットの余裕を持つのは Claude Code なので、余裕値の％は各 Claude Code の頭の上の電池に出す。
-// 部屋・机・電池の構図は ./team_bid/TeamRoom.tsx にあり、寝て待つ回でも使い回す。
+// 部屋・机・電池の構図は ../_shared/TeamRoom.tsx にあり、寝て待つ回でも使い回す。
 // 時刻はすべて動画の頭からの秒で書く。座標は 1080×1080 の画面の座標
 
 const clamp = { extrapolateLeft: "clamp", extrapolateRight: "clamp" } as const;
@@ -146,7 +146,7 @@ const POSE_SRC: Record<string, string> = {
   receive: "characters/claude_code/receive.png",
   work: "characters/claude_code/work.png",
   fist: "characters/claude_code/fist.png",
-  wait: "ep/team_bid/cc_wait.png",
+  wait: "ep/team-bid/cc_wait.png",
   cheer: "characters/claude_code/peace_jump.png",
 };
 
@@ -323,14 +323,14 @@ const FastForward: React.FC = () => {
   );
 };
 
-// 効果音。音は scripts/make_sfx.py と scripts/sfx_team_bid.py で合成した public/sfx/*.wav。at は動画の頭からの秒
+// 効果音。音は short_movie/materials/sfx/make_sfx.py と short_movie/materials/sfx/sfx_team-bid.py で合成した short_movie/materials/sfx/*.wav。at は動画の頭からの秒
 const SFX: { name: string; at: number; volume: number }[] = [
   ...[0.35, 0.85, 1.35].map((a) => ({ name: "splat", at: a + 0.18, volume: 0.35 })), // カードが Ready に積まれる
   { name: "pop", at: 2.0, volume: 0.4 }, // Claude Code 3体が出る
   ...ROUNDS.map((r, n) => ({ name: "splat", at: r.t0 + 0.18, volume: n === 0 ? 0.6 : 0.3 })), // 新しいカード
-  ...[0, 1, 2].map((i) => ({ name: "team_bid_bid", at: ROUNDS[0].bid + i * ROUNDS[0].stagger, volume: 0.45 })), // ％が浮かぶ
-  ...ROUNDS.slice(1).map((r) => ({ name: "team_bid_bid", at: r.bid, volume: 0.3 })),
-  ...ROUNDS.map((r, n) => ({ name: "team_bid_win", at: r.win, volume: n === 0 ? 0.6 : 0.35 })), // いちばん大きい机が選ばれる
+  ...[0, 1, 2].map((i) => ({ name: "team-bid_bid", at: ROUNDS[0].bid + i * ROUNDS[0].stagger, volume: 0.45 })), // ％が浮かぶ
+  ...ROUNDS.slice(1).map((r) => ({ name: "team-bid_bid", at: r.bid, volume: 0.3 })),
+  ...ROUNDS.map((r, n) => ({ name: "team-bid_win", at: r.win, volume: n === 0 ? 0.6 : 0.35 })), // いちばん大きい机が選ばれる
   { name: "whoosh", at: ROUNDS[0].lift, volume: 0.45 }, // 運ぶ
   ...ROUNDS.slice(1).map((r) => ({ name: "swish", at: r.lift, volume: 0.35 })),
   ...FLIGHTS.map((fl) => ({ name: "pop", at: fl.end, volume: 0.35 })), // In Review に届く
@@ -367,3 +367,7 @@ export const TeamBid: React.FC = () => (
     ))}
   </AbsoluteFill>
 );
+
+// short-movie の render.sh は default の部品と meta を読む
+export default TeamBid;
+export { meta } from "./script";

@@ -1,7 +1,7 @@
-"""動画で鳴らす効果音を、数式で合成して public/sfx/*.wav に書き出す。
+"""動画で鳴らす共通の効果音を、数式で合成して、このファイルと同じフォルダ（short_movie/materials/sfx/）に *.wav で書き出す。
 
 素材を持ってこないので、権利の確認も人の手も要らない。
-`uv run --with numpy python -I scripts/make_sfx.py` で全部を作り直す。どの音も 44.1kHz・16bit・モノラル。
+呼び方は short_movie/materials/sfx/README.md のとおり `uv run --no-project --python 3.12 --with numpy==2.5.4 python -I short_movie/materials/sfx/make_sfx.py`。どの音も 44.1kHz・16bit・モノラル。
 """
 import os
 import wave
@@ -9,7 +9,7 @@ import wave
 import numpy as np
 
 RATE = 44100
-OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "public", "sfx")
+OUT = os.path.dirname(os.path.abspath(__file__))  # 書き出し先は、このファイルと同じフォルダ
 rng = np.random.default_rng(7)
 
 

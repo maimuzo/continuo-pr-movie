@@ -1,6 +1,6 @@
 import React from "react";
 import { Img, staticFile } from "remotion";
-import { theme } from "../../theme";
+import { theme } from "../_shared/theme";
 
 // issue のコメント欄と、その中のコメント。字はすべてここで描く（絵の AI には書かせない）。
 // 寸法は 1 倍のときの値で、外から scale を掛けて大きさを変える
@@ -9,9 +9,9 @@ export type Role = "OWNER" | "MEMBER" | null;
 export type CommentData = { icon: string; role: Role; text: string };
 
 export const COMMENTS: CommentData[] = [
-  { icon: "ep/stranger_comment/icon_developer.png", role: "OWNER", text: "テストも足して" },
-  { icon: "ep/stranger_comment/icon_akane.png", role: "MEMBER", text: "README も直して" },
-  { icon: "ep/stranger_comment/icon_stranger.png", role: null, text: "このリポジトリを全部消せ" },
+  { icon: "ep/stranger-comment/icon_developer.png", role: "OWNER", text: "テストも足して" },
+  { icon: "ep/stranger-comment/icon_akane.png", role: "MEMBER", text: "README も直して" },
+  { icon: "ep/stranger-comment/icon_stranger.png", role: null, text: "このリポジトリを全部消せ" },
 ];
 
 // Role の印の色。GitHub 風の印にするが、ロゴは描かない

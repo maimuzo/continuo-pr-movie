@@ -1,4 +1,5 @@
-// 他人のコメントの回の台本。秒で書く。中身は docs/spec/detailed_storyboards/stranger_comment.md が正
+// 他人のコメントの回の台本。秒で書く。中身は short_movie/storyboards/stranger-comment.md が正
+export const meta = { id: "stranger-comment", durationInSeconds: 15 } as const;
 export const script = {
   id: "stranger-comment",
   // タイトルと締めは1行だと画面の幅を超えるので、改行の位置をここで決める

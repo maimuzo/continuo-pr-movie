@@ -1,7 +1,7 @@
 import React from "react";
-import { theme } from "../../theme";
+import { theme } from "../_shared/theme";
 
-// 共通の Kanban（src/components/Kanban.tsx）を写して、列を広く・高くしたもの。
+// 共通の Kanban（short_movie/videos/_shared/Kanban.tsx）を写して、列を広く・高くしたもの。
 // この回では1列に3枚のカードを縦に並べ、カードの帯にリポジトリの名前を書くので、共通の大きさでは収まらない
 export const COLUMNS = ["Ready", "In Progress", "In Review", "Done"] as const;
 const HEADER_COLORS = ["#A8D89A", "#F5D66E", "#AFC8EE", "#F4AFAF"] as const;

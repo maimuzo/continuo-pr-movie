@@ -1,4 +1,5 @@
-// 見える工房の回の台本。秒で書く。中身は docs/spec/detailed_storyboards/visible_workshop.md が正
+// 見える工房の回の台本。秒で書く。中身は short_movie/storyboards/visible-workshop.md が正
+export const meta = { id: "visible-workshop", durationInSeconds: 15 } as const;
 // captionSize は字幕の字の大きさ。1行に収まる中で、いちばん大きくする
 export const script = {
   id: "visible-workshop",

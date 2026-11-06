@@ -1,8 +1,8 @@
 # 寝て待つ回　詳しいコンテ
 
 **言いたいこと。**「5時間のレートリミットは放っておけば勝手に再開し、1週間のレートリミットは担当を外して別の人が引き継ぐ」を15秒で見せる回の、場面ごとの作りを決める文書である。
-何が起きるかは [docs/spec/storyboard.md](../storyboard.md) の「寝て待つ回」の表と1節の共通の決まりが正である。部屋・机3つ・電池・コンティ1頭は、チームで入札の回（[team_bid.md](team_bid.md)）と同じ見た目にする。
-キャラクターの見た目は [docs/spec/characters.md](../characters.md) にある。continuo の役はクジラのコンティ1頭、Claude Code の役はテラコッタ色の丸いロボット3体で、この回に Codex は出ない。
+何が起きるかは [short_movie/concept.md](../concept.md) の「寝て待つ回」の表と1節の共通の決まりが正である。部屋・机3つ・電池・コンティ1頭は、チームで入札の回（[team-bid.md](team-bid.md)）と同じ見た目にする。
+キャラクターの見た目は [short_movie/characters.md](../characters.md) にある。continuo の役はクジラのコンティ1頭、Claude Code の役はテラコッタ色の丸いロボット3体で、この回に Codex は出ない。
 
 ---
 
@@ -14,7 +14,7 @@
 | --- | --- | --- |
 | 画面 | 1080×1080、30fps、450フレーム | 制作設計の「書き出しと X の仕様」の節 |
 | カット | チームで入札の回の部屋の1カット。カメラは動かさない | チームで入札の回のあとに置くので、同じ部屋だと入札の続きとして読める |
-| 部屋の部品 | `src/videos/team_bid/TeamRoom.tsx` の部屋・机・電池をそのまま使う。机の左は アカネ、真ん中は開発者、右はゲンさん | チームで入札の回と見た目をそろえる |
+| 部屋の部品 | `short_movie/videos/_shared/TeamRoom.tsx` の部屋・机・電池をそのまま使う。机の左は アカネ、真ん中は開発者、右はゲンさん | チームで入札の回と見た目をそろえる |
 | 真ん中の電池 | Claude Code の頭の上に2本並べ、左に「5時間」、右に「1週間」の札。札の字は 40px。空になると縁が赤く点滅し、中に赤い「！」 | どちらのレートリミットが尽きたかを、字幕なしでも見分けるため |
 | 左右の電池 | 1本ずつ。入札の場面で余裕値の％（68%・20%）を浮かべる | チームで入札の回の入札と同じ見せ方にする |
 | 机の顔 | 各机の前板に、その机の人の顔のアイコン（80px） | カードの担当者の顔が「どの机の人か」を読み取れるようにする |
@@ -22,7 +22,7 @@
 | 時計と日めくり | 壁の左に時計（赤い三角の印がリセットの時刻）、右に日めくり。動くあいだは大きくし、右上に「早回し」の印 | 5時間は時計の時刻で戻り、1週間は何日たっても戻らないことを分ける |
 | コンティ | 待つあいだはカンバンの左で眠る。カードが Ready へ戻ると起きて運ぶ | 5時間の再開は、誰も何もしなくても起きることを見せる |
 | 名前の札 | 2.05〜3.35秒、3体の頭の上にテラコッタの札。電池は札より上（上辺 420px）に置く | 1節の決まり。札と電池を重ねないため |
-| 字幕・締め | 場面の頭から4フレーム後に1行。締め「尽きても、止まらない」は2行に分けて 120px | 10字を1行にすると画面に収まらない。チームで入札の回の締めの形を `src/videos/wait_quota/WaitEndCard.tsx` に写した |
+| 字幕・締め | 場面の頭から4フレーム後に1行。締め「尽きても、止まらない」は2行に分けて 120px | 10字を1行にすると画面に収まらない。チームで入札の回の締めの形を `short_movie/videos/wait-quota/WaitEndCard.tsx` に写した |
 | 言葉 | 画面・台本・この文書のどこにも、レートリミットを別の言葉に言い換えない | 人間の指示 |
 
 ---
@@ -45,15 +45,15 @@
 | 秒 | 音 | 動き |
 | --- | --- | --- |
 | 2.05・2.1・2.9 | pop・typing | 名前の札・猛烈に作業する |
-| 3.5・3.62 | wait_quota_empty・splat | 「5時間」が空になる・座り込む |
-| 4.1・5.95 | wait_quota_tick・wait_quota_bell と wait_quota_charge | 早回し・ベルと満タン |
+| 3.5・3.62 | wait-quota_empty・splat | 「5時間」が空になる・座り込む |
+| 4.1・5.95 | wait-quota_tick・wait-quota_bell と wait-quota_charge | 早回し・ベルと満タン |
 | 6.2・6.55 | pop・typing | 立ち上がる・続きを作る |
-| 7.2・8.4 | wait_quota_flip・wait_quota_empty | 日めくり・「1週間」が空になる |
-| 8.95・9.3・9.8 | wait_quota_fall・swish・pop | 顔が落ちる・Ready へ戻る・コンティが起きる |
-| 10.15・10.25・10.55 | team_bid_bid・team_bid_win | ％が浮かぶ・68% の机が選ばれる |
+| 7.2・8.4 | wait-quota_flip・wait-quota_empty | 日めくり・「1週間」が空になる |
+| 8.95・9.3・9.8 | wait-quota_fall・swish・pop | 顔が落ちる・Ready へ戻る・コンティが起きる |
+| 10.15・10.25・10.55 | team-bid_bid・team-bid_win | ％が浮かぶ・68% の机が選ばれる |
 | 10.8・11.3・11.75・11.85・13.0 | whoosh・splat・sparkle・typing・pop | 運ぶ・置く・顔が替わる・引き継いで作る・締めの字 |
 
-`wait_quota_*` は `scripts/sfx_wait_quota.py`、`team_bid_*` は `scripts/sfx_team_bid.py` で合成した。
+`wait_quota_*` は `short_movie/materials/sfx/sfx_wait-quota.py`、`team_bid_*` は `short_movie/materials/sfx/sfx_team-bid.py` で合成した。
 
 ---
 
@@ -63,9 +63,9 @@
 
 | 絵 | 中身 | 作り方 |
 | --- | --- | --- |
-| `ep/wait_quota/icon_gen` | ゲンさんの顔のアイコン。短い白髪・太い眉・耳に鉛筆・からし色のセーター。めがね・ひげは描かない | Codex。参照は `ep/stranger_comment/icon_akane.png` と `icon_developer.png`。緑を `scripts/key_green.py` で抜いた。元の絵は `out/work/wait_quota/raw/icon_gen.png` |
-| `ep/wait_quota/icon_akane`・`icon_developer` | アカネと開発者の顔のアイコン | 他人のコメントの回の絵の写し |
-| `ep/team_bid/room`・`desk`・`cc_wait` | 部屋・机・座り込む Claude Code | チームで入札の回の絵をそのまま使う |
+| `ep/wait-quota/icon_gen` | ゲンさんの顔のアイコン。短い白髪・太い眉・耳に鉛筆・からし色のセーター。めがね・ひげは描かない | Codex。参照は `ep/stranger-comment/icon_akane.png` と `icon_developer.png`。緑を `short_movie/materials/scripts/key_green.py` で抜いた。元の絵は `out/work/wait_quota/raw/icon_gen.png` |
+| `ep/wait-quota/icon_akane`・`icon_developer` | アカネと開発者の顔のアイコン | 他人のコメントの回の絵の写し |
+| `ep/team-bid/room`・`desk`・`cc_wait` | 部屋・机・座り込む Claude Code | チームで入札の回の絵をそのまま使う |
 | `claude_code/work`・`fist`・`receive`、`continuo/wave`・`sleep` | 作る・立つ・受け取る、ヒレを振る・眠る | 既存 |
 
-**Remotion で描くもの。**`src/videos/wait_quota/Gauges.tsx` に、札の付いた電池（`LabeledBattery`）・壁の時計（`WallClock`）・日めくり（`DayCalendar`）・早回しの印・担当者の顔（`FaceIcon`）・眠りの「Z」を置いた。電池の残り・針・ページを毎フレーム秒から計算するので、減る・戻る・めくれるが滑らかに動く。
+**Remotion で描くもの。**`short_movie/videos/wait-quota/Gauges.tsx` に、札の付いた電池（`LabeledBattery`）・壁の時計（`WallClock`）・日めくり（`DayCalendar`）・早回しの印・担当者の顔（`FaceIcon`）・眠りの「Z」を置いた。電池の残り・針・ページを毎フレーム秒から計算するので、減る・戻る・めくれるが滑らかに動く。

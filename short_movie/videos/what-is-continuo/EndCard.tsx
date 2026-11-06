@@ -1,8 +1,8 @@
 import React from "react";
 import { Img, interpolate, spring, staticFile, useCurrentFrame, useVideoConfig } from "remotion";
-import { theme } from "../../theme";
+import { theme } from "../_shared/theme";
 
-// 締め。src/components/EndCard.tsx を写し、15文字の締め「見るのはエージェントでなく、仕事」を2行に割った。
+// 締め。short_movie/videos/_shared/EndCard.tsx を写し、15文字の締め「見るのはエージェントでなく、仕事」を2行に割った。
 // 1行に入れると、150px の字では画面から大きくはみ出す。文言は変えず、「、」の後ろで割って「仕事」を大きく置く
 export const EndCard: React.FC<{ lines: [string, string]; sprite: string; spriteWidth?: number; spriteTop?: number }> = ({ lines, sprite, spriteWidth = 300, spriteTop = 720 }) => {
   const frame = useCurrentFrame();

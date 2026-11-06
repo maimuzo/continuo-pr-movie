@@ -1,6 +1,6 @@
-"""止めても続きからの回だけで使う効果音を合成し、public/sfx/resume_{off,on,click,steps}.wav に書き出す。
+"""止めても続きからの回だけで使う効果音を合成し、short_movie/materials/sfx/resume_{off,on,click,steps}.wav に書き出す。
 
-`uv run --with numpy python -I scripts/sfx_resume.py` で作る。make_sfx.py の関数を借り、make_sfx.py は書き換えない。
+`uv run --no-project --python 3.12 --with numpy==2.5.4 python -I short_movie/materials/sfx/sfx_resume.py` で作る。make_sfx.py の関数を借り、make_sfx.py は書き換えない。
 off は左の窓が暗くなるときの下がる音、on は明るくなるときの上がる音。
 click はディスプレイの電源を切り替える音、steps は開発者が歩く足音。
 """

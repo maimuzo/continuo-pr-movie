@@ -1,16 +1,16 @@
 import React from "react";
 import { AbsoluteFill, Audio, Easing, Img, interpolate, Sequence, staticFile, useCurrentFrame } from "remotion";
-import { Caption } from "../components/Caption";
-import { CrumpleMarks, Sparkle, SpeedLines, Sweat } from "../components/Effects";
-import { EndCard } from "./one_kanban/EndCard";
-import { NameTag } from "../components/NameTag";
-import { Sprite } from "../components/Sprite";
-import { TitleCard } from "../components/TitleCard";
-import { WorktreeSign } from "../components/WorktreeSign";
-import { sec, theme } from "../theme";
-import { Board, REPO_CARD, RepoCard, slot } from "./one_kanban/Board";
-import { BOOTH_X, REPOS, SIGNBOARD_Y } from "./one_kanban/repos";
-import { script } from "./one_kanban.script";
+import { Caption } from "../../components/Caption";
+import { CrumpleMarks, Sparkle, SpeedLines, Sweat } from "../../components/Effects";
+import { EndCard } from "./EndCard";
+import { NameTag } from "../../components/NameTag";
+import { Sprite } from "../../components/Sprite";
+import { TitleCard } from "../../components/TitleCard";
+import { WorktreeSign } from "../_shared/WorktreeSign";
+import { sec, theme } from "../_shared/theme";
+import { Board, REPO_CARD, RepoCard, slot } from "./Board";
+import { BOOTH_X, REPOS, SIGNBOARD_Y } from "./repos";
+import { script } from "./script";
 
 // カンバン1枚の回。カンバンの壁のカット（2〜5秒）と、3軒の工房のカット（5〜13秒）に割る。
 // 工房のカットは同じ絵の上で、カードを飛ばす場面と同時に作る場面を続けて見せる。カメラは動かさない。
@@ -47,7 +47,7 @@ const tagSpot = (i: number) => ({ x: signLeft(i) + 84 * SIGN_SCALE, y: SIGN_Y + 
 
 const WorkshopsBackground: React.FC = () => (
   <>
-    <Img src={staticFile("ep/one_kanban/workshops.png")} style={{ position: "absolute", left: 0, top: 0, width: 1080, height: 1080 }} />
+    <Img src={staticFile("ep/one-kanban/workshops.png")} style={{ position: "absolute", left: 0, top: 0, width: 1080, height: 1080 }} />
     {/* 入口の看板にリポジトリの名前。絵には字を描かせず、ここで書く（字が崩れないように）。
         板の幅は約250pxで、maimuzo/project-a を1行では収まらないので、owner と名前の2行にする */}
     {REPOS.map((r, i) => (
@@ -164,7 +164,7 @@ const LineUpScene: React.FC = () => {
       </Board>
       {/* 開発者は顔を歪めないよう、伸び縮みさせず、貼るたびに少し背伸びするだけにする */}
       <Sprite
-        src="ep/one_kanban/dev_pin.png"
+        src="ep/one-kanban/dev_pin.png"
         cx={DEV.cx}
         baseY={DEV.baseY - PLACE_AT.reduce((a, t) => a + interpolate(f, [at(t), at(t + 0.15), at(t + 0.35)], [0, 14, 0], clamp), 0)}
         height={DEV.height}
@@ -437,3 +437,7 @@ export const OneKanban: React.FC = () => (
     ))}
   </AbsoluteFill>
 );
+
+// short-movie の render.sh は default の部品と meta を読む
+export default OneKanban;
+export { meta } from "./script";

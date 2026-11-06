@@ -1,4 +1,5 @@
-// 寝て待つ回の台本。秒で書く。中身は docs/spec/detailed_storyboards/wait_quota.md が正
+// 寝て待つ回の台本。秒で書く。中身は short_movie/storyboards/wait-quota.md が正
+export const meta = { id: "wait-quota", durationInSeconds: 15 } as const;
 export const script = {
   id: "wait-quota",
   title: "尽きても、勝手に再開",

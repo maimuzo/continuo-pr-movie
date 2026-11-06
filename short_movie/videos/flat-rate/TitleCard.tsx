@@ -1,6 +1,6 @@
 import React from "react";
 import { interpolate, spring, useCurrentFrame, useVideoConfig } from "remotion";
-import { theme } from "../../theme";
+import { theme } from "../_shared/theme";
 
 // 冒頭のタイトル（共通の部品の写し。6字のタイトルを大きく見せるため字を 140 にし、折り返さない）。弾んで出て、outFrom から縮んで消える
 export const TitleCard: React.FC<{ text: string; outFrom: number }> = ({ text, outFrom }) => {

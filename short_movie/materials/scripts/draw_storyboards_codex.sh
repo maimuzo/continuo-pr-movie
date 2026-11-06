@@ -1,5 +1,5 @@
 #!/bin/bash
-# 絵コンテ（scripts/storyboard_frames.py の絵）を Codex に1枚ずつ描かせ、1枚ごとに利用枠の使用率を記録する。
+# 絵コンテ（short_movie/materials/scripts/storyboard_frames.py の絵）を Codex に1枚ずつ描かせ、1枚ごとに利用枠の使用率を記録する。
 # 5時間枠が尽きたら、リセットの時刻の1分後まで眠って続ける。週の枠が WEEK_STOP（既定 80）% に達したら止まる。
 # 描けた絵は飛ばすので、止めても同じコマンドで続きから描ける。
 # 記録: out/review/codex_usage.tsv（時刻・絵・5時間枠の前と後・週の枠の前と後・かかった秒）
@@ -21,7 +21,7 @@ read_quota() {
         ($w|map(select(.used_percent>=100))|map(.reset_at)|max // 0) ] | @tsv'
 }
 
-for id in $(python3 -I scripts/storyboard_frames.py list | jq -r ".[].id"); do
+for id in $(python3 -I short_movie/materials/scripts/storyboard_frames.py list | jq -r ".[].id"); do
   out="out/storyboards/$id.png"
   [ -s "$out" ] && continue
   mkdir -p "$(dirname "$out")"
@@ -36,8 +36,8 @@ for id in $(python3 -I scripts/storyboard_frames.py list | jq -r ".[].id"); do
       [ "$ok" = "true" ] || { echo "リセットの時刻を過ぎても使えない"; exit 2; }
     fi
     t0=$(date +%s)
-    refs=($(python3 -I scripts/storyboard_frames.py refs "$id"))
-    printf '%s\n' "Use your built-in image generation tool to create ONE image, then save the PNG to $out. Do not write any other files. Image prompt: $(python3 -I scripts/storyboard_frames.py prompt "$id")" \
+    refs=($(python3 -I short_movie/materials/scripts/storyboard_frames.py refs "$id"))
+    printf '%s\n' "Use your built-in image generation tool to create ONE image, then save the PNG to $out. Do not write any other files. Image prompt: $(python3 -I short_movie/materials/scripts/storyboard_frames.py prompt "$id")" \
       | codex exec -s workspace-write -C "$PWD" --image "${refs[@]}" - > "out/review/codex_last.log" 2>&1
     read -r h1 w1 _ _ < <(read_quota)
     printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\n' "$(date '+%m-%d %H:%M')" "$id" "$h0" "$h1" "$w0" "$w1" "$(( $(date +%s) - t0 ))" >> "$LOG"

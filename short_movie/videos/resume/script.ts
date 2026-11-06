@@ -1,4 +1,5 @@
-// 止めても続きからの回の台本。秒で書く。中身は docs/spec/detailed_storyboards/resume.md が正
+// 止めても続きからの回の台本。秒で書く。中身は short_movie/storyboards/resume.md が正
+export const meta = { id: "resume", durationInSeconds: 15 } as const;
 export const script = {
   id: "resume",
   title: "止めても、消えない",

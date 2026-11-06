@@ -22,10 +22,10 @@ export const deskXs = (n: number, w = DESK.w) => {
 // 机の左のモニターを避けて、Claude Code は机の真ん中より少し右に座る
 export const robotCxOf = (deskX: number, w = DESK.w) => deskX + w / 2 + 30;
 
-export const Room: React.FC = () => <Img src={staticFile("ep/team_bid/room.png")} style={{ position: "absolute", width: 1080, height: 1080 }} />;
+export const Room: React.FC = () => <Img src={staticFile("ep/team-bid/room.png")} style={{ position: "absolute", width: 1080, height: 1080 }} />;
 
 export const Desk: React.FC<{ x: number; w?: number }> = ({ x, w = DESK.w }) => (
-  <Img src={staticFile("ep/team_bid/desk.png")} style={{ position: "absolute", left: x, top: DESK.top, width: w }} />
+  <Img src={staticFile("ep/team-bid/desk.png")} style={{ position: "absolute", left: x, top: DESK.top, width: w }} />
 );
 
 // 各 Claude Code の頭の上に並べる電池。levels の長さが電池の本数になる。

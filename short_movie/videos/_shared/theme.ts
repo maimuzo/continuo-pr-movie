@@ -3,7 +3,7 @@ import { loadFont } from "@remotion/google-fonts/MPLUSRounded1c";
 // 和文は細かい部分に分けて配られるので、subsets を絞らずに全部読む
 const { fontFamily } = loadFont("normal", { weights: ["800"] });
 
-// 10本で共有する色・書体・尺。色はキャラクター設定書（docs/spec/characters.md）に合わせる
+// 全回で共有する色・書体・尺。色はキャラクター設定書（short_movie/characters.md）に合わせる
 export const theme = {
   fontFamily,
   fps: 30,

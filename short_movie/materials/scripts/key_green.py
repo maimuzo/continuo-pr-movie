@@ -1,6 +1,6 @@
 """緑一色の背景（#00FF00）で描かせた絵から背景を抜き、透明な PNG にする。
 
-使い方: uv run --with pillow --with numpy python -I scripts/key_green.py <入力.png> <出力.png>
+使い方: uv run --with pillow --with numpy python -I short_movie/materials/scripts/key_green.py <入力.png> <出力.png>
 
 ffmpeg の colorkey だけでは、輪郭のまわりに緑のにじみが残る。そこで、
 緑の強さで透明度を決め、残った緑みを赤と青の大きいほうまで下げてから、絵のある範囲で切り抜く。

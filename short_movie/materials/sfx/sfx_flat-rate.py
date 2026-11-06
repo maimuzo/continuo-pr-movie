@@ -1,6 +1,6 @@
-"""定額のままの回だけで鳴らす効果音を合成して public/sfx/flat_rate_*.wav に書き出す。
+"""定額のままの回だけで鳴らす効果音を合成して short_movie/materials/sfx/flat-rate_*.wav に書き出す。
 
-`uv run --with numpy python -I scripts/sfx_flat_rate.py` で作り直す。合成の道具は scripts/make_sfx.py から借りる（書き換えない）。
+`uv run --no-project --python 3.12 --with numpy==2.5.4 python -I short_movie/materials/sfx/sfx_flat-rate.py` で作り直す。合成の道具は 同じフォルダの make_sfx.py から借りる（書き換えない）。
 - coin: チャリン。従量課金のレジから硬貨が出るたびに鳴らす
 - lock: カチャ。定額のレジに錠が掛かる
 - unplug: プツッ。開発者がレジの電源を抜く（いまは鳴らしていない。crt_off に替えた）
@@ -66,5 +66,5 @@ def crt_off():
 
 if __name__ == "__main__":
     for name, make in {"coin": coin, "lock": lock, "unplug": unplug, "crt_off": crt_off}.items():
-        save(f"flat_rate_{name}", make())
-        print(f"flat_rate_{name}")
+        save(f"flat-rate_{name}", make())
+        print(f"flat-rate_{name}")

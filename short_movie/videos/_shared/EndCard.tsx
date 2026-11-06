@@ -1,6 +1,6 @@
 import React from "react";
 import { Img, interpolate, spring, staticFile, useCurrentFrame, useVideoConfig } from "remotion";
-import { theme } from "../theme";
+import { theme } from "./theme";
 
 // 締め。中央に決めの字幕、下に continuo の名前と URL、跳ねるキャラクター。
 // 字幕は最初のフレームから見えるように、透明から出さず、大きい字から縮めて「ドン」と置く

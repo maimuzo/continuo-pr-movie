@@ -1,14 +1,14 @@
 import React from "react";
 import { AbsoluteFill, Audio, Easing, Img, interpolate, Sequence, staticFile, useCurrentFrame } from "remotion";
-import { Caption } from "../components/Caption";
-import { Exclamation, Sparkle, SpeedLines, Steam, Sweat } from "../components/Effects";
-import { EndCard } from "./resume/EndCard";
-import { IssueCard } from "../components/IssueCard";
-import { NameTag } from "../components/NameTag";
-import { Sprite } from "../components/Sprite";
-import { TitleCard } from "../components/TitleCard";
-import { sec, theme } from "../theme";
-import { script } from "./resume.script";
+import { Caption } from "../../components/Caption";
+import { Exclamation, Sparkle, SpeedLines, Steam, Sweat } from "../../components/Effects";
+import { EndCard } from "./EndCard";
+import { IssueCard } from "../_shared/IssueCard";
+import { NameTag } from "../../components/NameTag";
+import { Sprite } from "../../components/Sprite";
+import { TitleCard } from "../../components/TitleCard";
+import { sec, theme } from "../_shared/theme";
+import { script } from "./script";
 
 // 止めても続きからの回。2〜13秒は「開発者の PC の画面に窓が2つ並ぶ」1つのカットで通す。
 // コンティは左の窓（continuo）、Claude Code は右の窓（pane）の中だけで動き、窓の外は切り取る。
@@ -521,7 +521,7 @@ const Scene: React.FC = () => {
   return <Room t={f / theme.fps} />;
 };
 
-// 効果音。音は scripts/make_sfx.py と scripts/sfx_resume.py で合成した public/sfx/*.wav。at は動画の頭からの秒
+// 効果音。音は short_movie/materials/sfx/make_sfx.py と short_movie/materials/sfx/sfx_resume.py で合成した short_movie/materials/sfx/*.wav。at は動画の頭からの秒
 const SFX: { name: string; at: number; volume: number }[] = [
   { name: "enter", at: T.press, volume: 0.7 }, // Ctrl+C を押す
   { name: "resume_off", at: T.press + 0.05, volume: 0.55 }, // 左の窓が暗くなる
@@ -574,3 +574,7 @@ export const Resume: React.FC = () => (
     ))}
   </AbsoluteFill>
 );
+
+// short-movie の render.sh は default の部品と meta を読む
+export default Resume;
+export { meta } from "./script";

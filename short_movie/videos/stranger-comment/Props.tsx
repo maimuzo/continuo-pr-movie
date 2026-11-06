@@ -1,5 +1,5 @@
 import React from "react";
-import { theme } from "../../theme";
+import { theme } from "../_shared/theme";
 import { ROLE_COLOR } from "./Comments";
 
 // 箱と指示書。どちらも Remotion で、設定画と同じ太い線・影1段の平らな塗りで描く

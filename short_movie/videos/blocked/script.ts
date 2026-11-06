@@ -1,4 +1,5 @@
-// 詰まったらひとことの回の台本。秒で書く。中身は docs/spec/detailed_storyboards/blocked.md が正
+// 詰まったらひとことの回の台本。秒で書く。中身は short_movie/storyboards/blocked.md が正
+export const meta = { id: "blocked", durationInSeconds: 15 } as const;
 export const script = {
   id: "blocked",
   title: "詰まったら、ひとこと",

@@ -1,8 +1,8 @@
 import React from "react";
-import { theme } from "../../theme";
+import { theme } from "../_shared/theme";
 
 // 右上に浮かべる、カンバンの小窓（GitHub Projects 風。ロゴは入れない）。
-// src/components/Kanban.tsx の5列版（src/videos/blocked/Kanban.tsx）にならい、小さくても見出しが読めるように列を詰め、字を太く大きめにした。
+// short_movie/videos/_shared/Kanban.tsx の5列版（short_movie/videos/blocked/Kanban.tsx）にならい、小さくても見出しが読めるように列を詰め、字を太く大きめにした。
 // 見出しの色は Kanban.tsx と同じ並びに Blocked の赤を足したもの
 
 export const MINI_COLUMNS = [

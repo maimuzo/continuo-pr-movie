@@ -1,6 +1,6 @@
 import React from "react";
 import { interpolate, spring, useCurrentFrame, useVideoConfig } from "remotion";
-import { theme } from "../../theme";
+import { theme } from "../_shared/theme";
 
 // 詰まったらひとことの回だけで使う部品。どれも設定画にそろえて、太い輪郭線と平らな塗り、影1段で描く
 

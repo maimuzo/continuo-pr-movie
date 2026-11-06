@@ -1,8 +1,8 @@
 import React from "react";
 import { Img, interpolate, spring, staticFile, useCurrentFrame, useVideoConfig } from "remotion";
-import { theme } from "../../theme";
+import { theme } from "../_shared/theme";
 
-// 共通の EndCard（src/components/EndCard.tsx）の写し。締めの字が18字あり1行では収まらないので、lines で2行に分けて受け取り、
+// 共通の EndCard（short_movie/videos/_shared/EndCard.tsx）の写し。締めの字が18字あり1行では収まらないので、lines で2行に分けて受け取り、
 // 長い方の行（10字）が大きい字から縮める頭のコマ（1.12倍）でも1080pxに収まるよう、字を90pxにした。2行になる分、字を上に、名前と URL を下にずらした。
 // 締め。中央に決めの字幕、下に continuo の名前と URL、跳ねるキャラクター。
 // 字幕は最初のフレームから見えるように、透明から出さず、大きい字から縮めて「ドン」と置く

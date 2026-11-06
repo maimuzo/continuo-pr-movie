@@ -1,7 +1,7 @@
 # continuo 機能紹介動画の制作設計（詳細版）
 
 **この文書が正である。**人間のレビュー用の要約は [production_design_slim.md](production_design_slim.md) にあり、食い違ったらこちらに従う。
-何を映すかは [docs/spec/storyboard.md](../spec/storyboard.md)、進み具合は [docs/plans/impl/tasks.md](impl/tasks.md) にある。
+何を映すかは [short_movie/concept.md](../../concept.md)、進み具合は [short_movie/docs/plans/impl/tasks.md](impl/tasks.md) にある。
 調べた値（無料枠・価格・仕様）は **2026-10-28 時点**のもので、各工程の前に確かめ直す。
 
 ---
@@ -12,11 +12,11 @@
 画面・字幕・組み立て・書き出し・自己点検は Claude Code が Remotion で行う。
 
 ```
-コンテ（docs/spec/storyboard.md）
+コンテ（short_movie/concept.md）
   └→ [Claude Code] 1本ごとの台本データ（src/videos/NN_*.script.ts）と、要る絵の一覧（assets/manifest.json）
-       ├→ [Claude Code] 絵の依頼書（assets/prompts/NN_*.md）。プロンプトを1枚ずつ書く
+       ├→ [Claude Code] 絵の依頼書（short_movie/materials/prompts/NN_*.md）。プロンプトを1枚ずつ書く
        │     ├→ Codex の枠が足りる → [Codex 画像生成] が描く
-       │     └→ 足りない → [人間] 依頼書のプロンプトを Nano Banana へ貼り、画像を assets/inbox/ へ保存する
+       │     └→ 足りない → [人間] 依頼書のプロンプトを Nano Banana へ貼り、画像を short_movie/inbox/ へ保存する
        │           └→ [Claude Code] 受け取り・緑抜き・設定画との見比べ。ずれた絵は描き直しの依頼書に回す
        ├→ [Claude Code] デフォルメ画面の部品（カンバン・カード・pane・コメント欄・燃料計）を React + SVG で書く
        └→ [Claude Code] Remotion で組み立てる
@@ -57,8 +57,8 @@
 画像はまず `~/.codex/generated_images/<セッション>/exec-<id>.png` に書かれ、Codex 自身がそれを指定のパスへ写す。1枚で約2.9万トークン使い、5時間枠と週の枠の使用率はどちらも 0% のまま動かなかった。出た画像は 1145×1374 の PNG だった。
 
 ```sh
-printf '%s\n' "Use your built-in image generation tool to create ONE image, then save the PNG to assets/raw/robot/catch_jump.png. Do not write any other files. Image prompt: ..." \
-  | codex exec -s workspace-write -C "$PWD" --image assets/ref/robot.png -
+printf '%s\n' "Use your built-in image generation tool to create ONE image, then save the PNG to short_movie/materials/raw/robot/catch_jump.png. Do not write any other files. Image prompt: ..." \
+  | codex exec -s workspace-write -C "$PWD" --image short_movie/materials/ref/robot.png -
 ```
 
 **参照画像を渡すときは、プロンプトを標準入力から渡す。**`--image` は後ろに続く引数をすべて画像のパスとして読むので、`--image <画像> "<プロンプト>"` と書くとプロンプトまで画像扱いになり、`No prompt provided via stdin.` で止まる（2026-10-28 に3回とも止まった）。末尾の `-` が「プロンプトは標準入力から読む」の指定である。
@@ -72,16 +72,16 @@ printf '%s\n' "Use your built-in image generation tool to create ONE image, then
 
 | 順 | 誰が | 何をする |
 | --- | --- | --- |
-| 1 | Claude Code | 依頼書 `assets/prompts/<回>.md` を書き、チャットで「この依頼書をお願いします」と渡す |
-| 2 | 人間 | Gemini アプリで新しいチャットを開き、依頼書の冒頭にある設定画（`assets/ref/robot.png` など、その回に出るキャラクターのもの）を添付する |
-| 3 | 人間 | 依頼書のプロンプトを上から順に1つずつ貼り、出た画像を1枚ずつ `assets/inbox/` へ保存する |
+| 1 | Claude Code | 依頼書 `short_movie/materials/prompts/<回>.md` を書き、チャットで「この依頼書をお願いします」と渡す |
+| 2 | 人間 | Gemini アプリで新しいチャットを開き、依頼書の冒頭にある設定画（`short_movie/materials/ref/robot.png` など、その回に出るキャラクターのもの）を添付する |
+| 3 | 人間 | 依頼書のプロンプトを上から順に1つずつ貼り、出た画像を1枚ずつ `short_movie/inbox/` へ保存する |
 | 4 | 人間 | チャットで「保存した」と伝える |
-| 5 | Claude Code | `scripts/ingest.py` で、保存された順と依頼書の順を突き合わせて名前を付け、緑を抜く |
+| 5 | Claude Code | `short_movie/materials/scripts/ingest.py` で、保存された順と依頼書の順を突き合わせて名前を付け、緑を抜く |
 | 6 | Claude Code | 1枚ずつ見て、プロンプトと違う絵・設定画とずれた絵を描き直しの依頼書にまとめる |
 
 **なぜ同じチャットで続けて描かせるか。**最初に添付した設定画が会話に残るので、2枚目以降は添付し直さなくてよい。
 
-**なぜ保存の順で突き合わせるか。**人間にファイル名を付け直させないためである。`scripts/ingest.py` は保存された時刻の順に並べる。枚数が依頼書と合わなければ、名前を付けずに止まって人間に聞く。
+**なぜ保存の順で突き合わせるか。**人間にファイル名を付け直させないためである。`short_movie/materials/scripts/ingest.py` は保存された時刻の順に並べる。枚数が依頼書と合わなければ、名前を付けずに止まって人間に聞く。
 
 **最初に1回だけ人間がすること。**Gemini アプリの設定で「Media watermark」を Off にする。見える透かし（右下のきらきら）が入らなくなる。見えない透かし（SynthID）は残るが、動画には映らない。
 
@@ -94,12 +94,12 @@ printf '%s\n' "Use your built-in image generation tool to create ONE image, then
 **言いたいこと。**依頼書は Codex にも人間にも同じものを渡す。プロンプトは英語で書く。
 **なぜ英語か。**画像生成は英語のプロンプトのほうが指示の取りこぼしが少ないためである。人間が読めるよう、各プロンプトの上に日本語の1行を添える。
 
-依頼書の形（`assets/prompts/01_ready.md`。Claude Code が書く）。
+依頼書の形（`short_movie/materials/prompts/01_ready.md`。Claude Code が書く）。
 
 ````markdown
 # 絵の依頼書 01_ready（2026-11-02）
 
-最初に `assets/ref/robot.png` を添付してください。上から順に貼り、出た画像を順に `assets/inbox/` へ保存してください。
+最初に `short_movie/materials/ref/robot.png` を添付してください。上から順に貼り、出た画像を順に `short_movie/inbox/` へ保存してください。
 
 ## 1. robot/nap_sofa　ロボットがソファで寝ている
 ```
@@ -112,7 +112,7 @@ Solid #00FF00 background. Do not use green anywhere in the character. Bold outli
 
 ```json
 {
-  "refs": { "robot": "assets/ref/robot.png", "developer": "assets/ref/developer.png" },
+  "refs": { "robot": "short_movie/materials/ref/robot.png", "developer": "short_movie/materials/ref/developer.png" },
   "items": [
     { "id": "robot/nap_sofa", "video": "01", "tool": "nano_banana", "status": "requested" },
     { "id": "robot/catch_jump", "video": "01", "tool": "nano_banana", "status": "ok" }
@@ -130,17 +130,17 @@ Solid #00FF00 background. Do not use green anywhere in the character. Bold outli
 ## 5. キャラクターの作り方
 
 **言いたいこと。**動画を作り始める前に、キャラクターの設定と設定画を固める。以後はそれを毎回参照に渡して描かせる。
-設定（見た目・色・性格・プロンプトの核）は [docs/spec/characters.md](../spec/characters.md) が正である。
+設定（見た目・色・性格・プロンプトの核）は [short_movie/characters.md](../../characters.md) が正である。
 背景は緑一色で描かせ、手元で抜く。白背景はロボットの白い部分まで抜けるので使わない。
 
 **なぜ先に固めるか。**回ごとにキャラクターを決めると、10本の間で顔や色がぶれる。設定を1か所に置き、プロンプトをそこから作れば、どの回の絵も同じ設定から出る。
 
 | 順 | 誰が | 何をする | できるもの |
 | --- | --- | --- | --- |
-| 1 | Codex か人間（2節で決める） | 絵柄の違う設定画を3案描く（正面・横・後ろ、ロボット・人間・現場監督） | `assets/raw/style_candidates/*.png` |
-| 2 | 人間 | 案から1つ選ぶ | 選んだ1枚を `assets/ref/<役>.png` に置く |
-| 3 | Codex か人間 | 設定画を参照に、各回で要るポーズ違いを描く | `assets/raw/<役>/<ポーズ>.png` |
-| 4 | Claude Code | 緑を抜き、余白を切り、大きさをそろえる | `public/characters/<役>/<ポーズ>.png` |
+| 1 | Codex か人間（2節で決める） | 絵柄の違う設定画を3案描く（正面・横・後ろ、ロボット・人間・現場監督） | `short_movie/materials/raw/style_candidates/*.png` |
+| 2 | 人間 | 案から1つ選ぶ | 選んだ1枚を `short_movie/materials/ref/<役>.png` に置く |
+| 3 | Codex か人間 | 設定画を参照に、各回で要るポーズ違いを描く | `short_movie/materials/raw/<役>/<ポーズ>.png` |
+| 4 | Claude Code | 緑を抜き、余白を切り、大きさをそろえる | `short_movie/materials/characters/<役>/<ポーズ>.png` |
 | 5 | Claude Code | 設定画と並べて見比べ、色と形がずれたものを `redo` にする | 描き直しの依頼書 |
 
 **設定画は、2つの道具のどちらで描いても後の回で使える。**どちらの道具にも同じ設定画を参照として渡すためである。
@@ -148,7 +148,7 @@ Solid #00FF00 background. Do not use green anywhere in the character. Bold outli
 **緑の抜き方。**ffmpeg の `colorkey` を使う。ふちに緑が残ったら Python（Pillow）で緑みを消す。
 
 ```sh
-ffmpeg -i assets/raw/robot/catch_jump.png -vf "colorkey=0x00FF00:0.30:0.08" public/characters/robot/catch_jump.png
+ffmpeg -i short_movie/materials/raw/robot/catch_jump.png -vf "colorkey=0x00FF00:0.30:0.08" short_movie/materials/characters/robot/catch_jump.png
 ```
 
 ---
@@ -190,7 +190,7 @@ Remotion では `<Sequence>` でポーズを切り替え、`scale` を数フレ�
 | `Caption` / `TitleCard` / `EndCard` | 全回 | 焼き込み字幕・タイトル・締め |
 | `Effects` | 全回 | 集中線・汗・煙・びっくりマーク |
 
-**配色と書体は1か所で決める。**`src/theme.ts` に色と書体を置き、全部品がそこを読む。
+**配色と書体は1か所で決める。**`short_movie/videos/_shared/theme.ts` に色と書体を置き、全部品がそこを読む。
 書体は Google Fonts の和文の太字（候補は M PLUS Rounded 1c・Dela Gothic One。どちらも SIL Open Font License）を `@remotion/google-fonts` で読む。商用でも無料で使える。
 
 **架空の名前だけを書く。**リポジトリ名は `octocat/hello-world` のような実在しないもの、人の名前は出さない。
@@ -211,8 +211,8 @@ continuo-pr-movie/
 │   ├── inbox/                  # 人間が Nano Banana の画像を保存する場所（git に入れない）
 │   ├── raw/                    # 名前を付けた描いたままの絵（緑背景）
 │   └── manifest.json           # 要る絵の一覧
-├── public/characters/          # 緑を抜いた透明 PNG（Remotion が読む）
-├── scripts/                    # 受け取り・緑抜き・静止画の一覧作り・仕様検査
+├── short_movie/materials/characters/          # 緑を抜いた透明 PNG（Remotion が読む）
+├── short_movie/materials/scripts/                    # 受け取り・緑抜き・静止画の一覧作り・仕様検査
 ├── src/
 │   ├── Root.tsx                # 10本の Composition を並べる
 │   ├── theme.ts                # 色・書体・尺の決まり
@@ -251,14 +251,14 @@ export const script = {
 
 | 順 | 誰が | 何を見るか | 合格の線 |
 | --- | --- | --- | --- |
-| 1 | `scripts/check_spec.sh` | ffprobe で尺・解像度・コーデック | 尺が14.5〜15.5秒、1080×1080、H.264、30fps |
+| 1 | `short_movie/materials/scripts/check_spec.sh` | ffprobe で尺・解像度・コーデック | 尺が14.5〜15.5秒、1080×1080、H.264、30fps |
 | 2 | Claude Code | 1秒ごとの静止画15枚を、コンテの表と1行ずつ突き合わせる | コンテの全行が、指定の秒の静止画に映っている |
 | 3 | Claude Code | 字幕の読みやすさ | 字幕が画面の外へはみ出さず、背景と重なって読めない箇所が無い |
 | 4 | subagent | 同じ静止画とコンテだけを渡し、崩れ・違和感・既存キャラクターへの類似を挙げさせる | 指摘のうち「直さないと見た人が誤解する」ものが0件 |
 
 **なぜ Codex に見させないか。**Codex の利用枠は絵を描くほうへ回す（2節）。文脈を持たない subagent でも、作った本人と違う目で見られる。
 
-**静止画の書き出し。**`npx remotion still <id> --frame=<N>` を1秒ごとに叩き、`scripts/contact_sheet.sh` で1枚の一覧画像にまとめる。
+**静止画の書き出し。**`npx remotion still <id> --frame=<N>` を1秒ごとに叩き、`short_movie/materials/scripts/contact_sheet.sh` で1枚の一覧画像にまとめる。
 
 **点検の記録。**`out/review/<id>/review.md` に書く（`out/` は git に入れない）。
 
@@ -290,7 +290,7 @@ export const script = {
 
 | 項目 | 決まり |
 | --- | --- |
-| 作り方 | [scripts/make_sfx.py:1-5](../../scripts/make_sfx.py#L1-L5) が `public/sfx/*.wav` を書き出す。`uv run --with numpy python -I scripts/make_sfx.py` で全部を作り直す |
+| 作り方 | [short_movie/materials/sfx/make_sfx.py:1-5](../../materials/sfx/make_sfx.py#L1-L5) が `short_movie/materials/sfx/*.wav` を書き出す。`uv run --with numpy python -I short_movie/materials/sfx/make_sfx.py` で全部を作り直す |
 | 音の種類 | typing（カタカタ）・enter（ターン）・whoosh（シュー）・splat（ペタッ）・spout（ピュー）・swish（スッ）・sparkle（キラン）・pop（ポン） |
 | 鳴らし方 | 各回の動画の `SFX` の表に、音の名前・鳴らす秒・音量を書き、Remotion の `<Audio>` を `<Sequence>` の中に置く。秒は場面の動きの時刻の定数から取る |
 | 確かめ方 | `ffmpeg -i <動画> -af "silencedetect=n=-45dB:d=0.12" -f null -` で、音が鳴り始める秒が `SFX` の表と合うかを見る |
@@ -374,9 +374,9 @@ https://github.com/user-attachments/assets/<上げたときにできる id>
 
 - **既存のキャラクターやロゴを描かない。**Octocat、Claude・Anthropic のロゴやマスコットは使わない。プロンプトにも既存のキャラクター名を書かない
 - **生成した絵の扱いを確かめる。**OpenAI と Google の利用規約で、生成物の権利と商用利用の条件を Phase 0 で確かめる
-- **commit しないもの。**`out/`・`node_modules/`・`.venv/`・`.env`・`assets/inbox/`・個人の絶対パス（`/Users/<名前>/`）を含むファイル
-- **`assets/inbox/` を commit しない理由。**ブラウザが付けたファイル名や、受け取り前の絵が混ざるため。受け取ったものは `assets/raw/` へ移す
-- **`assets/raw/` と `assets/prompts/` は commit する。**同じプロンプトでもう一度描かせても同じ絵は出ないので、元の絵とプロンプトを残す
+- **commit しないもの。**`out/`・`node_modules/`・`.venv/`・`.env`・`short_movie/inbox/`・個人の絶対パス（`/Users/<名前>/`）を含むファイル
+- **`short_movie/inbox/` を commit しない理由。**ブラウザが付けたファイル名や、受け取り前の絵が混ざるため。受け取ったものは `short_movie/materials/raw/` へ移す
+- **`short_movie/materials/raw/` と `short_movie/materials/prompts/` は commit する。**同じプロンプトでもう一度描かせても同じ絵は出ないので、元の絵とプロンプトを残す
 - **本物の画面を録らない。**録るときは制作方針の issue の「実際の画面を録るとき」に従う
 
 ---

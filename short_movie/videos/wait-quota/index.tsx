@@ -1,17 +1,17 @@
 import React from "react";
 import { AbsoluteFill, Audio, Easing, interpolate, Sequence, staticFile, useCurrentFrame } from "remotion";
-import { Caption } from "../components/Caption";
-import { Exclamation, Sparkle, SpeedLines, Sweat } from "../components/Effects";
-import { IssueCard } from "../components/IssueCard";
-import { cardSlot, Kanban } from "../components/Kanban";
-import { NameTag } from "../components/NameTag";
-import { Sprite } from "../components/Sprite";
-import { TitleCard } from "../components/TitleCard";
-import { sec, theme } from "../theme";
-import { BatteryRow, Desk, deskXs, HEAD_TOP, KB, Room, ROBOT_BASE, ROBOT_H, robotCxOf } from "./team_bid/TeamRoom";
-import { DayCalendar, FaceIcon, FastForward, LabeledBattery, WallClock, Zzz } from "./wait_quota/Gauges";
-import { WaitEndCard } from "./wait_quota/WaitEndCard";
-import { script } from "./wait_quota.script";
+import { Caption } from "../../components/Caption";
+import { Exclamation, Sparkle, SpeedLines, Sweat } from "../../components/Effects";
+import { IssueCard } from "../_shared/IssueCard";
+import { cardSlot, Kanban } from "../_shared/Kanban";
+import { NameTag } from "../../components/NameTag";
+import { Sprite } from "../../components/Sprite";
+import { TitleCard } from "../../components/TitleCard";
+import { sec, theme } from "../_shared/theme";
+import { BatteryRow, Desk, deskXs, HEAD_TOP, KB, Room, ROBOT_BASE, ROBOT_H, robotCxOf } from "../_shared/TeamRoom";
+import { DayCalendar, FaceIcon, FastForward, LabeledBattery, WallClock, Zzz } from "./Gauges";
+import { WaitEndCard } from "./WaitEndCard";
+import { script } from "./script";
 
 // 寝て待つ回。チームで入札の回と同じ部屋（上に共有のカンバン、下にメンバーの机3つと Claude Code 3体、コンティ1頭）の1カットで通す。
 // 真ん中の机の Claude Code の頭の上に「5時間」「1週間」の札を付けた電池を2本並べる。
@@ -34,7 +34,7 @@ const DESK_X = deskXs(3); // 20・375・730
 const robotCx = (i: number) => robotCxOf(DESK_X[i]);
 const MID = 1; // レートリミットが尽きる机（開発者）
 const TO = 0; // 引き継ぐ机（アカネ、68%）
-const FACES = ["ep/wait_quota/icon_akane.png", "ep/wait_quota/icon_developer.png", "ep/wait_quota/icon_gen.png"];
+const FACES = ["ep/wait-quota/icon_akane.png", "ep/wait-quota/icon_developer.png", "ep/wait-quota/icon_gen.png"];
 const BADGE = (i: number) => ({ cx: DESK_X[i] + 165, cy: 858, size: 80 }); // 机の前板に付けた、その机の人の顔
 const BAT_Y = 420; // 電池の上辺。名前の札（頭の上 486〜562）と重ならない高さ
 const BAT5 = robotCx(MID) - 85;
@@ -105,7 +105,7 @@ const POSE_SRC: Record<string, string> = {
   receive: "characters/claude_code/receive.png",
   work: "characters/claude_code/work.png",
   fist: "characters/claude_code/fist.png",
-  wait: "ep/team_bid/cc_wait.png",
+  wait: "ep/team-bid/cc_wait.png",
 };
 const robotPose = (i: number, t: number) => {
   if (i === MID) {
@@ -315,26 +315,26 @@ const Main: React.FC = () => {
   );
 };
 
-// 効果音。音は scripts/make_sfx.py・scripts/sfx_wait_quota.py・scripts/sfx_team_bid.py で合成した public/sfx/*.wav。at は動画の頭からの秒
+// 効果音。音は short_movie/materials/sfx/make_sfx.py・short_movie/materials/sfx/sfx_wait-quota.py・short_movie/materials/sfx/sfx_team-bid.py で合成した short_movie/materials/sfx/*.wav。at は動画の頭からの秒
 const SFX: { name: string; at: number; volume: number; len?: number }[] = [
   { name: "pop", at: T.tags, volume: 0.35 }, // 名前の札
   { name: "typing", at: 2.1, volume: 0.4 }, // 猛烈に作業する
   { name: "typing", at: 2.9, volume: 0.35 },
-  { name: "wait_quota_empty", at: T.drain5[1], volume: 0.6 }, // 5時間の電池が空になる
+  { name: "wait-quota_empty", at: T.drain5[1], volume: 0.6 }, // 5時間の電池が空になる
   { name: "splat", at: T.sit1 + 0.02, volume: 0.3 }, // 座り込む
-  { name: "wait_quota_tick", at: T.ff1[0] - 0.1, volume: 0.5, len: 2 }, // 時計の早回し
-  { name: "wait_quota_bell", at: T.bell, volume: 0.5 }, // リセットの時刻のベル
-  { name: "wait_quota_charge", at: T.bell + 0.02, volume: 0.55 }, // 満タンへ戻る
+  { name: "wait-quota_tick", at: T.ff1[0] - 0.1, volume: 0.5, len: 2 }, // 時計の早回し
+  { name: "wait-quota_bell", at: T.bell, volume: 0.5 }, // リセットの時刻のベル
+  { name: "wait-quota_charge", at: T.bell + 0.02, volume: 0.55 }, // 満タンへ戻る
   { name: "pop", at: T.stand, volume: 0.45 }, // 立ち上がる
   { name: "typing", at: T.work2, volume: 0.35 }, // 続きを始める
-  { name: "wait_quota_flip", at: FLIPS[0], volume: 0.6 }, // 日めくり
-  { name: "wait_quota_empty", at: T.drain7[1], volume: 0.55 }, // 1週間の電池が空になる
-  { name: "wait_quota_fall", at: T.fall[0], volume: 0.6 }, // 顔が外れて落ちる
+  { name: "wait-quota_flip", at: FLIPS[0], volume: 0.6 }, // 日めくり
+  { name: "wait-quota_empty", at: T.drain7[1], volume: 0.55 }, // 1週間の電池が空になる
+  { name: "wait-quota_fall", at: T.fall[0], volume: 0.6 }, // 顔が外れて落ちる
   { name: "swish", at: T.back[0], volume: 0.45 }, // Ready へ戻る
   { name: "pop", at: T.wake, volume: 0.4 }, // コンティが起きる
-  { name: "team_bid_bid", at: T.bid[0], volume: 0.45 }, // 余裕値が浮かぶ
-  { name: "team_bid_bid", at: T.bid[1], volume: 0.4 },
-  { name: "team_bid_win", at: T.win, volume: 0.55 }, // 68% の机が選ばれる
+  { name: "team-bid_bid", at: T.bid[0], volume: 0.45 }, // 余裕値が浮かぶ
+  { name: "team-bid_bid", at: T.bid[1], volume: 0.4 },
+  { name: "team-bid_win", at: T.win, volume: 0.55 }, // 68% の机が選ばれる
   { name: "whoosh", at: T.lift, volume: 0.45 }, // 運ぶ
   { name: "splat", at: T.drop, volume: 0.4 }, // 机に置く
   { name: "sparkle", at: T.swap[1], volume: 0.5 }, // 顔が替わる
@@ -370,3 +370,7 @@ export const WaitQuota: React.FC = () => (
     ))}
   </AbsoluteFill>
 );
+
+// short-movie の render.sh は default の部品と meta を読む
+export default WaitQuota;
+export { meta } from "./script";

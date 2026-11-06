@@ -1,4 +1,5 @@
-// 置くだけの回の台本。秒で書く。中身は docs/spec/detailed_storyboards/place_on_ready.md が正
+// 置くだけの回の台本。秒で書く。中身は short_movie/storyboards/place-on-ready.md が正
+export const meta = { id: "place-on-ready", durationInSeconds: 15 } as const;
 export const script = {
   id: "place-on-ready",
   title: "置くだけで、始まる",
