@@ -3,21 +3,25 @@ import { Battery, BATTERY } from "../_shared/Battery";
 import { theme } from "../_shared/theme";
 
 // 自分の分だけ上書きの回だけで使う部品。壁の WORKFLOW.md の紙（WorkflowSheet）、机の付箋（LocalNote）、
-// 机の小さな日めくり（MiniCalendar）、「自分の分」の点線の付いた電池（MarginBattery）。
+// 机の小さな日めくり（MiniCalendar）、「自分の分」の点線の付いた電池（MarginBattery）、
+// 巻き戻しの印（Rewind）と走査線（Scanlines）、「仕切り直し」の札（ResetSign）、「えっ！？」の吹き出し（Shout）。
 // 電池は寝て待つ回の LabeledBattery を写して、どの日も自分の分が残る回と同じ「自分の分」の記号（縦の点線と、その右の薄い斜線）を足したもの。
 // ほかの回のフォルダは import できないので、ここに写す。座標は 1080×1080 の画面の座標
 
 const POINTER = "#D9483B";
 const NOTE = "#FFE57A";
 
-// 壁に貼った、チームで共有する WORKFLOW.md の紙。glow（0〜1）で紙全体を光らせ、hot（0〜1）で「10%」の行を光らせる
-export const WorkflowSheet: React.FC<{ left: number; top: number; width: number; height: number; glow?: number; hot?: number }> = ({
+// 壁に貼った、チームで共有する WORKFLOW.md の紙。glow（0〜1）で紙全体を光らせ、hot（0〜1）で「10%」の行を光らせる。
+// strike（0〜1）は「10%」に引く線の伸び具合、rewrite（0〜1）は「10%」の下に手で書き込む赤い「0%」の書けた割合
+export const WorkflowSheet: React.FC<{ left: number; top: number; width: number; height: number; glow?: number; hot?: number; strike?: number; rewrite?: number }> = ({
   left,
   top,
   width,
   height,
   glow = 0,
   hot = 0,
+  strike = 0,
+  rewrite = 0,
 }) => (
   <div
     style={{
@@ -56,10 +60,126 @@ export const WorkflowSheet: React.FC<{ left: number; top: number; width: number;
         whiteSpace: "nowrap",
       }}
     >
-      マージン 10%
+      マージン{" "}
+      <span style={{ position: "relative", display: "inline-block" }}>
+        10%
+        {strike > 0 ? (
+          <svg width={110} height={60} style={{ position: "absolute", left: -12, top: 0, overflow: "visible" }}>
+            <line x1={0} y1={34} x2={8 + 104 * strike} y2={26} stroke={POINTER} strokeWidth={9} strokeLinecap="round" />
+          </svg>
+        ) : null}
+        {rewrite > 0 ? (
+          <span
+            style={{
+              position: "absolute",
+              left: 4,
+              top: "92%",
+              fontSize: 54,
+              color: POINTER,
+              transform: "rotate(-8deg)",
+              clipPath: `inset(0 ${100 - rewrite * 100}% 0 0)`,
+              whiteSpace: "nowrap",
+            }}
+          >
+            0%
+          </span>
+        ) : null}
+      </span>
     </div>
   </div>
 );
+
+// 巻き戻しの印。寝て待つ回の「早回し」の印（FastForward）と同じ形で、三角を左向きにしたもの
+export const Rewind: React.FC<{ frame: number; left?: number; top?: number }> = ({ frame, left = 820, top = 44 }) => {
+  const blink = Math.floor(frame / 8) % 2 === 0 ? 1 : 0.55;
+  return (
+    <div
+      style={{
+        position: "absolute",
+        left,
+        top,
+        width: 230,
+        height: 64,
+        borderRadius: 16,
+        background: theme.color.ink,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        gap: 8,
+        fontFamily: theme.fontFamily,
+        fontWeight: 800,
+        fontSize: 30,
+        color: "#FFFFFF",
+      }}
+    >
+      <svg width={44} height={30} viewBox="0 0 44 30" style={{ opacity: blink }}>
+        <path d="M42 2 L22 15 L42 28 Z M22 2 L2 15 L22 28 Z" fill={theme.color.highlight} />
+      </svg>
+      巻き戻し
+    </div>
+  );
+};
+
+// 巻き戻しのあいだ画面に重ねる走査線。横の細い線と、下へ流れる太い帯
+export const Scanlines: React.FC<{ frame: number; opacity: number }> = ({ frame, opacity }) => (
+  <div style={{ position: "absolute", inset: 0, opacity, pointerEvents: "none" }}>
+    <div style={{ position: "absolute", inset: 0, background: "repeating-linear-gradient(0deg, rgba(42,36,32,0.16) 0px, rgba(42,36,32,0.16) 3px, transparent 3px, transparent 9px)" }} />
+    <div style={{ position: "absolute", left: 0, right: 0, top: ((frame * 37) % 1200) - 120, height: 90, background: "rgba(255,255,255,0.28)" }} />
+    <div style={{ position: "absolute", inset: 0, background: "rgba(60,90,140,0.10)" }} />
+  </div>
+);
+
+// 画面の真ん中に大きく出す「仕切り直し」の札。appear（0〜1）で弾んで出て、0 で消える
+export const ResetSign: React.FC<{ appear: number }> = ({ appear }) =>
+  appear <= 0 ? null : (
+    <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", pointerEvents: "none" }}>
+      <div
+        style={{
+          padding: "28px 64px",
+          background: theme.color.paper,
+          border: `10px solid ${theme.color.ink}`,
+          borderRadius: 28,
+          boxShadow: "10px 14px 0 rgba(42,36,32,0.35)",
+          fontFamily: theme.fontFamily,
+          fontWeight: 800,
+          fontSize: 136,
+          lineHeight: 1.1,
+          color: theme.color.ink,
+          whiteSpace: "nowrap",
+          transform: `scale(${appear}) rotate(-4deg)`,
+          opacity: Math.min(1, appear * 1.5),
+        }}
+      >
+        仕切り直し
+      </div>
+    </div>
+  );
+
+// 驚いた人の頭の横に出す吹き出し。(x, y) は吹き出しの左上。tail が 1 なら右下、-1 なら左下にしっぽを出す
+export const Shout: React.FC<{ x: number; y: number; text: string; scale: number; tail?: 1 | -1 }> = ({ x, y, text, scale, tail = 1 }) =>
+  scale <= 0 ? null : (
+    <div style={{ position: "absolute", left: x, top: y, transform: `scale(${scale})`, transformOrigin: tail === 1 ? "90% 100%" : "10% 100%" }}>
+      <div
+        style={{
+          padding: "6px 22px",
+          background: "#FFFFFF",
+          border: `6px solid ${theme.color.ink}`,
+          borderRadius: 30,
+          fontFamily: theme.fontFamily,
+          fontWeight: 800,
+          fontSize: 46,
+          color: theme.color.ink,
+          whiteSpace: "nowrap",
+        }}
+      >
+        {text}
+      </div>
+      <svg width={40} height={30} style={{ position: "absolute", top: "100%", marginTop: -6, [tail === 1 ? "right" : "left"]: 26 }}>
+        <path d={tail === 1 ? "M2 0 L38 0 L34 28 Z" : "M2 0 L38 0 L6 28 Z"} fill="#FFFFFF" stroke={theme.color.ink} strokeWidth={6} strokeLinejoin="round" />
+        <line x1={4} y1={1} x2={36} y2={1} stroke="#FFFFFF" strokeWidth={8} />
+      </svg>
+    </div>
+  );
 
 // 机の天板の右端に立てて貼る付箋（幅 108px）。appear（0〜1）で弾んで出て、written（0〜1）の割合だけ「マージン 0%」の字が書かれる
 export const LocalNote: React.FC<{ left: number; top: number; appear: number; written: number; glow?: number }> = ({ left, top, appear, written, glow = 0 }) => {
