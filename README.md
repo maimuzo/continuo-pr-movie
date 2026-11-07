@@ -1,7 +1,7 @@
 # continuo-pr-movie
 
 [continuo](https://github.com/maimuzo/continuo) の機能紹介動画を、Remotion で作るリポジトリ。
-X に投稿するための 1080×1080 の動画が12本ある（2本は30秒、ほかは15秒）。
+X に投稿するための 1080×1080 の動画が14本ある（4本は30秒、ほかは15秒）。
 
 ## 動画
 
@@ -52,6 +52,14 @@ https://github.com/user-attachments/assets/caba4d50-7035-4285-be8e-8974b3b457ad
 ### 話したいときは、直接
 
 https://github.com/user-attachments/assets/3a3db808-2bd1-47e5-8ddd-a5f10dd02429
+
+### いつでも、自分の分は残ってる（30秒）
+
+https://github.com/user-attachments/assets/d0e76ce6-8b6e-4cf2-a10e-1bf7da607827
+
+### 自分の分だけ、上書き（30秒）
+
+https://github.com/user-attachments/assets/5eeb752b-c516-4e85-9881-bb0335e6983e
 
 ## 作り方
 
