@@ -1,6 +1,6 @@
-"""寝て待つ回だけで使う効果音を合成し、public/sfx/wait_quota_*.wav に書き出す。
+"""寝て待つ回だけで使う効果音を合成し、short_movie/materials/sfx/wait-quota_*.wav に書き出す。
 
-`uv run --with numpy python -I scripts/sfx_wait_quota.py` で作る。make_sfx.py の関数を借り、make_sfx.py は書き換えない。
+`uv run --no-project --python 3.12 --with numpy==2.5.4 python -I short_movie/materials/sfx/sfx_wait-quota.py` で作る。make_sfx.py の関数を借り、make_sfx.py は書き換えない。
 empty は電池が空になって座り込むときの下がる音、tick は時計の早回しのチクタク、
 bell は壁の時計のベル、charge は電池が満タンへ戻るときの上がる音、
 flip は日めくりがパラパラめくれる音、fall は担当者の顔のアイコンが外れて落ちる音。
@@ -91,9 +91,9 @@ def fall():
 
 
 if __name__ == "__main__":
-    save("wait_quota_empty", empty())
-    save("wait_quota_tick", tick())
-    save("wait_quota_bell", bell())
-    save("wait_quota_charge", charge())
-    save("wait_quota_flip", flip())
-    save("wait_quota_fall", fall())
+    save("wait-quota_empty", empty())
+    save("wait-quota_tick", tick())
+    save("wait-quota_bell", bell())
+    save("wait-quota_charge", charge())
+    save("wait-quota_flip", flip())
+    save("wait-quota_fall", fall())

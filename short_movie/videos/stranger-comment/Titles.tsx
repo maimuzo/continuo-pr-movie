@@ -1,8 +1,8 @@
 import React from "react";
 import { Img, interpolate, spring, staticFile, useCurrentFrame, useVideoConfig } from "remotion";
-import { theme } from "../../theme";
+import { theme } from "../_shared/theme";
 
-// src/components/TitleCard.tsx と EndCard.tsx の写し。この回のタイトルと締めの字は1行だと
+// short-movie の engine/src/components/TitleCard.tsx と EndCard.tsx の写し。この回のタイトルと締めの字は1行だと
 // 1080 の幅を超えるので、改行を入れて2行で出せるようにした。締めは字が長く、元の 1.5倍から縮めると
 // 13.0秒の1コマ目で字が画面の端で切れるので、1.1倍から縮める（ほかの動きと色は元のまま）
 

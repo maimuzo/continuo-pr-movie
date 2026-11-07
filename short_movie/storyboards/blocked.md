@@ -1,8 +1,8 @@
 # 詰まったらひとことの回　詳しいコンテ
 
 **言いたいこと。**「Claude Code が行き詰まると、continuo がカードを `Blocked` へ移し、開発者がコメントでひとこと書いて `Ready` へ戻すと、続きから再開する」を15秒で見せる回の、場面ごとの作りを決める文書である。
-何が起きるかは [docs/spec/storyboard.md](../storyboard.md) の「詰まったらひとことの回」の表と1節の共通の決まりが正で、構図と演技は絵コンテ `out/storyboards/blocked/{2-5,5-7,7-10,10-13}.png` を見本にする。
-キャラクターの見た目は [docs/spec/characters.md](../characters.md) にある。continuo の役はクジラのコンティ、Claude Code の役はテラコッタ色の丸いロボットで、この回に Codex は出ない。
+何が起きるかは [short_movie/concept.md](../concept.md) の「詰まったらひとことの回」の表と1節の共通の決まりが正で、構図と演技は絵コンテ `out/storyboards/blocked/{2-5,5-7,7-10,10-13}.png` を見本にする。
+キャラクターの見た目は [short_movie/characters.md](../characters.md) にある。continuo の役はクジラのコンティ、Claude Code の役はテラコッタ色の丸いロボットで、この回に Codex は出ない。
 
 ---
 
@@ -16,7 +16,7 @@
 | 工事現場 | 積み木の家が並ぶ小さな工事現場。手前から奥へ道がのび、奥で壁に突き当たって左右に分かれる。左右の道の先は霧で見えない | 人間の指摘。Claude Code が作っている途中で、どちらへ進めばよいか分からなくなる、という詰まり方を見せる。壁に激突するだけでは「壊れた」に見える |
 | 詰まった姿 | 頭に「？」を浮かべ、片手を挙げる。ピースにしない | 人間の指摘。挙げた手は「質問があります」の手で、喜んでいるようには見せない |
 | `Ready` へ戻す人 | 開発者がマウスでカードを `Blocked` から `Ready` へ引きずって戻す | continuo の README の運用。continuo は `Blocked` へ移すだけで、戻すのは人間である |
-| カンバン | 列は `Ready`（緑）/ `In Progress`（黄）/ `Blocked`（赤）/ `In Review`（青）/ `Done`（薄紫）。共通の部品を `src/videos/blocked/Kanban.tsx` に写して列を足した | 共通の部品には `Blocked` の列が無い。`Done` の赤と `Blocked` の赤が紛れないように、`Done` を薄紫にした |
+| カンバン | 列は `Ready`（緑）/ `In Progress`（黄）/ `Blocked`（赤）/ `In Review`（青）/ `Done`（薄紫）。共通の部品を `short_movie/videos/blocked/Kanban.tsx` に写して列を足した | 共通の部品には `Blocked` の列が無い。`Done` の赤と `Blocked` の赤が紛れないように、`Done` を薄紫にした |
 | 霧 | Remotion で、白い丸を重ねた雲に太い輪郭線と影1段を付けて描く。背景の絵には描かない | 右の霧だけを晴らすので、背景とは別の部品にする。絵柄は設定画の平らな塗りにそろえる |
 | 積み木 | 組み上げる積み木の家は Remotion で描く（太い輪郭線・平らな塗り・上に丸い突起） | 1個ずつ積み上がる動きを見せるため |
 | 開発者の顔 | 丸い輪郭と、眼鏡の奥の大きな瞳。絵を伸び縮みさせる弾みを付けない | characters.md の開発者は可愛い顔で、顔をつぶしたり歪めたりしない |
@@ -109,14 +109,14 @@
 | 絵 | 中身 | 使う場面 | 作り方 |
 | --- | --- | --- | --- |
 | `ep/blocked/site` | 積み木の工事現場。手前から奥への道、奥の赤い壁、左右に分かれる道、両わきの家、右の道の先の空き地 | 1・2・5 | Codex。霧は描かせない |
-| `ep/blocked/cc_place` | 積み木を両手で頭の上に持ち上げる | 2・5 | Codex。参照は `assets/ref/claude_code.png`。緑の積み木が混ざった1枚目は抜けないので描き直した |
+| `ep/blocked/cc_place` | 積み木を両手で頭の上に持ち上げる | 2・5 | Codex。参照は `short_movie/materials/ref/claude_code.png`。緑の積み木が混ざった1枚目は抜けないので描き直した |
 | `ep/blocked/cc_run_back` | 積み木を抱えて奥へ走る後ろ姿 | 2 | 同上 |
 | `ep/blocked/cc_confused` | 困った顔で、積み木を片腕に抱え、もう片方の手のひらを挙げる | 2・5 | 同上。ピースにしないと指定した |
 | `ep/blocked/cc_carry_side` | 積み木を抱えて右へ走る | 5 | 同上 |
-| `ep/blocked/dev_notice` | マグカップを持って立ち、左上を見上げて驚く | 3 | Codex。参照は `assets/ref/developer.png` と `developer/sip_coffee`。1枚目は頭身が高すぎたので、約1.5頭身と指定して描き直した |
+| `ep/blocked/dev_notice` | マグカップを持って立ち、左上を見上げて驚く | 3 | Codex。参照は `short_movie/materials/ref/developer.png` と `developer/sip_coffee`。1枚目は頭身が高すぎたので、約1.5頭身と指定して描き直した |
 | 既存 | `continuo/wave`・`developer/typing`・`backgrounds/corner`・`desk` | 3・4・5・6 | — |
 
-**キャラクターは緑一色（#00FF00）の背景で描かせて `scripts/key_green.py` で抜いた。**元の絵は `out/work/blocked/raw/` にある。
+**キャラクターは緑一色（#00FF00）の背景で描かせて `short_movie/materials/scripts/key_green.py` で抜いた。**元の絵は `out/work/blocked/raw/` にある。
 
 | 音 | 鳴らす瞬間 |
 | --- | --- |
@@ -125,4 +125,4 @@
 | `blocked_huh`（ほえ？） | 「？」が出る瞬間 |
 | 既存の `swish`・`pop`・`typing`・`enter`・`splat`・`sparkle`・`whoosh` | 走り出し・カードを移す・気づく・打つ・送る・戻す・届く・霧が晴れる・締め |
 
-**新しい3つの音は `scripts/sfx_blocked.py` で、`scripts/make_sfx.py` の関数を使って合成した。**
+**新しい3つの音は `short_movie/materials/sfx/sfx_blocked.py` で、`short_movie/materials/sfx/make_sfx.py` の関数を使って合成した。**

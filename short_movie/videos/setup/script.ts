@@ -1,4 +1,5 @@
-// セットアップの回の台本。秒で書く。この回だけ尺は30秒。中身は docs/spec/detailed_storyboards/setup.md が正
+// セットアップの回の台本。秒で書く。この回だけ尺は30秒。中身は short_movie/storyboards/setup.md が正
+export const meta = { id: "setup", durationInSeconds: 30 } as const;
 // captionSize は字幕の字の大きさ。1行に収まる中で、いちばん大きくする
 export const script = {
   id: "setup",

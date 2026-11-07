@@ -1,8 +1,8 @@
 # continuo とはの回　詳しいコンテ
 
 **言いたいこと。**「herdr という端末の上で、continuo と Claude Code が並んで動き、カンバンの Status に合わせて pane が開く・止まる・畳まれる」という仕組みの全体を30秒で見せる回の、作りを決める文書である。
-何が起きるかは [docs/spec/storyboard.md](../storyboard.md) の「continuo とはの回」の表と1節の共通の決まりが正である。この回には絵コンテが無いので、構図はこの文書で決める。
-キャラクターの見た目は [docs/spec/characters.md](../characters.md) にある。コンティが continuo、テラコッタ色の丸いロボット2体がどちらも Claude Code を演じ、この回に Codex は出ない。
+何が起きるかは [short_movie/concept.md](../concept.md) の「continuo とはの回」の表と1節の共通の決まりが正である。この回には絵コンテが無いので、構図はこの文書で決める。
+キャラクターの見た目は [short_movie/characters.md](../characters.md) にある。コンティが continuo、テラコッタ色の丸いロボット2体がどちらも Claude Code を演じ、この回に Codex は出ない。
 
 ---
 
@@ -85,9 +85,9 @@
 | 絵 | 出どころ |
 | --- | --- |
 | コンティ | `characters/continuo/sleep`・`leap`・`wave` |
-| Claude Code | `characters/claude_code/wake`・`work`、`ep/blocked/cc_confused`、新しく描いた `ep/what_is_continuo/cc_pr`（「PR ✓」の紙を頭の上に掲げる） |
-| 開発者 | `ep/direct_chat/dev_drag`（カードを動かす）・`dev_laptop`（コメントを書く）・`dev_point`（裏返して小窓を指さす）、`ep/visible_workshop/dev_watch`（見ている） |
-| 端末・小窓・看板 | Remotion で描く。worktree の看板は `src/components/WorktreeSign.tsx` |
+| Claude Code | `characters/claude_code/wake`・`work`、`ep/blocked/cc_confused`、新しく描いた `ep/what-is-continuo/cc_pr`（「PR ✓」の紙を頭の上に掲げる） |
+| 開発者 | `ep/direct-chat/dev_drag`（カードを動かす）・`dev_laptop`（コメントを書く）・`dev_point`（裏返して小窓を指さす）、`ep/visible-workshop/dev_watch`（見ている） |
+| 端末・小窓・看板 | Remotion で描く。worktree の看板は `short_movie/videos/_shared/WorktreeSign.tsx` |
 
 ### 音
 

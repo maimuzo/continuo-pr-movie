@@ -1,4 +1,5 @@
-// カンバン1枚の回の台本。秒で書く。中身は docs/spec/detailed_storyboards/one_kanban.md が正
+// カンバン1枚の回の台本。秒で書く。中身は short_movie/storyboards/one-kanban.md が正
+export const meta = { id: "one-kanban", durationInSeconds: 15 } as const;
 export const script = {
   id: "one-kanban",
   title: "カンバンは1枚でいい",

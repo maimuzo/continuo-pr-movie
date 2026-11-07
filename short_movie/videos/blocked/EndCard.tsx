@@ -1,10 +1,10 @@
 import React from "react";
 import { Img, interpolate, spring, staticFile, useCurrentFrame, useVideoConfig } from "remotion";
-import { theme } from "../../theme";
+import { theme } from "../_shared/theme";
 
 // 締め。中央に決めの字幕、下に continuo の名前と URL、跳ねるキャラクター。
 // 字幕は最初のフレームから見えるように、透明から出さず、少し大きい字から縮めて「ドン」と置く（10文字が端で切れないように 1.1倍から）
-// spriteWidth はキャラクターの幅。src/components/EndCard.tsx を写し、10文字の締めが画面に収まるように字の大きさ（fontSize）を変えられるようにした
+// spriteWidth はキャラクターの幅。short_movie/videos/_shared/EndCard.tsx を写し、10文字の締めが画面に収まるように字の大きさ（fontSize）を変えられるようにした
 export const EndCard: React.FC<{ text: string; sprite: string; spriteWidth?: number; spriteTop?: number; fontSize?: number }> = ({ text, sprite, spriteWidth = 200, spriteTop = 700, fontSize = 150 }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();

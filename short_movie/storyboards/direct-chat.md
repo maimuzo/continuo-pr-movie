@@ -1,8 +1,8 @@
 # Direct Chat の回　詳しいコンテ
 
 **言いたいこと。**「ふだんは issue のコメントで Claude Code と会話している。込み入ったらカードを `Direct Chat` 列へ動かし、Claude Code と直接話せる。戻せば、またコメントで」を15秒で見せる回の、場面ごとの作りを決める文書である。
-何が起きるかは [docs/spec/storyboard.md](../storyboard.md) の「Direct Chat の回」の表と1節の共通の決まりが正である。絵コンテ `out/storyboards/direct_chat/*.png` は前の筋（continuo がメガホンで指示する）のときのもので、構図の見本としてだけ使う。
-キャラクターは [docs/spec/characters.md](../characters.md) にある。この回に Codex は出ない。作りの見本は「置くだけの回」（[place_on_ready.md](place_on_ready.md)）である。
+何が起きるかは [short_movie/concept.md](../concept.md) の「Direct Chat の回」の表と1節の共通の決まりが正である。絵コンテ `out/storyboards/direct_chat/*.png` は前の筋（continuo がメガホンで指示する）のときのもので、構図の見本としてだけ使う。
+キャラクターは [short_movie/characters.md](../characters.md) にある。この回に Codex は出ない。作りの見本は「置くだけの回」（[place-on-ready.md](place-on-ready.md)）である。
 
 ---
 
@@ -18,9 +18,9 @@
 | コメント | 頭に書いた人の色の丸（開発者は紺、Claude Code はテラコッタ）と名前の線、本文の2行の白い札。文字は書かない | 15秒で文字を読ませず、誰から誰へのコメントかを色で見せる |
 | カンバン | 6列（`Ready` / `In Progress` / `In Review` / `Blocked` / `Done` / `Direct Chat`）を 0.8倍で右寄りに掛ける。`Direct Chat` の見出しは紫 | 列の並びは continuo の README の Status の表のとおり。開発者の体がカードの左にあるので、右へ寄せないと左の端で切れる |
 | カードを動かす開発者 | カンバンのカットの頭から、カードの前に立っている。左から歩いて入らない | 歩いて入ると、入りきるまで体が画面の左の端で切れる |
-| Claude Code の顔 | 白い顔に琥珀色の目 | 設定画 `assets/ref/claude_code.png` のとおり |
+| Claude Code の顔 | 白い顔に琥珀色の目 | 設定画 `short_movie/materials/ref/claude_code.png` のとおり |
 | 字幕・名前の札 | 字幕は画面の下に1行で、文言は storyboard.md の表のとおり。名前の札は Claude Code が初めて出る2.15秒から1.6秒 | storyboard.md の1節の決まり |
-| タイトル・締め | `src/videos/direct_chat/Cards.tsx`。締めは「話したいときは、」「直接」の2行 | 10文字の決めの字は、共通の大きさだと画面の幅を超えて切れる |
+| タイトル・締め | `short_movie/videos/direct-chat/Cards.tsx`。締めは「話したいときは、」「直接」の2行 | 10文字の決めの字は、共通の大きさだと画面の幅を超えて切れる |
 
 ---
 
@@ -82,16 +82,16 @@
 
 ## 4. 要る絵と音
 
-**言いたいこと。**絵は Codex に緑の背景で描かせて `scripts/key_green.py` で抜き、`public/ep/direct_chat/` に置いた。元の絵は `out/work/direct_chat/` にある。
+**言いたいこと。**絵は Codex に緑の背景で描かせて `short_movie/materials/scripts/key_green.py` で抜き、`short_movie/materials/ep/direct-chat/` に置いた。元の絵は `out/work/direct_chat/` にある。
 
 | 絵 | 中身 | 参照 |
 | --- | --- | --- |
-| `dev_laptop` | 椅子に座り、膝のノートパソコンでコメントを書く。左向き | `assets/ref/developer.png`、`characters/developer/typing` |
+| `dev_laptop` | 椅子に座り、膝のノートパソコンでコメントを書く。左向き | `short_movie/materials/ref/developer.png`、`characters/developer/typing` |
 | `dev_tangle` | 同じ姿勢で、両手で頭を抱えて困る。顔は可愛いまま | 同上 |
-| `dev_drag` | 立って右へ腕を伸ばし、手のひらでカードを押す。片手にマグカップ | `assets/ref/developer.png` |
+| `dev_drag` | 立って右へ腕を伸ばし、手のひらでカードを押す。片手にマグカップ | `short_movie/materials/ref/developer.png` |
 | `dev_point` | 椅子に座り、左上を指さして話す | 同上 |
-| `cc_point` | 右上を指さして話す。白い顔に琥珀色の目 | `assets/ref/claude_code.png` |
+| `cc_point` | 右上を指さして話す。白い顔に琥珀色の目 | `short_movie/materials/ref/claude_code.png` |
 
 既存の絵は `backgrounds/workshop`・`corner`、`props/bench`、`characters/claude_code/work`、`characters/continuo/wave` を使う。
-カンバン（6列）・コメントの札・コメントの山と糸・吹き出し・壁の画面は Remotion で描き、`src/videos/direct_chat/` に置く。
+カンバン（6列）・コメントの札・コメントの山と糸・吹き出し・壁の画面は Remotion で描き、`short_movie/videos/direct-chat/` に置く。
 **音。**共通の音（typing・swish・pop・splat・sparkle）だけを使う。コメントが飛ぶと swish、届くと pop、山に積み上がると pop が続き、頭を抱えると splat、カードが列に着くと splat、山がほどけきると sparkle。

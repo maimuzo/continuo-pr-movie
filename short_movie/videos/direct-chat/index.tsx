@@ -1,19 +1,19 @@
 import React from "react";
 import { AbsoluteFill, Audio, Easing, Img, interpolate, Sequence, staticFile, useCurrentFrame } from "remotion";
-import { Caption } from "../components/Caption";
-import { Sparkle, SpeedLines, Sweat } from "../components/Effects";
-import { CARD_SIZE, IssueCard } from "../components/IssueCard";
-import { NameTag } from "../components/NameTag";
-import { Sprite } from "../components/Sprite";
-import { sec } from "../theme";
-import { script } from "./direct_chat.script";
-import { EndCardDC, TitleCardDC } from "./direct_chat/Cards";
-import { cardSlot, DIRECT_CHAT, IN_PROGRESS, Kanban6 } from "./direct_chat/Kanban6";
-import { BubbleKind, CommentCard, CommentPile, PaneScreen, PILE_COLORS, SpeechBubble } from "./direct_chat/Props";
+import { Caption } from "../../components/Caption";
+import { Sparkle, SpeedLines, Sweat } from "../../components/Effects";
+import { CARD_SIZE, IssueCard } from "../_shared/IssueCard";
+import { NameTag } from "../../components/NameTag";
+import { Sprite } from "../../components/Sprite";
+import { sec } from "../_shared/theme";
+import { script } from "./script";
+import { EndCardDC, TitleCardDC } from "./Cards";
+import { cardSlot, DIRECT_CHAT, IN_PROGRESS, Kanban6 } from "./Kanban6";
+import { BubbleKind, CommentCard, CommentPile, PaneScreen, PILE_COLORS, SpeechBubble } from "./Props";
 
 // Direct Chat の回。ふだんは issue のコメントで会話し、込み入ったらカードを Direct Chat へ動かして Claude Code と直接話す。
 // continuo は指示を出さない（Claude Code を起動して見届けるだけ）ので、コンティは横で見守る役にする。
-// 座標はすべて 1080×1080 の画面の座標。各カットの中の時刻は、そのカットの頭からの秒で書く。中身は docs/spec/detailed_storyboards/direct_chat.md
+// 座標はすべて 1080×1080 の画面の座標。各カットの中の時刻は、そのカットの頭からの秒で書く。中身は short_movie/storyboards/direct-chat.md
 
 const clamp = { extrapolateLeft: "clamp", extrapolateRight: "clamp" } as const;
 const ease = Easing.inOut(Easing.cubic);
@@ -22,7 +22,7 @@ const DEV_COLOR = PILE_COLORS[0];
 const S = (id: (typeof script.scenes)[number]["id"]) => script.scenes.find((s) => s.id === id)!;
 const at = (s: number) => sec(s);
 const lerp = (t: number, a: number, b: number) => a + (b - a) * t;
-const EP = (name: string) => `ep/direct_chat/${name}.png`;
+const EP = (name: string) => `ep/direct-chat/${name}.png`;
 
 const Workshop: React.FC = () => <Img src={staticFile("backgrounds/workshop.png")} style={{ position: "absolute", width: 1080, height: 1080 }} />;
 const Corner: React.FC = () => <Img src={staticFile("backgrounds/corner.png")} style={{ position: "absolute", width: 1080, height: 1080 }} />;
@@ -367,3 +367,7 @@ export const DirectChat: React.FC = () => (
     ))}
   </AbsoluteFill>
 );
+
+// short-movie の render.sh は default の部品と meta を読む
+export default DirectChat;
+export { meta } from "./script";

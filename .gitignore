@@ -2,6 +2,5 @@ node_modules/
 out/
 .venv/
 .env
-assets/inbox/
 .DS_Store
 __pycache__/

@@ -1,4 +1,5 @@
-// Direct Chat の回の台本。秒で書く。中身は docs/spec/detailed_storyboards/direct_chat.md が正。
+// Direct Chat の回の台本。秒で書く。中身は short_movie/storyboards/direct-chat.md が正。
+export const meta = { id: "direct-chat", durationInSeconds: 15 } as const;
 // 字幕の区切りで場面を分け、場面の中でカットを切り替える
 export const script = {
   id: "direct-chat",

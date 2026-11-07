@@ -1,6 +1,6 @@
 import React from "react";
 import { Img, interpolate, spring, staticFile, useCurrentFrame, useVideoConfig } from "remotion";
-import { theme } from "../../theme";
+import { theme } from "../_shared/theme";
 
 // 締め。チームで入札の回の EndCardLines を写したもの。決めの字幕を2行に分けて出す。
 // 「尽きても、止まらない」は10字あり、共通の EndCard の 150px では画面の幅に収まらないため。

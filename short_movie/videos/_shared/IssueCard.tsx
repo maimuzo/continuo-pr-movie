@@ -1,5 +1,5 @@
 import React from "react";
-import { theme } from "../theme";
+import { theme } from "./theme";
 
 export const CARD_SIZE = { w: 130, h: 78 };
 

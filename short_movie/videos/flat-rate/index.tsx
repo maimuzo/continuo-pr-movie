@@ -1,13 +1,13 @@
 import React from "react";
 import { AbsoluteFill, Audio, Easing, Img, interpolate, Sequence, staticFile, useCurrentFrame } from "remotion";
-import { Caption } from "../components/Caption";
-import { Exclamation, Sparkle, SpeedLines, Steam, Sweat } from "../components/Effects";
-import { EndCard } from "./flat_rate/EndCard";
-import { NameTag } from "../components/NameTag";
-import { Sprite } from "../components/Sprite";
-import { TitleCard } from "./flat_rate/TitleCard";
-import { sec, theme } from "../theme";
-import { script } from "./flat_rate.script";
+import { Caption } from "../../components/Caption";
+import { Exclamation, Sparkle, SpeedLines, Steam, Sweat } from "../../components/Effects";
+import { EndCard } from "./EndCard";
+import { NameTag } from "../../components/NameTag";
+import { Sprite } from "../../components/Sprite";
+import { TitleCard } from "./TitleCard";
+import { sec, theme } from "../_shared/theme";
+import { script } from "./script";
 
 // 定額のままの回。2〜10秒は画面を左右に割り、左（従量課金）と右（continuo＝定額のまま）を同じ作りで並べる。
 // 左右の違いは「レジの表示が回るか止まるか」と開発者の顔だけにし、どちらが何かは上の大きな看板の帯で見せる。
@@ -329,7 +329,7 @@ const StackingRobot: React.FC<{ t: number; cx: number; baseY: number; height: nu
   const hop = lifting ? -Math.sin((ph / 0.5) * Math.PI) * 22 : 0;
   const wiggle = lifting ? 0 : Math.sin(f * 1.6) * 3;
   return lifting ? (
-    <Sprite src="ep/flat_rate/cc_lift.png" cx={cx} baseY={baseY + hop} height={height * 1.12} squash={false} />
+    <Sprite src="ep/flat-rate/cc_lift.png" cx={cx} baseY={baseY + hop} height={height * 1.12} squash={false} />
   ) : (
     <Sprite src="characters/claude_code/work.png" cx={cx + wiggle} baseY={baseY} height={height} squash={false} rotate={wiggle / 2} />
   );
@@ -351,7 +351,7 @@ const MeteredHalf: React.FC<{ t: number }> = ({ t }) => {
       <PileTable x={H_TABLE.x} y={H_TABLE.y} w={H_TABLE.w} />
       <Pile count={count} x={H_PILE.x} groundY={H_PILE.groundY} w={H_PILE.w} dropT={sinceBox / STACK_EVERY} />
       <StackingRobot t={t} cx={H_CC.cx} baseY={H_CC.baseY} height={H_CC.height} />
-      <Sprite src="ep/flat_rate/dev_pale.png" cx={H_DEV.cx} baseY={H_DEV.baseY + (t > T_SHOCK ? Math.sin(f * 2.2) * 2 : 0)} height={350} flip squash={false} />
+      <Sprite src="ep/flat-rate/dev_pale.png" cx={H_DEV.cx} baseY={H_DEV.baseY + (t > T_SHOCK ? Math.sin(f * 2.2) * 2 : 0)} height={350} flip squash={false} />
       {t > T_SHOCK + 0.3 ? <PaleLines x={H_DEV.cx - 60} y={H_DEV.baseY - 300} /> : null}
       {t > T_SHOCK + 0.3 ? <Sweat x={H_DEV.cx + 70} y={H_DEV.baseY - 300} scale={0.8} /> : null}
       <Sequence from={sec(T_SHOCK - 2)} durationInFrames={sec(0.7)}>
@@ -514,9 +514,9 @@ const MoveScene: React.FC = () => {
 
       {/* 開発者：抜く → 箱を抱えて右へ */}
       {local < T_WALK ? (
-        <Sprite src="ep/flat_rate/dev_unplug.png" cx={devPullCx} baseY={UNPLUG_DEV.baseY} height={UNPLUG_DEV.height} flip squash={false} />
+        <Sprite src="ep/flat-rate/dev_unplug.png" cx={devPullCx} baseY={UNPLUG_DEV.baseY} height={UNPLUG_DEV.height} flip squash={false} />
       ) : (
-        <Sprite src="ep/flat_rate/dev_carry.png" cx={devCx} baseY={910 + step} height={380} squash={false} />
+        <Sprite src="ep/flat-rate/dev_carry.png" cx={devCx} baseY={910 + step} height={380} squash={false} />
       )}
       <Sequence from={sec(T_WALK)} durationInFrames={sec(T_ARRIVE - T_WALK)}>
         <SpeedLines x={340} y={620} width={160} height={140} direction={1} />
@@ -531,10 +531,10 @@ const MoveScene: React.FC = () => {
 // 効果音。at は動画の頭からの秒。左のレジは品を積むたびに「チャリン」と鳴り、右は鳴らない
 const coinTimes = Array.from({ length: 16 }, (_, i) => STACK_FROM + i * STACK_EVERY).filter((s) => s < S("move").from + T_UNPLUG);
 const SFX: { name: string; at: number; volume: number }[] = [
-  ...coinTimes.map((s, i) => ({ name: "flat_rate_coin", at: s, volume: s < T_REVEAL ? 0.45 : 0.22 + (i % 2) * 0.03 })),
+  ...coinTimes.map((s, i) => ({ name: "flat-rate_coin", at: s, volume: s < T_REVEAL ? 0.45 : 0.22 + (i % 2) * 0.03 })),
   { name: "whoosh", at: T_REVEAL, volume: 0.45 }, // シャッターが上がる
-  { name: "flat_rate_lock", at: T_LOCK + 0.25, volume: 0.8 }, // 錠が掛かる
-  { name: "flat_rate_crt_off", at: S("move").from + T_UNPLUG, volume: 0.9 }, // 電源を抜く。ブラウン管が消える「ブォン」
+  { name: "flat-rate_lock", at: T_LOCK + 0.25, volume: 0.8 }, // 錠が掛かる
+  { name: "flat-rate_crt_off", at: S("move").from + T_UNPLUG, volume: 0.9 }, // 電源を抜く。ブラウン管が消える「ブォン」
   { name: "swish", at: S("move").from + T_WALK, volume: 0.5 }, // 箱を抱えて歩き出す
   { name: "sparkle", at: S("move").from + T_ARRIVE, volume: 0.45 }, // 右の工房に着く
   { name: "pop", at: S("end").from, volume: 0.6 }, // 締めの字
@@ -592,3 +592,7 @@ export const FlatRate: React.FC = () => (
     ))}
   </AbsoluteFill>
 );
+
+// short-movie の render.sh は default の部品と meta を読む
+export default FlatRate;
+export { meta } from "./script";

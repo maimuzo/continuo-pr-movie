@@ -2,7 +2,7 @@
 
 **言いたいこと。**10本の動画に出るキャラクターを、ここで1回だけ決める。絵を描かせるプロンプトは、毎回この文書の「プロンプトの核」から作る。
 continuo の役はクジラのコンティ、Claude Code と Codex の役は丸いロボットの色違い2体である。**クジラの見た目、丸いロボットを continuo から外すこと、ロボット2体の色は、人間が決めた（2026-10-29）。**
-何を映すかは [docs/spec/storyboard.md](storyboard.md)、絵の作り方は [docs/plans/production_design.md](../plans/production_design.md) にある。
+何を映すかは [short_movie/concept.md](concept.md)、絵の作り方は [short_movie/docs/plans/production_design.md](docs/plans/production_design.md) にある。
 
 ---
 
@@ -41,8 +41,8 @@ continuo の役はクジラのコンティ、Claude Code と Codex の役は丸�
 
 **アイコン。**横向きの全身で、潮を吹く形にする。クジラだとひと目で分かるためである（人間が選んだ）。
 **キャラクターの絵として使ってよいもの。**正面の顔・横向きの全身・下から覗く顔の3つ。丸まった形は、可愛くないので使わない（人間が却下した）。
-**設定画。**`assets/ref/continuo.png`（宙に浮いてヒレを振る基本の姿と、喜ぶ・慌てる・眠るの3つ。人間が確定した）。部屋の中にも出られるように、宙に浮く小さなクジラにし、前ヒレを手の代わりに使う。依頼書は [assets/prompts/continuo_sheet.md](../../assets/prompts/continuo_sheet.md)。
-**アイコンの絵。**[out/review/continuo_whale_icon.png](../../out/review/continuo_whale_icon.png)（4案を並べた Gemini の画面の写し）。依頼書は [assets/prompts/continuo_whale_icon.md](../../assets/prompts/continuo_whale_icon.md)。アイコンの元の画像は、使うときに描き直して取り込む。
+**設定画。**`short_movie/materials/ref/continuo.png`（宙に浮いてヒレを振る基本の姿と、喜ぶ・慌てる・眠るの3つ。人間が確定した）。部屋の中にも出られるように、宙に浮く小さなクジラにし、前ヒレを手の代わりに使う。依頼書は [short_movie/materials/prompts/continuo_sheet.md](materials/prompts/continuo_sheet.md)。
+**アイコンの絵。**[out/review/continuo_whale_icon.png](../out/review/continuo_whale_icon.png)（4案を並べた Gemini の画面の写し）。依頼書は [short_movie/materials/prompts/continuo_whale_icon.md](materials/prompts/continuo_whale_icon.md)。アイコンの元の画像は、使うときに描き直して取り込む。
 
 **プロンプトの核。**
 
@@ -60,14 +60,14 @@ No orange, no light blue, no green. Nothing stacked on its back, no boxes, no co
 
 | 項目 | 設定 |
 | --- | --- |
-| 形 | 白い大きな丸い頭と、小さな体。頭の上に玉の付いたアンテナ。大きな目と、よく動く口。耳は円盤、足は丸。胸に歯車の印が1つ。設定画は `assets/ref/robot.png` |
+| 形 | 白い大きな丸い頭と、小さな体。頭の上に玉の付いたアンテナ。大きな目と、よく動く口。耳は円盤、足は丸。胸に歯車の印が1つ。設定画は `short_movie/materials/ref/robot.png` |
 | 色 | 耳・足・アンテナの玉だけを塗り分ける。頭と体は白のまま。Claude Code はテラコッタ #D97757、Codex は青紫 #7A9DFF。どちらも、それぞれのアイコンの色に近づけた（人間が決めた）。ロゴやアイコンの形は描かない |
-| 設定画 | Claude Code は `assets/ref/claude_code.png`、Codex は `assets/ref/codex.png`。`assets/ref/robot.png` の耳・足・アンテナの玉を、スクリプトで塗り替えて作った（形は元と同じ） |
+| 設定画 | Claude Code は `short_movie/materials/ref/claude_code.png`、Codex は `short_movie/materials/ref/codex.png`。`short_movie/materials/ref/robot.png` の耳・足・アンテナの玉を、スクリプトで塗り替えて作った（形は元と同じ） |
 | Claude Code の役 | コンティから作業を受け、作業台で作る。詰まると止まり、利用枠（燃料）を使い切るとへたり込む。作業の一部を Codex に頼む |
 | Codex の役 | Claude Code から頼まれた部分を引き受けて仕上げる |
 | 描かないもの | 工具ベルト・胸の板・リベット・パネルの線。Claude・Anthropic・OpenAI のロゴやマスコット |
 
-**名前の見せ方。**その回で初めて画面に出たとき、頭の上に名前の札を1〜2秒浮かべる。札はロボットと同じ色で、白い字で名前を書く。札は Remotion の部品で描くので、絵には描き込まない（2026-10-29 に人間が決めた）。見本は [out/review/name_tags.png](../../out/review/name_tags.png) の右側。
+**名前の見せ方。**その回で初めて画面に出たとき、頭の上に名前の札を1〜2秒浮かべる。札はロボットと同じ色で、白い字で名前を書く。札は Remotion の部品で描くので、絵には描き込まない（2026-10-29 に人間が決めた）。見本は [out/review/name_tags.png](../out/review/name_tags.png) の右側。
 
 **なぜ同じ型か。**人間が「既存のロボットの色を変えて Claude Code と Codex のキャラクターにする」と決めた。描く枚数も色の差し替えで済む。
 
@@ -83,7 +83,7 @@ one brass gear mark (#C9A23A) on the chest. No belt, no chest plate, no rivets, 
 
 ## 4. 開発者（continuo の利用者の役。確定）
 
-**言いたいこと。**面倒なことはしたくない、ちょっと横着な開発者。見る人が自分を重ねる役である。設定画は `assets/ref/developer.png`。
+**言いたいこと。**面倒なことはしたくない、ちょっと横着な開発者。見る人が自分を重ねる役である。設定画は `short_movie/materials/ref/developer.png`。
 
 | 項目 | 設定 |
 | --- | --- |
@@ -136,15 +136,15 @@ dark charcoal pants (#3A3D42), headphones around the neck, always holding a yell
 
 | キャラクター | 設定画 | 状態 |
 | --- | --- | --- |
-| コンティ（クジラ） | `assets/ref/continuo.png` | 確定（2026-10-29） |
-| Claude Code | `assets/ref/claude_code.png` | 確定（2026-10-29） |
-| Codex | `assets/ref/codex.png` | 確定（2026-10-29） |
-| 丸いロボットの元の絵 | `assets/ref/robot.png` | 色違いの元。動画には、この色のままでは出さない |
-| 開発者 | `assets/ref/developer.png` | 確定（2026-10-28） |
-| アカネ | `assets/ref/akane.png` | 確定（2026-10-28） |
-| ゲンさん | `assets/ref/gen.png` | 保留。チームで入札の回の机に人を座らせるかが決まってから |
-| 知らない人 | `assets/ref/stranger.png` | 確定（2026-10-28） |
-| 使わない絵 | `assets/ref/foreman.png`・`assets/ref/robot_blue.png`・`assets/ref/robot_purple.png` | 役がなくなった |
+| コンティ（クジラ） | `short_movie/materials/ref/continuo.png` | 確定（2026-10-29） |
+| Claude Code | `short_movie/materials/ref/claude_code.png` | 確定（2026-10-29） |
+| Codex | `short_movie/materials/ref/codex.png` | 確定（2026-10-29） |
+| 丸いロボットの元の絵 | `short_movie/materials/ref/robot.png` | 色違いの元。動画には、この色のままでは出さない |
+| 開発者 | `short_movie/materials/ref/developer.png` | 確定（2026-10-28） |
+| アカネ | `short_movie/materials/ref/akane.png` | 確定（2026-10-28） |
+| ゲンさん | `short_movie/materials/ref/gen.png` | 確定（`short_movie/materials/raw/character_candidates/gen_v2.png` の写し。issue #6 のコメントで人間が確定済みと示した） |
+| 知らない人 | `short_movie/materials/ref/stranger.png` | 確定（2026-10-28） |
+| 使わない絵 | `short_movie/materials/ref/foreman.png`・`short_movie/materials/ref/robot_blue.png`・`short_movie/materials/ref/robot_purple.png` | 役がなくなった |
 
 **なぜ1人1枚か。**1枚に全員を並べると、1人あたりの絵が小さくなり、細かい形が参照で伝わりにくい。描く絵に出ないキャラクターまで描き込まれることもある。
 
@@ -152,7 +152,7 @@ dark charcoal pants (#3A3D42), headphones around the neck, always holding a yell
 
 ## 8. どの回に誰が出るか
 
-**言いたいこと。**場面ごとの出番は [docs/spec/storyboard.md](storyboard.md) が正である。ここには回ごとの顔ぶれだけを置く。
+**言いたいこと。**場面ごとの出番は [short_movie/concept.md](concept.md) が正である。ここには回ごとの顔ぶれだけを置く。
 
 | 回 | 出るキャラクター |
 | --- | --- |
@@ -166,3 +166,5 @@ dark charcoal pants (#3A3D42), headphones around the neck, always holding a yell
 | 定額のままの回 | コンティ・Claude Code・開発者 |
 | 止めても続きからの回 | コンティ・Claude Code・開発者 |
 | Direct Chat の回 | コンティ・Claude Code・開発者 |
+| どの日も自分の分が残る回 | コンティ・Claude Code・開発者 |
+| 自分の分だけ上書きの回 | Claude Code（3体）・開発者・アカネ・ゲンさん（3人とも机の前に立つ全身で出る） |

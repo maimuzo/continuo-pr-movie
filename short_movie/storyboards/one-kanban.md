@@ -1,8 +1,8 @@
 # カンバン1枚の回　詳しいコンテ
 
 **言いたいこと。**「1枚のカンバンで、複数の GitHub リポジトリの issue を同時に進められる」を15秒で見せる回の、場面ごとの作りを決める文書である。
-何が起きるかは [docs/spec/storyboard.md](../storyboard.md) の「カンバン1枚の回」の表と1節の共通の決まりが正で、構図は絵コンテ `out/storyboards/one_kanban/{2-5,5-10,10-13}.png` を見本にする。
-キャラクターの見た目は [docs/spec/characters.md](../characters.md) にある。この回に Codex は出ない。
+何が起きるかは [short_movie/concept.md](../concept.md) の「カンバン1枚の回」の表と1節の共通の決まりが正で、構図は絵コンテ `out/storyboards/one_kanban/{2-5,5-10,10-13}.png` を見本にする。
+キャラクターの見た目は [short_movie/characters.md](../characters.md) にある。この回に Codex は出ない。
 
 ---
 
@@ -16,10 +16,10 @@
 | リポジトリ | `maimuzo/project-a`（赤 #E05B45）・`maimuzo/project-b`（黄 #F1AF3C）・`maimuzo/project-c`（紫 #9E68D0）の3つ。色は背景の絵の屋根を測った値 | 中身を思わせる名前だと「別々のプロジェクト」より名前の意味に目が行くので、並びの分かる名前にする。色だけでは「リポジトリ」だと分からないので、看板に名前を書き、カードの帯にも名前を書く |
 | 看板の字 | 絵には字を描かせず、Remotion で看板の板の上に書く。上の行に小さく `maimuzo/`（22px）、下の行に `project-a`（32px）の2行 | 描かせた字は崩れることがあり、架空の名前を正確に出せない。板の幅は約250pxで、17字を1行にすると読めない大きさになる |
 | カードの帯の字 | `project-a`・`project-b`・`project-c`（`maimuzo/` を省く） | 帯の幅は150pxで、`maimuzo/` まで入れると字が小さくて読めない。3つとも同じ持ち主なので、違いは後ろの名前だけで分かる |
-| カット | カンバンの壁（`backgrounds/corner`）と、3軒の工房（`ep/one_kanban/workshops`）の2つ。カメラは動かさない | 工房のカットの上の壁にカンバンを掛け、カンバンと3軒を同じ画面に収める |
+| カット | カンバンの壁（`backgrounds/corner`）と、3軒の工房（`ep/one-kanban/workshops`）の2つ。カメラは動かさない | 工房のカットの上の壁にカンバンを掛け、カンバンと3軒を同じ画面に収める |
 | 3体の Claude Code | 3軒それぞれに1体。初めて出たとき、3体とも頭の上にテラコッタの名前の札を1.5秒 | 「3体が同時に」を数で見せる。名前の札は1節の共通の決まり |
 | 開発者の顔 | 伸び縮みの弾みを付けない。貼るたびに少し背伸びするだけ | characters.md の、顔をつぶさない決まり |
-| 締め | 13.0秒から「1つのカンバンで全プロジェクトを管理」。共通の締めを `src/videos/one_kanban/EndCard.tsx` に写し、「1つのカンバンで」「全プロジェクトを管理」の2行、字を90px、縮め始めを1.12倍にした | 18字は1行に収まらない。長い方の10字の行が、頭のコマの1.12倍でも1080pxの中に収まる大きさにした |
+| 締め | 13.0秒から「1つのカンバンで全プロジェクトを管理」。共通の締めを `short_movie/videos/one-kanban/EndCard.tsx` に写し、「1つのカンバンで」「全プロジェクトを管理」の2行、字を90px、縮め始めを1.12倍にした | 18字は1行に収まらない。長い方の10字の行が、頭のコマの1.12倍でも1080pxの中に収まる大きさにした |
 
 ---
 
@@ -45,10 +45,10 @@
 
 | 絵・部品 | 中身 | 作り方 |
 | --- | --- | --- |
-| `public/ep/one_kanban/workshops.png` | 上3割が無地の壁、その下に赤・黄・紫の屋根の工房3軒（字の無い看板。名前は Remotion で重ねる、屋根と同じ色の箱）、下に床 | Codex。参照は絵コンテ 10-13 と `backgrounds/workshop`。1254px を 1080px に縮めた |
-| `public/ep/one_kanban/dev_pin.png` | 立って右を向き、右手を上げて貼る開発者。左手にマグ | Codex。参照は `assets/ref/developer.png`。緑を `scripts/key_green.py` で抜いた |
+| `short_movie/materials/ep/one-kanban/workshops.png` | 上3割が無地の壁、その下に赤・黄・紫の屋根の工房3軒（字の無い看板。名前は Remotion で重ねる、屋根と同じ色の箱）、下に床 | Codex。参照は絵コンテ 10-13 と `backgrounds/workshop`。1254px を 1080px に縮めた |
+| `short_movie/materials/ep/one-kanban/dev_pin.png` | 立って右を向き、右手を上げて貼る開発者。左手にマグ | Codex。参照は `short_movie/materials/ref/developer.png`。緑を `short_movie/materials/scripts/key_green.py` で抜いた |
 | 既存の絵 | `claude_code/receive`・`work`、`continuo/wave`・`leap`、`props/bench`、`backgrounds/corner` | そのまま使う |
-| `src/videos/one_kanban/Board.tsx` | 共通の Kanban を写し、列を広く高くしたカンバンと、色の帯に名前を書くカード | 1列に3枚を縦に並べ、帯の字を読ませるため |
-| `src/videos/one_kanban/repos.ts` | 3つのリポジトリの名前と色、工房の位置 | 色と位置を1か所で決める |
+| `short_movie/videos/one-kanban/Board.tsx` | 共通の Kanban を写し、列を広く高くしたカンバンと、色の帯に名前を書くカード | 1列に3枚を縦に並べ、帯の字を読ませるため |
+| `short_movie/videos/one-kanban/repos.ts` | 3つのリポジトリの名前と色、工房の位置 | 色と位置を1か所で決める |
 
-描かせた元の絵と抜いた絵は `out/work/one_kanban/` に置く。効果音は既存の `public/sfx/` の音だけを使う。
+描かせた元の絵と抜いた絵は `out/work/one_kanban/` に置く。効果音は既存の `short_movie/materials/sfx/` の音だけを使う。

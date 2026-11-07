@@ -1,4 +1,5 @@
-// チームで入札の回の台本。秒で書く。中身は docs/spec/detailed_storyboards/team_bid.md が正
+// チームで入札の回の台本。秒で書く。中身は short_movie/storyboards/team-bid.md が正
+export const meta = { id: "team-bid", durationInSeconds: 15 } as const;
 export const script = {
   id: "team-bid",
   title: "チームで、入札",

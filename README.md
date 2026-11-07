@@ -1,7 +1,7 @@
 # continuo-pr-movie
 
 [continuo](https://github.com/maimuzo/continuo) の機能紹介動画を、Remotion で作るリポジトリ。
-X に投稿するための 1080×1080 の動画が12本ある（2本は30秒、ほかは15秒）。
+X に投稿するための 1080×1080 の動画が14本ある（4本は30秒、ほかは15秒）。
 
 ## 動画
 
@@ -53,16 +53,29 @@ https://github.com/user-attachments/assets/caba4d50-7035-4285-be8e-8974b3b457ad
 
 https://github.com/user-attachments/assets/3a3db808-2bd1-47e5-8ddd-a5f10dd02429
 
+### いつでも、自分の分は残ってる（30秒）
+
+https://github.com/user-attachments/assets/d0e76ce6-8b6e-4cf2-a10e-1bf7da607827
+
+### 自分の分だけ、上書き（30秒）
+
+https://github.com/user-attachments/assets/5eeb752b-c516-4e85-9881-bb0335e6983e
+
 ## 作り方
 
-- 何を映すか：[docs/spec/storyboard.md](docs/spec/storyboard.md)
-- キャラクター：[docs/spec/characters.md](docs/spec/characters.md)
-- 制作の設計：[docs/plans/production_design.md](docs/plans/production_design.md)
+動画の資料は全部 [short_movie/](short_movie/) にあり、Claude Code のプラグイン short-movie（下の「別の製品の動画を同じ流れで作る」）で作っています。Remotion の土台はプラグインの中にあるので、このリポジトリに `package.json` はありません。
+
+- 方針：[short_movie/brief.md](short_movie/brief.md)
+- 何を映すか（回の一覧と回の id）：[short_movie/concept.md](short_movie/concept.md)
+- 回ごとの絵コンテ：[short_movie/storyboards/](short_movie/storyboards/)
+- キャラクター：[short_movie/characters.md](short_movie/characters.md)
+- 制作の設計：[short_movie/docs/plans/production_design.md](short_movie/docs/plans/production_design.md)
+
+short-movie を入れたあと、リポジトリの根で次を叩きます（`<plugin>` は short-movie のプラグインの置き場）。
 
 ```bash
-npm install
-npx remotion studio src/index.ts                                  # 確かめながら作る
-npx remotion render src/index.ts place-on-ready out/place_on_ready.mp4  # 1本書き出す
+bash <plugin>/scripts/studio.sh short_movie place-on-ready   # 確かめながら作る
+bash <plugin>/scripts/render.sh short_movie place-on-ready   # 1本書き出す（short_movie/out/place-on-ready.mp4）
 ```
 
 ### 別の製品の動画を同じ流れで作る

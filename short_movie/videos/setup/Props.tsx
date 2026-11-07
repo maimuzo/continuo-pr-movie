@@ -1,6 +1,6 @@
 import React from "react";
 import { Img, interpolate, staticFile } from "remotion";
-import { theme } from "../../theme";
+import { theme } from "../_shared/theme";
 import { mono } from "./Terminal";
 
 // セットアップの回の小道具。どれも太い線・平らな塗りで、ぼかした影を付けない

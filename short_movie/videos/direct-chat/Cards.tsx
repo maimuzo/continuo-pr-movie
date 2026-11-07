@@ -1,6 +1,6 @@
 import React from "react";
 import { Img, interpolate, spring, staticFile, useCurrentFrame, useVideoConfig } from "remotion";
-import { theme } from "../../theme";
+import { theme } from "../_shared/theme";
 
 // タイトルと締め。共通の TitleCard（104px）と EndCard（150px）は、この回の10文字の決めの字だと画面の幅を超えて切れる。
 // そこで写して字の大きさだけを変え、締めは「話したいときは、」と「直接」の2行に割る。動きは共通の部品と同じ

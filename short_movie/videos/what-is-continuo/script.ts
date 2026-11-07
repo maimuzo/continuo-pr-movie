@@ -1,4 +1,5 @@
-// continuo とはの回の台本。秒で書く（30秒）。中身は docs/spec/detailed_storyboards/what_is_continuo.md が正
+// continuo とはの回の台本。秒で書く（30秒）。中身は short_movie/storyboards/what-is-continuo.md が正
+export const meta = { id: "what-is-continuo", durationInSeconds: 30 } as const;
 export const script = {
   id: "what-is-continuo",
   title: "continuo とは",

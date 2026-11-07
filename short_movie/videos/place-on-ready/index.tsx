@@ -1,17 +1,17 @@
 import React from "react";
 import { AbsoluteFill, Audio, Easing, Img, interpolate, Sequence, staticFile, useCurrentFrame } from "remotion";
-import { Caption } from "../components/Caption";
-import { ConcentrationLines, CrumpleMarks, Exclamation, Sparkle, SpeedLines, Steam, Sweat } from "../components/Effects";
-import { EndCard } from "../components/EndCard";
-import { Inset } from "../components/Inset";
-import { CARD_SIZE, IssueCard } from "../components/IssueCard";
-import { cardSlot, Kanban } from "../components/Kanban";
-import { NameTag } from "../components/NameTag";
-import { Sprite } from "../components/Sprite";
-import { TitleCard } from "../components/TitleCard";
-import { WorktreeSign } from "../components/WorktreeSign";
-import { sec, theme } from "../theme";
-import { script } from "./place_on_ready.script";
+import { Caption } from "../../components/Caption";
+import { ConcentrationLines, CrumpleMarks, Exclamation, Sparkle, SpeedLines, Steam, Sweat } from "../../components/Effects";
+import { EndCard } from "../_shared/EndCard";
+import { Inset } from "../../components/Inset";
+import { CARD_SIZE, IssueCard } from "../_shared/IssueCard";
+import { cardSlot, Kanban } from "../_shared/Kanban";
+import { NameTag } from "../../components/NameTag";
+import { Sprite } from "../../components/Sprite";
+import { TitleCard } from "../../components/TitleCard";
+import { WorktreeSign } from "../_shared/WorktreeSign";
+import { sec, theme } from "../_shared/theme";
+import { script } from "./script";
 
 // 置くだけの回。場面ごとにカットを割る（机・カンバンの壁・作業台）。
 // 部屋を横に振る作りだと、正方形の画面にカンバンが収まらず端で切れるため、場面ごとに構図を決める。
@@ -371,7 +371,7 @@ const InsetWork: React.FC = () => {
   );
 };
 
-// 効果音。音は scripts/make_sfx.py で合成した public/sfx/*.wav。at は動画の頭からの秒で、各場面の動きの時刻に合わせる。
+// 効果音。音は short_movie/materials/sfx/make_sfx.py で合成した short_movie/materials/sfx/*.wav。at は動画の頭からの秒で、各場面の動きの時刻に合わせる。
 // 無音で見ても意味が通る作りは変えず、音を出して見る人へのおまけとして鳴らす
 const SFX: { name: string; at: number; volume: number }[] = [
   { name: "typing", at: S("throw").from + 0.15, volume: 0.35 }, // issue を書く
@@ -425,3 +425,7 @@ export const PlaceOnReady: React.FC = () => (
     ))}
   </AbsoluteFill>
 );
+
+// short-movie の render.sh は default の部品と meta を読む
+export default PlaceOnReady;
+export { meta } from "./script";

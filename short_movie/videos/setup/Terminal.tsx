@@ -1,10 +1,10 @@
 import React from "react";
 import { loadFont } from "@remotion/google-fonts/JetBrainsMono";
 import { interpolate, Easing } from "remotion";
-import { theme } from "../../theme";
+import { theme } from "../_shared/theme";
 
 // セットアップの回の端末の窓。React と SVG で描く。
-// 等幅の書体はこの回だけで使うので、src/theme.ts は書き換えずにここで読む
+// 等幅の書体はこの回だけで使うので、short_movie/videos/_shared/theme.ts は書き換えずにここで読む
 export const mono = loadFont("normal", { weights: ["500", "700"], subsets: ["latin"] }).fontFamily;
 
 // JetBrains Mono の1文字の幅は字の大きさの 0.6 倍

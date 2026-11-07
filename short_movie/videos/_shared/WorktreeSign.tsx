@@ -1,5 +1,5 @@
 import React from "react";
-import { theme } from "../theme";
+import { theme } from "./theme";
 
 // 作業台の看板。カードと同じ色の札を下げ、どの issue の作業台かを示す
 export const WorktreeSign: React.FC<{ x: number; y: number; tagColor?: string }> = ({ x, y, tagColor = theme.color.cardTag }) => (
