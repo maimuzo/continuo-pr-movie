@@ -246,7 +246,7 @@ export const MarginTable: React.FC<{ left: number; top: number; width: number; r
         transformOrigin: "50% 0",
         fontFamily: theme.fontFamily,
         fontWeight: 800,
-        fontSize: 30,
+        fontSize: 26, // 7等分の6行を、電池の札より上に収める
         color: theme.color.ink,
       }}
     >
@@ -257,7 +257,7 @@ export const MarginTable: React.FC<{ left: number; top: number; width: number; r
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
-            height: 42,
+            height: 32,
             padding: "0 16px",
             borderRadius: 10,
             background: active === d ? FILL : "transparent",

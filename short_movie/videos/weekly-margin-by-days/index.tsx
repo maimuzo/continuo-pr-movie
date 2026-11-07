@@ -34,7 +34,7 @@ const DESK = { x: 560, w: 400 };
 const CC_X = 760; // Claude Code の中心
 const BAT = { cx: 760, top: 330, labelCx: 640 }; // 電池（寝て待つ回の2倍）。札「1週間」は電池の上の左寄り
 const CAL = { left: 860, top: 70 };
-const TABLE = { left: 330, top: 60, width: 360 };
+const TABLE = { left: 330, top: 22, width: 360 };
 const DEV = { cx: 250, baseY: 960, h: 430 };
 const WHALE = { cx: 520, top: 420, h: 150 };
 const WHALE_W = (WHALE.h * 729) / 556;
@@ -43,15 +43,17 @@ const CARD_TO = { x: 700, y: 775 }; // カードが届く Claude Code の手も�
 const LAPTOP = { x: 366, y: 742 }; // 裏返した dev_laptop のノートPC
 
 // ---- 自分の分（看板の値。％は例）----
+// 1週間を残り日数で7等分し、5%刻みに丸めた値（人間の指示 issue #6 のコメント 6699563759）。
 // 看板に出す行。あと1日の行は出さない（0% は最後の日の場面で初めて見せる）
 const ROWS = [
-  [7, 30],
-  [5, 15],
-  [3, 10],
-  [2, 5],
+  [7, 85],
+  [6, 70],
+  [5, 55],
+  [4, 45],
+  [3, 30],
+  [2, 15],
 ] as const;
-// 看板に出さない日（あと6日・あと4日）も点線は右へ寄せるので、前後の行のあいだの値にする
-const MARGIN: Record<number, number> = { 7: 30, 6: 20, 5: 15, 4: 12, 3: 10, 2: 5, 1: 0 };
+const MARGIN: Record<number, number> = { 7: 85, 6: 70, 5: 55, 4: 45, 3: 30, 2: 15, 1: 0 };
 
 // ---- 時刻（30秒。0〜3 タイトル / 3〜10 / 10〜21 / 21〜27 / 27〜30 締め）----
 const T = {
