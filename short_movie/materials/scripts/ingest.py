@@ -1,9 +1,9 @@
-"""人間が Nano Banana で描いて assets/inbox/ に保存した画像に、依頼書の順で名前を付ける。
+"""人間が Nano Banana で描いて short_movie/inbox/ に保存した画像に、依頼書の順で名前を付ける。
 
-使い方: python3 -I scripts/ingest.py assets/prompts/<依頼書>.md [--dry-run]
+使い方: python3 -I short_movie/materials/scripts/ingest.py short_movie/materials/prompts/<依頼書>.md [--dry-run]
 
 依頼書の「## 1. craftsman/box_goggles　…」のような見出しの順と、inbox の画像を保存した時刻の順を
-突き合わせ、assets/raw/<id>.png へ移す。枚数が合わなければ、何も動かさずに止まる。
+突き合わせ、short_movie/materials/raw/<id>.png へ移す。枚数が合わなければ、何も動かさずに止まる。
 """
 import os
 import re

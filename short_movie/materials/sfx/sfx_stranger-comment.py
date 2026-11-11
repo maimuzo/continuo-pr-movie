@@ -1,7 +1,7 @@
-"""他人のコメントの回だけで鳴らす効果音を合成して public/sfx/stranger_comment_*.wav に書き出す。
+"""他人のコメントの回だけで鳴らす効果音を合成して short_movie/materials/sfx/stranger-comment_*.wav に書き出す。
 
-`uv run --with numpy python -I scripts/sfx_stranger_comment.py` で作り直す。
-合成の道具は scripts/make_sfx.py の関数を使う（make_sfx.py は書き換えない）。
+`uv run --no-project --python 3.12 --with numpy==2.5.4 python -I short_movie/materials/sfx/sfx_stranger-comment.py` で作り直す。
+合成の道具は 同じフォルダの make_sfx.py の関数を使う（make_sfx.py は書き換えない）。
 """
 import os
 import sys
@@ -32,5 +32,5 @@ def drop():
 
 
 if __name__ == "__main__":
-    save("stranger_comment_relief", relief())
-    save("stranger_comment_drop", drop())
+    save("stranger-comment_relief", relief())
+    save("stranger-comment_drop", drop())

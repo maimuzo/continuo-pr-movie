@@ -4,7 +4,7 @@ continuo の役を、クジラをもとにしたキャラクターにする。�
 丸いロボットは色を変えて Claude Code と Codex の役に回すので、このクジラはオレンジを使わない。
 **Docker のロゴ（水色のクジラが背中に箱を積む）に似せない。**水色にしない、背中に箱や荷物を積まない。
 
-**描くとき：**Gemini で新しいチャットを開き、`assets/ref/robot.png` を添付して、下を貼る。
+**描くとき：**Gemini で新しいチャットを開き、`short_movie/materials/ref/robot.png` を添付して、下を貼る。
 
 ## 1. continuo/whale_icon　クジラのアイコン4案
 

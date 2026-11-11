@@ -1,6 +1,6 @@
 """各回の代表場面を1枚ずつ描かせる依頼文をまとめる。
 
-docs/spec/storyboard.md の各回から、機能がいちばん伝わる本編の場面を1つ選び、1枚の絵にする。
+short_movie/concept.md の各回から、機能がいちばん伝わる本編の場面を1つ選び、1枚の絵にする。
 `prompt <回のid>` で依頼文を、`refs <回のid>` で添付する設定画を、`list` で回と字幕の一覧を出す。
 """
 import json
@@ -21,7 +21,7 @@ CAST = {
     "codex": "the same round white robot with PERIWINKLE BLUE ear discs, feet, hands and antenna ball",
     "dev": "a lazy but cute developer with a friendly round face and big sparkly eyes behind round glasses, messy black hair, navy hoodie and a yellow mug; never draw his face squashed or distorted",
 }
-REFS = {"whale": "assets/ref/continuo.png", "cc": "assets/ref/claude_code.png", "codex": "assets/ref/codex.png", "dev": "assets/ref/developer.png"}
+REFS = {"whale": "short_movie/materials/ref/continuo.png", "cc": "short_movie/materials/ref/claude_code.png", "codex": "short_movie/materials/ref/codex.png", "dev": "short_movie/materials/ref/developer.png"}
 EP = [
     ("place_on_ready", "置くだけの回", "8〜11", "Claude Code が作業開始", ["whale", "cc", "dev"],
      "A kanban board on the wall shows one card in 'In Progress'. In front of it, Konti floats beside a small workbench with a signboard reading 'worktree', handing a paper card to the terracotta robot, who clenches its fist with determination. In the background the developer leans back at a desk sipping coffee."),

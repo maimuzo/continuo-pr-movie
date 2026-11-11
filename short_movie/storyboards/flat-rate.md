@@ -1,7 +1,7 @@
 # 定額のままの回　詳しいコンテ
 
 **言いたいこと。**「continuo は Claude Code をいつもの対話モードのまま動かすので、定額プランのままで従量課金にならない」を15秒で見せる回の、場面ごとの作りを決める文書である。
-何が起きるかは [docs/spec/storyboard.md](../storyboard.md) の「定額のままの回」の表と1節の共通の決まりが正で、構図と演技は絵コンテ `out/storyboards/flat_rate/{2-6,6-10,10-13}.png` を見本にする。
+何が起きるかは [short_movie/concept.md](../concept.md) の「定額のままの回」の表と1節の共通の決まりが正で、構図と演技は絵コンテ `out/storyboards/flat_rate/{2-6,6-10,10-13}.png` を見本にする。
 絵コンテ `6-10` では右の Claude Code が泣き顔になっていて、右の意味が読み取れなかった（人間の指摘）。この文書では、右も左と同じレジ・同じだけの品・楽しそうに働く Claude Code にし、違いをレジの金額表示だけに絞る。
 
 ---
@@ -48,14 +48,14 @@
 
 ## 3. 要る絵の一覧
 
-**言いたいこと。**新しく描いた絵は4枚で、どれも Codex に緑一色の背景で描かせ、`scripts/key_green.py` で抜いた。元の絵は `out/work/flat_rate/` にある。
+**言いたいこと。**新しく描いた絵は4枚で、どれも Codex に緑一色の背景で描かせ、`short_movie/materials/scripts/key_green.py` で抜いた。元の絵は `out/work/flat_rate/` にある。
 
 | 絵 | 中身 | 使う場面 | 作り方 |
 | --- | --- | --- | --- |
-| `ep/flat_rate/cc_lift` | Claude Code が品の箱を頭の上に持ち上げて笑う | 場面2・3・4 | Codex。参照は `assets/ref/claude_code.png` |
-| `ep/flat_rate/dev_pale` | 立って青ざめる開発者。片手を頬に、片手にマグカップ | 場面2・3 | Codex。参照は `assets/ref/developer.png` |
-| `ep/flat_rate/dev_unplug` | 片手でプラグを引き抜く開発者 | 場面4 | 同上 |
-| `ep/flat_rate/dev_carry` | 箱を抱えて右へ歩く開発者 | 場面4 | 同上 |
+| `ep/flat-rate/cc_lift` | Claude Code が品の箱を頭の上に持ち上げて笑う | 場面2・3・4 | Codex。参照は `short_movie/materials/ref/claude_code.png` |
+| `ep/flat-rate/dev_pale` | 立って青ざめる開発者。片手を頬に、片手にマグカップ | 場面2・3 | Codex。参照は `short_movie/materials/ref/developer.png` |
+| `ep/flat-rate/dev_unplug` | 片手でプラグを引き抜く開発者 | 場面4 | 同上 |
+| `ep/flat-rate/dev_carry` | 箱を抱えて右へ歩く開発者 | 場面4 | 同上 |
 | `characters/claude_code/work`・`developer/sip_coffee`・`continuo/wave` | 既存の絵 | 場面2〜5 | 置くだけの回で描いたもの |
 | `backgrounds/workshop` | 作業台の部屋 | 場面1〜4 | 既存の絵。左半分だけ彩度を落とす |
 
@@ -68,6 +68,6 @@
 
 | 効果音 | 中身 | 鳴らす秒 |
 | --- | --- | --- |
-| `flat_rate_coin` | チャリン。左のレジから硬貨が飛ぶたび | 2.3秒から0.5秒ごと、10.5秒まで |
-| `flat_rate_lock` | カチャ。右のレジに錠が掛かる | 6.75秒 |
-| `flat_rate_crt_off` | ブォン。低いブーンが一瞬膨らんでしぼみ、高いキーンが細くなって消える。約0.6秒。`scripts/sfx_flat_rate.py` で合成 | 10.5秒（電源を抜く瞬間） |
+| `flat-rate_coin` | チャリン。左のレジから硬貨が飛ぶたび | 2.3秒から0.5秒ごと、10.5秒まで |
+| `flat-rate_lock` | カチャ。右のレジに錠が掛かる | 6.75秒 |
+| `flat-rate_crt_off` | ブォン。低いブーンが一瞬膨らんでしぼみ、高いキーンが細くなって消える。約0.6秒。`short_movie/materials/sfx/sfx_flat-rate.py` で合成 | 10.5秒（電源を抜く瞬間） |

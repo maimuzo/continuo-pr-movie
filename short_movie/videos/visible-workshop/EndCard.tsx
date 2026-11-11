@@ -1,8 +1,8 @@
 import React from "react";
 import { Img, interpolate, spring, staticFile, useCurrentFrame, useVideoConfig } from "remotion";
-import { theme } from "../../theme";
+import { theme } from "../_shared/theme";
 
-// src/components/EndCard.tsx の写し。締めの字「何してるか、いつでも見える」は1行の 150px では画面からはみ出すので、
+// short_movie/videos/_shared/EndCard.tsx の写し。締めの字「何してるか、いつでも見える」は1行の 150px では画面からはみ出すので、
 // 行を分けて渡せるようにし、字の大きさも変えられるようにした。縮める前の大きさも、2行が画面に収まるよう 1.3倍にした。ほかの作りは元と同じ
 export const EndCard: React.FC<{ lines: string[]; fontSize?: number; sprite: string; spriteWidth?: number; spriteTop?: number }> = ({
   lines,

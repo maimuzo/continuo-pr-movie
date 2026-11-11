@@ -1,7 +1,7 @@
 import React from "react";
 import { Img, staticFile } from "remotion";
-import { Battery, BATTERY } from "../team_bid/Battery";
-import { theme } from "../../theme";
+import { Battery, BATTERY } from "../_shared/Battery";
+import { theme } from "../_shared/theme";
 
 // 寝て待つ回だけで使う部品。札の付いたレートリミットの電池、壁の時計、日めくり、早回しの印、担当者の顔のアイコン、眠りの「Z」。
 // 電池そのものはチームで入札の回の Battery をそのまま使い、見た目をそろえる

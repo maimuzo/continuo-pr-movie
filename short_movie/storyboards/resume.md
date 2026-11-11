@@ -1,8 +1,8 @@
 # 止めても続きからの回　詳しいコンテ
 
 **言いたいこと。**「continuo を `Ctrl+C` で止めても pane は閉じず、次に起動すれば続きから」を15秒で見せる回の、場面ごとの作りを決める文書である。
-何が起きるかは [docs/spec/storyboard.md](../storyboard.md) の「止めても続きからの回」の表と注記、1節の共通の決まりが正で、構図は絵コンテ `out/storyboards/resume/{2-6,6-10,10-13}.png` を見本にする（秒の割り振りと夜・朝の流れはコンテが正）。
-絵柄・字幕・締め・名前の札・効果音の付け方は、お手本の [置くだけの回](place_on_ready.md) にそろえる。
+何が起きるかは [short_movie/concept.md](../concept.md) の「止めても続きからの回」の表と注記、1節の共通の決まりが正で、構図は絵コンテ `out/storyboards/resume/{2-6,6-10,10-13}.png` を見本にする（秒の割り振りと夜・朝の流れはコンテが正）。
+絵柄・字幕・締め・名前の札・効果音の付け方は、お手本の [置くだけの回](place-on-ready.md) にそろえる。
 
 ---
 
@@ -48,10 +48,10 @@
 
 | 絵 | 中身 | 作り方 |
 | --- | --- | --- |
-| `ep/resume/cc_sit_wait` | 床に座り、両手をひざに置いて目を開けたまま待つ Claude Code | Codex。参照は `assets/ref/claude_code.png` と `claude_code/wake` |
-| `ep/resume/dev_walk_bag` | かばんを肩にかけて右へ歩く開発者。穏やかな笑顔 | Codex。参照は `assets/ref/developer.png` と `ep/flat_rate/dev_carry` |
-| `ep/resume/dev_cheer` | 右を向いて立ち、片手を突き上げてガッツポーズする笑顔の開発者 | Codex。参照は `assets/ref/developer.png` と `developer/typing` |
+| `ep/resume/cc_sit_wait` | 床に座り、両手をひざに置いて目を開けたまま待つ Claude Code | Codex。参照は `short_movie/materials/ref/claude_code.png` と `claude_code/wake` |
+| `ep/resume/dev_walk_bag` | かばんを肩にかけて右へ歩く開発者。穏やかな笑顔 | Codex。参照は `short_movie/materials/ref/developer.png` と `ep/flat-rate/dev_carry` |
+| `ep/resume/dev_cheer` | 右を向いて立ち、片手を突き上げてガッツポーズする笑顔の開発者 | Codex。参照は `short_movie/materials/ref/developer.png` と `developer/typing` |
 | 既存 | `continuo/wave`・`leap`、`claude_code/work`・`fist`・`receive`、`developer/typing`・`sip_coffee`、`backgrounds/corner`・`workshop`、`props/bench` | そのまま |
 
 **Remotion で描くもの。**ディスプレイ・窓の枠と題名の帯・暗くなる幕・黒い画面・PC 本体とランプ・空の椅子・`Ctrl+C` と Enter のキー・`$ continuo` の字・机・「夜」と「翌朝」の札。
-**効果音。**既存の音に加え、`scripts/sfx_resume.py` で「止まる音」「点く音」「電源のカチッ」「足音」を作り、`public/sfx/resume_{off,on,click,steps}.wav` に置く。
+**効果音。**既存の音に加え、`short_movie/materials/sfx/sfx_resume.py` で「止まる音」「点く音」「電源のカチッ」「足音」を作り、`short_movie/materials/sfx/resume_{off,on,click,steps}.wav` に置く。

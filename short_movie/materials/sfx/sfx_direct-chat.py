@@ -1,6 +1,6 @@
-"""Direct Chat の回だけで鳴らす効果音を合成し、public/sfx/direct_chat_*.wav に書き出す。
+"""Direct Chat の回だけで鳴らす効果音を合成し、short_movie/materials/sfx/direct-chat_*.wav に書き出す。
 
-`uv run --with numpy python -I scripts/sfx_direct_chat.py` で作り直す。合成の部品は scripts/make_sfx.py から借り、make_sfx.py は書き換えない。
+`uv run --no-project --python 3.12 --with numpy==2.5.4 python -I short_movie/materials/sfx/sfx_direct-chat.py` で作り直す。合成の部品は 同じフォルダの make_sfx.py から借り、make_sfx.py は書き換えない。
 - direct_chat_blare: メガホンで指示を出す「ブッ」。のこぎり波を少し割らせた短い音
 - direct_chat_zip: 口のチャックを閉める「ジーッ」。細かいクリックを速く並べ、音程を上げていく
 """
@@ -37,6 +37,6 @@ def zip_():
 
 
 if __name__ == "__main__":
-    save("direct_chat_blare", blare())
-    save("direct_chat_zip", zip_())
-    print("direct_chat_blare", "direct_chat_zip")
+    save("direct-chat_blare", blare())
+    save("direct-chat_zip", zip_())
+    print("direct-chat_blare", "direct-chat_zip")

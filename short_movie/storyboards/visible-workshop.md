@@ -1,8 +1,8 @@
 # 見える工房の回　詳しいコンテ
 
 **言いたいこと。**「continuo では、Claude Code が対話モードのまま pane の中で働き、その作業の内容を直接確認できる」を15秒で見せる回の、場面ごとの作りを決める文書である。
-何が起きるかは [docs/spec/storyboard.md](../storyboard.md) の「見える工房の回」の表と注記、1節の共通の決まりが正で、構図と演技は絵コンテ `out/storyboards/visible_workshop/*.png` を見本にする。絵コンテと食い違うところ（別の端末の場面が無いことなど）はコンテが正。
-キャラクターの見た目は [docs/spec/characters.md](../characters.md) にある。作りの見本は「置くだけの回」（[place_on_ready.md](place_on_ready.md)）である。
+何が起きるかは [short_movie/concept.md](../concept.md) の「見える工房の回」の表と注記、1節の共通の決まりが正で、構図と演技は絵コンテ `out/storyboards/visible_workshop/*.png` を見本にする。絵コンテと食い違うところ（別の端末の場面が無いことなど）はコンテが正。
+キャラクターの見た目は [short_movie/characters.md](../characters.md) にある。作りの見本は「置くだけの回」（[place-on-ready.md](place-on-ready.md)）である。
 
 ---
 
@@ -89,16 +89,16 @@
 
 ## 4. 要る絵の一覧
 
-**言いたいこと。**新しく描いた絵は開発者3枚と Claude Code 1枚で（うち `dev_tablet` は今は使っていない）、Codex の3枚は Claude Code の絵を塗り替えて作った。どれも `public/ep/visible_workshop/` に置く。
+**言いたいこと。**新しく描いた絵は開発者3枚と Claude Code 1枚で（うち `dev_tablet` は今は使っていない）、Codex の3枚は Claude Code の絵を塗り替えて作った。どれも `short_movie/materials/ep/visible-workshop/` に置く。
 
 | 絵 | 中身 | 作り方 |
 | --- | --- | --- |
-| `dev_puzzled` | 立って右を向き、マグを持ち、指をあごに当てて首をかしげる | Codex。参照は `assets/ref/developer.png` |
+| `dev_puzzled` | 立って右を向き、マグを持ち、指をあごに当てて首をかしげる | Codex。参照は `short_movie/materials/ref/developer.png` |
 | `dev_watch` | 立って右を向き、両手でマグを持って笑顔で見る | 同上 |
 | `dev_tablet` | ソファに座り、白い画面のタブレットを掲げて笑う | 同上。別の端末の場面を外したので、今は使っていない |
-| `cc_highfive` | 右を向き、片手を高く上げてハイタッチする Claude Code | Codex。参照は `assets/ref/claude_code.png` |
+| `cc_highfive` | 右を向き、片手を高く上げてハイタッチする Claude Code | Codex。参照は `short_movie/materials/ref/claude_code.png` |
 | `codex_receive`・`codex_work`・`codex_highfive` | Codex の受け取る・作る・ハイタッチ | `claude_code/receive`・`work` と `cc_highfive` を `out/work/visible_workshop/recolor_codex.py` で青紫に塗り替え |
 
 **Codex の絵は塗り替えで作る。**characters.md のとおり2体は同じ型で、色だけが違うためである。口の中と頬と瞳は塗り替えから外す。
 **黒い箱・煙・ガラス・看板・吹き出し・紙は Remotion で描く。**同じ線の太さと平らな塗りにそろえる。
-**新しい効果音は2つ。**`visible_workshop_rattle`（黒い箱のガタガタ）と `visible_workshop_clap`（ハイタッチ）を `scripts/sfx_visible_workshop.py` で合成した。
+**新しい効果音は2つ。**`visible-workshop_rattle`（黒い箱のガタガタ）と `visible-workshop_clap`（ハイタッチ）を `short_movie/materials/sfx/sfx_visible-workshop.py` で合成した。

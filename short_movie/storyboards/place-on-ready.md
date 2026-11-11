@@ -1,8 +1,8 @@
 # 置くだけの回　詳しいコンテ
 
 **言いたいこと。**「`Ready` に置くだけで、continuo が拾って Claude Code に着手させる」を15秒で見せる回の、場面ごとの作りを決める文書である。
-何が起きるかは [docs/spec/storyboard.md](../storyboard.md) の「置くだけの回」の表と1節の共通の決まりが正で、場面ごとの構図と演技は絵コンテ `out/storyboards/place_on_ready/{2-5,5-8,8-11,11-13}.png` を見本にする。
-キャラクターの見た目は [docs/spec/characters.md](../characters.md) にある。continuo の役はクジラのコンティ、Claude Code の役はテラコッタ色の丸いロボットで、この回に Codex は出ない。
+何が起きるかは [short_movie/concept.md](../concept.md) の「置くだけの回」の表と1節の共通の決まりが正で、場面ごとの構図と演技は絵コンテ `out/storyboards/place_on_ready/{2-5,5-8,8-11,11-13}.png` を見本にする。
+キャラクターの見た目は [short_movie/characters.md](../characters.md) にある。continuo の役はクジラのコンティ、Claude Code の役はテラコッタ色の丸いロボットで、この回に Codex は出ない。
 
 ---
 
@@ -109,15 +109,15 @@
 
 | 絵 | 中身 | 使う場面 | 作り方 |
 | --- | --- | --- | --- |
-| `continuo/sleep`・`leap`・`wave` | 眠る・跳ねて潮を吹く・浮かんでヒレを振る（左向き。右へ向かうときは裏返す） | 場面3・4・5・6 | `assets/raw/continuo/sheet.jpeg` から `scripts/cut_continuo.py` で切り分け |
-| `claude_code/receive` | 両手を差し出して受け取る | 場面4 | Codex。参照は `assets/ref/claude_code.png` |
+| `continuo/sleep`・`leap`・`wave` | 眠る・跳ねて潮を吹く・浮かんでヒレを振る（左向き。右へ向かうときは裏返す） | 場面3・4・5・6 | `short_movie/materials/raw/continuo/sheet.jpeg` から `short_movie/materials/scripts/cut_continuo.py` で切り分け |
+| `claude_code/receive` | 両手を差し出して受け取る | 場面4 | Codex。参照は `short_movie/materials/ref/claude_code.png` |
 | `claude_code/fist` | 両手の拳を胸の前で握って気合 | 場面4 | 同上 |
 | `claude_code/work` | 前かがみで手を動かして作る | 場面4・5の小窓 | 同上 |
-| `developer/typing`・`crumple`・`throw`・`sip_coffee` | 打つ・丸める・肩越しに放る・もたれてすする。どれも椅子ごと、左向き | 場面2・5 | Codex。参照は `assets/ref/developer.png`。顔は丸い輪郭と大きな瞳と指定した |
+| `developer/typing`・`crumple`・`throw`・`sip_coffee` | 打つ・丸める・肩越しに放る・もたれてすする。どれも椅子ごと、左向き | 場面2・5 | Codex。参照は `short_movie/materials/ref/developer.png`。顔は丸い輪郭と大きな瞳と指定した |
 | `backgrounds/desk`・`corner`・`workshop` | 机・カンバンの壁・作業台の部屋。キャラクターとカンバンは描かない | 全場面 | Codex。参照は同じ場面の絵コンテ |
 | `props/bench` | 正面から見た作業台。ノートパソコンの背と、工具とメモ | 場面4・5の小窓 | Codex |
 
-**キャラクターと小道具は、緑一色（#00FF00）の背景で描かせて `scripts/key_green.py` で抜く。**描かせた元の絵と抜いた絵は `out/work/place_on_ready/` に置き、使う絵を `public/` へ写す。
+**キャラクターと小道具は、緑一色（#00FF00）の背景で描かせて `short_movie/materials/scripts/key_green.py` で抜く。**描かせた元の絵と抜いた絵は `out/work/place_on_ready/` に置き、使う絵を `short_movie/materials/` へ写す。
 **拳を握る絵を新しく描いた。**レンチを構える絵で気合を表すと、storyboard.md の「拳を握って気合を入れる」にならないためである。
 
 ### Remotion の部品で描くもの

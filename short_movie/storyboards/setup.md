@@ -1,7 +1,7 @@
 # セットアップの回　詳しいコンテ
 
 **言いたいこと。**「依存物を入れ、continuo を入れ、設定して確かめ、起動する」までの順番を、1つの端末の窓に打ち込まれるコマンドで30秒に見せる回の、場面ごとの作りを決める文書である。
-何が起きるかは [docs/spec/storyboard.md](../storyboard.md) の「セットアップの回」の表と1節の共通の決まりが正である。この回には絵コンテが無いので、構図はこの文書で決める。
+何が起きるかは [short_movie/concept.md](../concept.md) の「セットアップの回」の表と1節の共通の決まりが正である。この回には絵コンテが無いので、構図はこの文書で決める。
 コマンドの字は continuo の README の「Install」と「Use」の段のとおりにし、1文字も変えない。
 
 ---
@@ -15,7 +15,7 @@
 | 画面 | 1080×1080、30fps、900フレーム（この回だけ30秒） | 入れるものとコマンドが多く、15秒では読み切れなかった。storyboard.md の「この回だけ尺を30秒にする」の段 |
 | 打つ間 | 1行を打ち終えてから次の行を打ち始めるまで1秒以上あける。窓の中身は次の行の1文字目が出るコマで入れ替え、端末が `$` だけになる間を作らない | storyboard.md の同じ段 |
 | 端末の窓 | 濃い紺の窓に、上の帯（丸い3つの点と題名 `continuo-setup`）。通常は左右 30px あけて置き、長い行の場面と左右に割る場面は画面の幅いっぱいまで広げる | 窓の幅で折り返さずに1行で見せる、と人間が決めたため |
-| 書体 | コマンドは JetBrains Mono（`@remotion/google-fonts` から、この回のファイルの中で読む）。札と字幕は共通の丸ゴシック | 等幅でないとコマンドに見えない。`src/theme.ts` は10本で共有するので書き換えない |
+| 書体 | コマンドは JetBrains Mono（`@remotion/google-fonts` から、この回のファイルの中で読む）。札と字幕は共通の丸ゴシック | 等幅でないとコマンドに見えない。`short_movie/videos/_shared/theme.ts` は10本で共有するので書き換えない |
 | 字の大きさ | 場面ごとにできるだけ大きくする。依存物 26px、continuo の install.sh 36px、設定 44px、macOS だけの行 30px、doctor 38px、起動 34px | スマホの幅で読めるようにする |
 | 長い行 | install.sh の URL は、字を変えずに見せる段だけを2つに分け、2段目は2字下げる。依存物の curl は最後の「/」のあと、continuo の行は `githubusercontent.com/` のあとで分ける | 1行のままでは 16〜20px にしかならず、読めなかった |
 | ✓ | 1行を打ち終えると、行の右に明るい黄色（`#FFC94D`）の ✓ を SVG で描く | 緑は避けると決めた。書体に ✓ が無くても欠けないよう、字ではなく線で描く |
@@ -79,6 +79,6 @@
 | --- | --- | --- |
 | `developer/typing` | 椅子に座って打つ開発者 | 既存の絵 |
 | `continuo/wave`・`leap` | 見守るコンティ・潮を吹いて跳ねるコンティ。顔のアイコンは `wave` を丸く切り抜く | 既存の絵 |
-| `src/videos/setup/Terminal.tsx` | 端末の窓・打たれる行・✓・左右の札 | Remotion |
-| `src/videos/setup/Props.tsx` | WORKFLOW.md の紙・吹き出し・列と役の対応の絵・ブラウザの小窓・ネットワークの線 | Remotion |
-| `src/videos/setup/EndCard.tsx` | 締めを2行にした写し | 共通の EndCard を写して直す |
+| `short_movie/videos/setup/Terminal.tsx` | 端末の窓・打たれる行・✓・左右の札 | Remotion |
+| `short_movie/videos/setup/Props.tsx` | WORKFLOW.md の紙・吹き出し・列と役の対応の絵・ブラウザの小窓・ネットワークの線 | Remotion |
+| `short_movie/videos/setup/EndCard.tsx` | 締めを2行にした写し | 共通の EndCard を写して直す |

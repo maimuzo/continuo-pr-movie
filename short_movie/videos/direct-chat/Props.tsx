@@ -1,6 +1,6 @@
 import React from "react";
 import { spring, useCurrentFrame, useVideoConfig } from "remotion";
-import { theme } from "../../theme";
+import { theme } from "../_shared/theme";
 
 const INK = theme.color.ink;
 

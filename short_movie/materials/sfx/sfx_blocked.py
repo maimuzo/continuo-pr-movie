@@ -1,6 +1,6 @@
-"""詰まったらひとことの回だけで鳴らす効果音を、scripts/make_sfx.py の関数で合成して public/sfx/blocked_*.wav に書き出す。
+"""詰まったらひとことの回だけで鳴らす効果音を、同じフォルダの make_sfx.py の関数で合成して short_movie/materials/sfx/blocked_*.wav に書き出す。
 
-`uv run --with numpy python scripts/sfx_blocked.py` で作り直す（make_sfx.py を import するため -I は付けない）。
+`uv run --no-project --python 3.12 --with numpy==2.5.4 python -I short_movie/materials/sfx/sfx_blocked.py` で作り直す（自分のフォルダを sys.path に足してから make_sfx.py を import するので、-I を付けても動く）。
 """
 import os
 import sys

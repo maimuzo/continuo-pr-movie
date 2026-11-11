@@ -1,10 +1,10 @@
 """オレンジの丸いロボットの抜き済みの絵を、Claude Code の色（テラコッタ #D97757）に塗り替える。
 
-使い方: uv run --with pillow --with numpy --with scipy python -I scripts/recolor_claude_code.py <入力.png>... <出力ディレクトリ>
+使い方: uv run --with pillow --with numpy --with scipy python -I short_movie/materials/scripts/recolor_claude_code.py <入力.png>... <出力ディレクトリ>
 
 耳・足・手・アンテナの玉のオレンジだけを塗り替え、RGBA の透明度はそのまま残す。
 口の中（赤みが強い・暗い）と目（琥珀色で暗い）は、色相と明るさの平均で外して変えない。
-assets/ref/claude_code.png を作ったときと同じ塗り替えの式である。
+short_movie/materials/ref/claude_code.png を作ったときと同じ塗り替えの式である。
 """
 import colorsys
 import sys

@@ -1,4 +1,5 @@
-// 定額のままの回の台本。秒で書く。中身は docs/spec/detailed_storyboards/flat_rate.md が正
+// 定額のままの回の台本。秒で書く。中身は short_movie/storyboards/flat-rate.md が正
+export const meta = { id: "flat-rate", durationInSeconds: 15 } as const;
 export const script = {
   id: "flat-rate",
   title: "定額で使える",

@@ -1,5 +1,5 @@
 // この回に出る架空のリポジトリ3つ。看板には owner と short を2行で書き、カードの帯には short を書く（帯の幅に owner まで入れると字が小さくて読めない）。
-// 色は背景の絵（public/ep/one_kanban/workshops.png）の屋根の色を測った値で、
+// 色は背景の絵（short_movie/materials/ep/one-kanban/workshops.png）の屋根の色を測った値で、
 // カードの帯・作業台の札・進み具合の棒をこの色にそろえ、「どのカードがどの工房のものか」を色で結ぶ
 export const REPOS = [
   { owner: "maimuzo", name: "maimuzo/project-a", short: "project-a", color: "#E05B45" },

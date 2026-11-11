@@ -9,7 +9,7 @@
 | 順 | 誰が | 何をする |
 | --- | --- | --- |
 | 1 | Claude Code | コンテから、1本ごとの台本データと、要る絵の一覧と、絵の依頼書（プロンプト）を作る |
-| 2 | Codex か人間 | Codex の枠が足りれば Codex が描く。足りなければ人間が依頼書を Nano Banana へ貼り、画像を `assets/inbox/` へ保存する |
+| 2 | Codex か人間 | Codex の枠が足りれば Codex が描く。足りなければ人間が依頼書を Nano Banana へ貼り、画像を `short_movie/inbox/` へ保存する |
 | 3 | Claude Code | 受け取った絵に名前を付け、ffmpeg で緑を抜き、設定画とずれた絵を描き直しに回す |
 | 4 | Claude Code | カンバン・カード・pane・コメント欄などを React + SVG で書き、Remotion で組み立てる |
 | 5 | Claude Code と subagent | 1秒ごとの静止画をコンテと見比べ、最大3周直す |

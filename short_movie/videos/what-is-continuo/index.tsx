@@ -1,15 +1,15 @@
 import React from "react";
 import { AbsoluteFill, Audio, Easing, interpolate, Sequence, staticFile, useCurrentFrame } from "remotion";
-import { Caption } from "../components/Caption";
-import { CrumpleMarks, Exclamation, Sparkle, SpeedLines } from "../components/Effects";
-import { NameTag } from "../components/NameTag";
-import { Sprite } from "../components/Sprite";
-import { TitleCard } from "../components/TitleCard";
-import { WorktreeSign } from "../components/WorktreeSign";
-import { sec, theme } from "../theme";
-import { EndCard } from "./what_is_continuo/EndCard";
-import { MINI, MiniCardState, MiniKanban, miniSlot } from "./what_is_continuo/MiniKanban";
-import { script } from "./what_is_continuo.script";
+import { Caption } from "../../components/Caption";
+import { CrumpleMarks, Exclamation, Sparkle, SpeedLines } from "../../components/Effects";
+import { NameTag } from "../../components/NameTag";
+import { Sprite } from "../../components/Sprite";
+import { TitleCard } from "../../components/TitleCard";
+import { WorktreeSign } from "../_shared/WorktreeSign";
+import { sec, theme } from "../_shared/theme";
+import { EndCard } from "./EndCard";
+import { MINI, MiniCardState, MiniKanban, miniSlot } from "./MiniKanban";
+import { script } from "./script";
 
 // continuo とはの回。主役は herdr の端末の画面で、画面のほとんどを使う。カンバンは右上の小窓。
 // 場面を割らず、1枚の herdr の画面の上で、カードの動きと pane の動き（開く・帯の色が変わる・畳まれる）を同じ瞬間に起こす。
@@ -139,7 +139,7 @@ const ccAPose = (t: number) =>
   t < T.aOpen + 0.35 ? "characters/claude_code/wake.png" : t < T.aStop || t >= T.aResume ? "characters/claude_code/work.png" : "ep/blocked/cc_confused.png";
 const ccCPose = (t: number) => (t < T.cOpen + 0.35 ? "characters/claude_code/wake.png" : "characters/claude_code/work.png");
 const ccBPose = (t: number) =>
-  t < T.bOpen + 0.35 ? "characters/claude_code/wake.png" : t < T.prRaise ? "characters/claude_code/work.png" : "ep/what_is_continuo/cc_pr.png";
+  t < T.bOpen + 0.35 ? "characters/claude_code/wake.png" : t < T.prRaise ? "characters/claude_code/work.png" : "ep/what-is-continuo/cc_pr.png";
 
 const devPose = (t: number) => {
   const drag = [
@@ -149,11 +149,11 @@ const devPose = (t: number) => {
     [22.0, 22.65],
     [24.0, 24.65],
   ];
-  if (drag.some(([a, b]) => t >= a && t < b)) return { src: "ep/direct_chat/dev_drag.png", flip: false };
-  if (t >= T.comment - 0.1 && t < 14.4) return { src: "ep/direct_chat/dev_laptop.png", flip: false };
+  if (drag.some(([a, b]) => t >= a && t < b)) return { src: "ep/direct-chat/dev_drag.png", flip: false };
+  if (t >= T.comment - 0.1 && t < 14.4) return { src: "ep/direct-chat/dev_laptop.png", flip: false };
   // #15 の結果を、小窓を指さして見る（絵は左を指すので裏返す）
-  if (t >= T.check - 0.1 && t < 22.0) return { src: "ep/direct_chat/dev_point.png", flip: true };
-  return { src: "ep/visible_workshop/dev_watch.png", flip: false };
+  if (t >= T.check - 0.1 && t < 22.0) return { src: "ep/direct-chat/dev_point.png", flip: true };
+  return { src: "ep/visible-workshop/dev_watch.png", flip: false };
 };
 const DEV = { cx: 494, baseY: 226, height: 186 };
 
@@ -666,3 +666,7 @@ const NameTagFollow: React.FC<{ pane: "a" | "b" | "c"; from: number }> = ({ pane
   const g = paneGeom(from + f / theme.fps)[pane];
   return <NameTag cx={g.x + g.w / 2 + 48} tipY={CC_BASE - CC_H - 6} name="Claude Code" color={TERRACOTTA} durationInFrames={sec(1.4)} fontSize={36} />;
 };
+
+// short-movie の render.sh は default の部品と meta を読む
+export default WhatIsContinuo;
+export { meta } from "./script";

@@ -1,10 +1,10 @@
 # 絵の依頼書 continuo_sheet（2026-10-29）
 
 コンティ（continuo の役のクジラ）の全身の設定画。人間が選んだアイコン（横向きの全身）の見た目に合わせ、動画で使う表情と動きを1枚に並べる。
-できた絵は `assets/ref/continuo.png` に置き、以後コンティを描かせるときの参照にする。
+できた絵は `short_movie/materials/ref/continuo.png` に置き、以後コンティを描かせるときの参照にする。
 部屋の中に出られるように、**宙に浮く小さなクジラ**にする。ヒレを手の代わりに使う。
 
-**描くとき：**Gemini で新しいチャットを開き、`assets/raw/continuo/icon_side_preview.png`（見た目の元）と `assets/ref/robot.png`（絵柄の元）を添付して、下を貼る。
+**描くとき：**Gemini で新しいチャットを開き、`short_movie/materials/raw/continuo/icon_side_preview.png`（見た目の元）と `short_movie/materials/ref/robot.png`（絵柄の元）を添付して、下を貼る。
 
 ## 1. continuo/sheet　コンティの全身の設定画
 

@@ -1,16 +1,16 @@
 import React from "react";
 import { AbsoluteFill, Audio, Easing, Img, interpolate, Sequence, staticFile, useCurrentFrame } from "remotion";
-import { Caption } from "../components/Caption";
-import { ConcentrationLines, CrumpleMarks, Exclamation, Sparkle, SpeedLines, Sweat } from "../components/Effects";
-import { CARD_SIZE, IssueCard } from "../components/IssueCard";
-import { NameTag } from "../components/NameTag";
-import { Sprite } from "../components/Sprite";
-import { sec, theme } from "../theme";
-import { EndCard } from "./blocked/EndCard";
-import { cardSlot, Kanban } from "./blocked/Kanban";
-import { BigQuestion, BumpStars, CommentBubble, Cursor, Fog, FogQuestion, ToyBlock, ToyRoof } from "./blocked/parts";
-import { TitleCard } from "./blocked/TitleCard";
-import { script } from "./blocked.script";
+import { Caption } from "../../components/Caption";
+import { ConcentrationLines, CrumpleMarks, Exclamation, Sparkle, SpeedLines, Sweat } from "../../components/Effects";
+import { CARD_SIZE, IssueCard } from "../_shared/IssueCard";
+import { NameTag } from "../../components/NameTag";
+import { Sprite } from "../../components/Sprite";
+import { sec, theme } from "../_shared/theme";
+import { EndCard } from "./EndCard";
+import { cardSlot, Kanban } from "./Kanban";
+import { BigQuestion, BumpStars, CommentBubble, Cursor, Fog, FogQuestion, ToyBlock, ToyRoof } from "./parts";
+import { TitleCard } from "./TitleCard";
+import { script } from "./script";
 
 // 詰まったらひとことの回。工事現場・カンバンの壁・机の3つのカットを場面ごとに切り替える。
 // 座標はすべて 1080×1080 の画面の座標。各場面の中の時刻は、その場面の頭からの秒で書く
@@ -493,7 +493,7 @@ const BigQuestionStill: React.FC<{ x: number; y: number }> = ({ x, y }) => (
   </Sequence>
 );
 
-// 効果音。音は scripts/make_sfx.py と scripts/sfx_blocked.py で合成した public/sfx/*.wav。at は動画の頭からの秒
+// 効果音。音は short_movie/materials/sfx/make_sfx.py と short_movie/materials/sfx/sfx_blocked.py で合成した short_movie/materials/sfx/*.wav。at は動画の頭からの秒
 const SFX: { name: string; at: number; volume: number }[] = [
   { name: "blocked_block", at: S("stuck").from + T_LAND, volume: 0.7 }, // 塔に積み木を積む
   { name: "swish", at: S("stuck").from + T_RUN, volume: 0.4 }, // 奥へ走り出す
@@ -553,3 +553,7 @@ export const Blocked: React.FC = () => (
     ))}
   </AbsoluteFill>
 );
+
+// short-movie の render.sh は default の部品と meta を読む
+export default Blocked;
+export { meta } from "./script";

@@ -1,8 +1,8 @@
 import React from "react";
 import { interpolate, spring, useCurrentFrame, useVideoConfig } from "remotion";
-import { theme } from "../../theme";
+import { theme } from "../_shared/theme";
 
-// 冒頭のタイトル。src/components/TitleCard.tsx を写し、10文字のタイトルが端で切れないように字の大きさを変えられるようにした
+// 冒頭のタイトル。short-movie の engine/src/components/TitleCard.tsx を写し、10文字のタイトルが端で切れないように字の大きさを変えられるようにした
 export const TitleCard: React.FC<{ text: string; outFrom: number; fontSize?: number }> = ({ text, outFrom, fontSize = 104 }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();

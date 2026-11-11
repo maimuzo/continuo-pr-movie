@@ -1,8 +1,8 @@
 import React from "react";
 import { Img, interpolate, spring, staticFile, useCurrentFrame, useVideoConfig } from "remotion";
-import { theme } from "../../theme";
+import { theme } from "../_shared/theme";
 
-// 共通の EndCard（src/components/EndCard.tsx）の写し（カンバン1枚の回の写しをもとにした）。締めの「あとは Ready に置くだけ」は1行では1080pxに収まらないので、
+// 共通の EndCard（short_movie/videos/_shared/EndCard.tsx）の写し（カンバン1枚の回の写しをもとにした）。締めの「あとは Ready に置くだけ」は1行では1080pxに収まらないので、
 // 字は変えずに「あとは」「Ready に置くだけ」の2行に分けて受け取る。長い方の行が、大きい字から縮める頭のコマ（1.12倍）でも収まるよう、字を110pxにした。
 // 締め。中央に決めの字幕、下に continuo の名前と URL、跳ねるキャラクター。
 // 字幕は最初のフレームから見えるように、透明から出さず、大きい字から縮めて「ドン」と置く

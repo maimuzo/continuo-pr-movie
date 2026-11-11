@@ -1,8 +1,8 @@
 import React from "react";
 import { Img, interpolate, spring, staticFile, useCurrentFrame, useVideoConfig } from "remotion";
-import { theme } from "../../theme";
+import { theme } from "../_shared/theme";
 
-// 締め（src/components/EndCard.tsx の写し）。この回の締めの字は9文字で、150px では1行に収まらないので fontSize を渡せるようにし、出だしの拡大も 1.5倍から 1.15倍に下げて画面の外へはみ出さないようにした。
+// 締め（short_movie/videos/_shared/EndCard.tsx の写し）。この回の締めの字は9文字で、150px では1行に収まらないので fontSize を渡せるようにし、出だしの拡大も 1.5倍から 1.15倍に下げて画面の外へはみ出さないようにした。
 // 締め。中央に決めの字幕、下に continuo の名前と URL、跳ねるキャラクター。
 // 字幕は最初のフレームから見えるように、透明から出さず、大きい字から縮めて「ドン」と置く
 // spriteWidth はキャラクターの幅。横に長いクジラと縦に長いロボットで変えられるようにする

@@ -1,6 +1,6 @@
-"""チームで入札の回だけで鳴らす効果音を合成して public/sfx/team_bid_*.wav に書き出す。
+"""チームで入札の回だけで鳴らす効果音を合成して short_movie/materials/sfx/team-bid_*.wav に書き出す。
 
-`uv run --with numpy python -I scripts/sfx_team_bid.py` で作り直す。合成の道具は scripts/make_sfx.py のものを使う。
+`uv run --no-project --python 3.12 --with numpy==2.5.4 python -I short_movie/materials/sfx/sfx_team-bid.py` で作り直す。合成の道具は 同じフォルダの make_sfx.py のものを使う。
 - team_bid_bid: 燃料計に％が浮かぶ「ピッ」。3台が続けて鳴らすので、短く高い音にする
 - team_bid_win: いちばん大きい数字が選ばれた「ピロン」。2音で上がる
 """
@@ -29,6 +29,6 @@ def win():
 
 
 if __name__ == "__main__":
-    save("team_bid_bid", bid())
-    save("team_bid_win", win())
-    print("team_bid_bid team_bid_win")
+    save("team-bid_bid", bid())
+    save("team-bid_win", win())
+    print("team-bid_bid team_bid_win")

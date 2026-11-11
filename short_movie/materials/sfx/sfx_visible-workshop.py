@@ -1,7 +1,7 @@
-"""見える工房の回だけで鳴らす効果音を合成して public/sfx/visible_workshop_*.wav に書き出す。
+"""見える工房の回だけで鳴らす効果音を合成して short_movie/materials/sfx/visible-workshop_*.wav に書き出す。
 
-`uv run --with numpy python -I scripts/sfx_visible_workshop.py` で作り直す。
-合成の部品は scripts/make_sfx.py の関数を使い、make_sfx.py は書き換えない。
+`uv run --no-project --python 3.12 --with numpy==2.5.4 python -I short_movie/materials/sfx/sfx_visible-workshop.py` で作り直す。
+合成の部品は 同じフォルダの make_sfx.py の関数を使い、make_sfx.py は書き換えない。
 """
 import os
 import sys
@@ -42,5 +42,5 @@ def clap():
 
 if __name__ == "__main__":
     for name, make in {"rattle": rattle, "clap": clap}.items():
-        m.save(f"visible_workshop_{name}", make())
+        m.save(f"visible-workshop_{name}", make())
         print(name)

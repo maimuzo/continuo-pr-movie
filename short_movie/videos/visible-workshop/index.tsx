@@ -1,13 +1,13 @@
 import React from "react";
 import { AbsoluteFill, Audio, Easing, Img, interpolate, Sequence, staticFile, useCurrentFrame } from "remotion";
-import { Caption } from "../components/Caption";
-import { Exclamation, Sparkle, SpeedLines, Sweat } from "../components/Effects";
-import { NameTag } from "../components/NameTag";
-import { Sprite } from "../components/Sprite";
-import { TitleCard } from "../components/TitleCard";
-import { sec, theme } from "../theme";
-import { EndCard } from "./visible_workshop/EndCard";
-import { script } from "./visible_workshop.script";
+import { Caption } from "../../components/Caption";
+import { Exclamation, Sparkle, SpeedLines, Sweat } from "../../components/Effects";
+import { NameTag } from "../../components/NameTag";
+import { Sprite } from "../../components/Sprite";
+import { TitleCard } from "../../components/TitleCard";
+import { sec, theme } from "../_shared/theme";
+import { EndCard } from "./EndCard";
+import { script } from "./script";
 
 // 見える工房の回。場面ごとにカットを割る（黒い箱の部屋・左右に割った黒い箱と工房・工房の中）。
 // 座標はすべて 1080×1080 の画面の座標。各場面の中の時刻は、その場面の頭からの秒で書く。
@@ -20,7 +20,7 @@ const PERIWINKLE = "#7A9DFF";
 const S = (id: (typeof script.scenes)[number]["id"]) => script.scenes.find((s) => s.id === id)!;
 const at = (s: number) => sec(s);
 const lerp = (t: number, a: number, b: number) => a + (b - a) * t;
-const EP = (name: string) => `ep/visible_workshop/${name}.png`;
+const EP = (name: string) => `ep/visible-workshop/${name}.png`;
 const WHALE_H = 150;
 
 // ---- 共通の部品 ----
@@ -556,11 +556,11 @@ const TitleBackdrop: React.FC = () => (
 
 // 効果音。at は動画の頭からの秒で、各場面の動きの時刻に合わせる
 const SFX: { name: string; at: number; volume: number }[] = [
-  { name: "visible_workshop_rattle", at: S("box").from + 0.1, volume: 0.6 }, // 黒い箱がガタガタ
+  { name: "visible-workshop_rattle", at: S("box").from + 0.1, volume: 0.6 }, // 黒い箱がガタガタ
   { name: "pop", at: S("box").from + 0.6, volume: 0.35 }, // 「？」
-  { name: "visible_workshop_rattle", at: S("box").from + 1.3, volume: 0.5 },
+  { name: "visible-workshop_rattle", at: S("box").from + 1.3, volume: 0.5 },
   { name: "pop", at: S("box").from + 2.0, volume: 0.35 }, // 2つ目の「？」
-  { name: "visible_workshop_rattle", at: S("box").from + 2.5, volume: 0.45 },
+  { name: "visible-workshop_rattle", at: S("box").from + 2.5, volume: 0.45 },
   { name: "whoosh", at: S("glass").from, volume: 0.5 }, // 画面が左右に割れる
   { name: "pop", at: S("glass").from + 0.45, volume: 0.45 }, // 「continuo」の看板が立つ
   { name: "sparkle", at: S("glass").from + 1.45, volume: 0.45 }, // コンティの「どうぞ」
@@ -569,7 +569,7 @@ const SFX: { name: string; at: number; volume: number }[] = [
   { name: "typing", at: S("handoff").from + T_WORK, volume: 0.35 }, // Codex が仕上げる
   { name: "sparkle", at: S("handoff").from + T_DONE, volume: 0.45 }, // 仕上がり
   { name: "swish", at: S("handoff").from + T_BACK, volume: 0.6 }, // 紙を返す
-  { name: "visible_workshop_clap", at: S("handoff").from + T_CLAP, volume: 0.8 }, // ハイタッチ
+  { name: "visible-workshop_clap", at: S("handoff").from + T_CLAP, volume: 0.8 }, // ハイタッチ
   { name: "pop", at: S("end").from, volume: 0.6 }, // 締めの字
 ];
 
@@ -613,3 +613,7 @@ export const VisibleWorkshop: React.FC = () => (
     ))}
   </AbsoluteFill>
 );
+
+// short-movie の render.sh は default の部品と meta を読む
+export default VisibleWorkshop;
+export { meta } from "./script";

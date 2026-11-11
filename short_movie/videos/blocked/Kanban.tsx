@@ -1,9 +1,9 @@
 import React from "react";
-import { theme } from "../../theme";
+import { theme } from "../_shared/theme";
 
 export const COLUMNS = ["Ready", "In Progress", "Blocked", "In Review", "Done"] as const;
 
-// 見出しの色。src/components/Kanban.tsx を写し、Blocked の列を足した。Blocked は目立つ赤、Done は赤と紛れないように薄紫にする
+// 見出しの色。short_movie/videos/_shared/Kanban.tsx を写し、Blocked の列を足した。Blocked は目立つ赤、Done は赤と紛れないように薄紫にする
 const HEADER_COLORS = ["#A8D89A", "#F5D66E", "#F08A7E", "#AFC8EE", "#CDB8EE"] as const;
 
 const COLUMN_WIDTH = 150;

@@ -1,14 +1,14 @@
 import React from "react";
 import { AbsoluteFill, Audio, Easing, interpolate, Sequence, staticFile, useCurrentFrame } from "remotion";
-import { Caption } from "../components/Caption";
-import { Sparkle, SpeedLines } from "../components/Effects";
-import { Sprite } from "../components/Sprite";
-import { TitleCard } from "../components/TitleCard";
-import { sec, theme } from "../theme";
-import { EndCard } from "./setup/EndCard";
-import { BrowserWindow, Bubble, ContiIcon, MappingPanel, NetworkLine, NotNeededTag, WorkflowPaper } from "./setup/Props";
-import { Check, Line, mono, OsTag, Rect, SplitLine, TERM, TerminalWindow, TypedLine } from "./setup/Terminal";
-import { script } from "./setup.script";
+import { Caption } from "../../components/Caption";
+import { Sparkle, SpeedLines } from "../../components/Effects";
+import { Sprite } from "../../components/Sprite";
+import { TitleCard } from "../../components/TitleCard";
+import { sec, theme } from "../_shared/theme";
+import { EndCard } from "./EndCard";
+import { BrowserWindow, Bubble, ContiIcon, MappingPanel, NetworkLine, NotNeededTag, WorkflowPaper } from "./Props";
+import { Check, Line, mono, OsTag, Rect, SplitLine, TERM, TerminalWindow, TypedLine } from "./Terminal";
+import { script } from "./script";
 
 // セットアップの回（この回だけ30秒）。主役は大きな端末の窓1つで、場面が変わるたびに窓の中を、その場面のコマンドに入れ替える。
 // 入れ替えは次の行を打ち始めるコマで行い、端末が `$` だけになる間を作らない。
@@ -366,3 +366,7 @@ export const Setup: React.FC = () => {
     </AbsoluteFill>
   );
 };
+
+// short-movie の render.sh は default の部品と meta を読む
+export default Setup;
+export { meta } from "./script";
